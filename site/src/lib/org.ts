@@ -159,6 +159,19 @@ export const ATTORNEY = {
     { src: "/img/juan-campos-portrait.jpg", width: 1100, height: 1600 },
     "camimlaw.com (LCO07573-Edit.jpg)",
   ),
+  /**
+   * A frame from one of his own Spanish explainer videos, cropped to remove
+   * the other firm's watermark. Real, and the only environmental image of him
+   * available.
+   *
+   * It is captioned as him at work, never as the Orlando office, because the
+   * room shown has not been confirmed as the Kirkman Road office.
+   * [CLIENT VERIFICATION REQUIRED: which office this is, and permission.]
+   */
+  atWork: v(
+    { src: "/img/juan-campos-at-work.jpg", width: 1200, height: 882 },
+    "Frame from the firm's own explainer video; watermark cropped out.",
+  ),
 
   /* ---- pending ---- */
   barNumber: pending<string | null>(null),      // LSBA roll no. — badge filename suggests 113502, not a record

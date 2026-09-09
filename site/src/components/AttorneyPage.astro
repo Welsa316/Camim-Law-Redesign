@@ -16,6 +16,7 @@ const education = show(ATTORNEY.education) ?? [];
 const memberships = show(ATTORNEY.memberships) ?? [];
 const prior = show(ATTORNEY.priorRoles) ?? [];
 const portrait = ATTORNEY.portrait.value;
+const atWork = show(ATTORNEY.atWork);
 const media = MEDIA.filter((m) => m.verified);
 
 const copy = es
@@ -105,7 +106,24 @@ const schema = graph([
   <Section surface="paper">
     <div class="editorial">
       <div><p class="eyebrow">{es ? "En sus palabras" : "In his words"}</p></div>
-      <div class="prose">{copy.body.map((p) => <p>{p}</p>)}</div>
+      <div class="words">
+        <div class="prose">{copy.body.slice(0, 3).map((p) => <p>{p}</p>)}</div>
+        {atWork && (
+          <figure class="words-fig" data-reveal="media">
+            <img src={atWork.src} width={atWork.width} height={atWork.height}
+                 loading="lazy" decoding="async"
+                 alt={es
+                   ? "Juan Campos en su escritorio, explicando un tema de inmigración a cámara."
+                   : "Juan Campos at his desk, explaining an immigration topic to camera."} />
+            <figcaption class="apparatus">
+              {es
+                ? "Publica explicaciones en español cada semana."
+                : "He publishes explanations in Spanish every week."}
+            </figcaption>
+          </figure>
+        )}
+        <div class="prose">{copy.body.slice(3).map((p) => <p>{p}</p>)}</div>
+      </div>
     </div>
   </Section>
 
@@ -199,6 +217,10 @@ const schema = graph([
     .ahead-text { grid-area: text; }
     .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 16%; }
   }
+  .words { display: grid; gap: var(--spacing-s7); }
+  .words-fig { margin: 0; display: grid; gap: var(--spacing-s3); max-width: var(--container-m-read); }
+  .words-fig img { width: 100%; height: auto; border-radius: var(--radius-md); background: var(--color-paper-2); }
+  .words-fig figcaption { color: var(--surface-ink-2); }
   .creds { display: grid; gap: var(--spacing-s5); max-width: var(--container-m-read); }
   .creds dd { margin: 0; }
   .creds ul { list-style: none; display: grid; gap: var(--spacing-s1); }

@@ -125,7 +125,26 @@ Deep green, warm paper, clay accent. The green is drawn from the attorney's own 
 
 ### 2.4 Photography
 
-One excellent studio portrait exists. Everything else that would help is missing. See `ASSET_PLAN.md`.
+**Confirm two imported images.**
+
+1. **The environmental photograph on the attorney page** is a frame lifted from one of the firm's own Spanish explainer videos, cropped to remove the other firm's watermark. It shows the attorney at a desk with framed diplomas behind him. It is captioned as him at work and **never** as the Orlando office, because the room has not been confirmed. Confirm which office it is and whether it may be used.
+2. **The texture behind the statement band** is a dark, near-abstract detail of flag fabric from the same asset library. It is a material, not a flag hero: no waving flag, no seal, and a heavy overlay. Confirm the direction.
+
+Deliberately **not** used from that library, and why:
+
+| Asset | Why not |
+|---|---|
+| Statue of Liberty | The category cliché the brief bans |
+| A man sitting dejected in a corner | Synthetic stock imagery of a distressed person; the advertising rules treat emotionally manipulative imagery as unduly manipulative |
+| A couple at a wedding | Stock, not clients; presenting it as a client story would be fabrication |
+| Photograph with a founding partner of the other firm | She does not work at the Orlando firm; including her would imply she does |
+| Team photograph, other headshots | New Orleans staff |
+| Louisiana and Michigan bar badges | The Michigan badge belongs to his partner, not to him |
+| Gavel and courthouse stock frames | Banned clichés |
+
+**The eleven Spanish explainer videos are the largest unexploited asset the firm owns** and the site is built to hold them. They are 17 to 64 MB each, so they need hosting decided before they ship. Confirm.
+
+One excellent studio portrait exists. See `ASSET_PLAN.md` for what is still missing.
 
 ### 2.5 Resources
 

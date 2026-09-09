@@ -113,14 +113,14 @@ if (!heads.length || reduced.matches || !capable) {
       // A slow scrub on the opening portrait. Small on purpose: it gives the
       // frame weight without moving anything a reader is trying to read, and
       // it always has a defined end state.
-      const portrait = document.querySelector<HTMLElement>("[data-scrub-portrait] img");
-      const frame = document.querySelector<HTMLElement>("[data-scrub-portrait]");
+      const portrait = document.querySelector<HTMLElement>("[data-scrub-portrait-img]");
+      const frame = portrait?.closest("section") ?? null;
       if (portrait && frame && innerWidth >= 900) {
         gsap.fromTo(
           portrait,
-          { yPercent: -3, scale: 1.08 },
+          { yPercent: -2.5, scale: 1.10 },
           {
-            yPercent: 3,
+            yPercent: 2.5,
             scale: 1.02,
             ease: "none",
             scrollTrigger: { trigger: frame, start: "top top", end: "bottom top", scrub: 0.6 },

@@ -15,7 +15,7 @@ const admissions = show(ATTORNEY.admissions) ?? [];
 const education = show(ATTORNEY.education) ?? [];
 const memberships = show(ATTORNEY.memberships) ?? [];
 const prior = show(ATTORNEY.priorRoles) ?? [];
-const portrait = ATTORNEY.portrait.value;
+const portrait = ATTORNEY.seated.value;
 const atWork = show(ATTORNEY.atWork);
 const media = MEDIA.filter((m) => m.verified);
 
@@ -208,14 +208,14 @@ const schema = graph([
   .ahead-figure { margin: 0; }
   .ahead-figure img {
     width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
-    object-position: 58% 20%; border-radius: var(--radius-md);
+    object-position: 50% 16%; border-radius: var(--radius-md);
     background: var(--color-paper-2);
   }
   @media (max-width: 899px) {
     .ahead-inner { grid-template-areas: "fig" "text"; }
     .ahead-figure { grid-area: fig; }
     .ahead-text { grid-area: text; }
-    .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 16%; }
+    .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 14%; }
   }
   .words { display: grid; gap: var(--spacing-s7); }
   .words-fig { margin: 0; display: grid; gap: var(--spacing-s3); max-width: var(--container-m-read); }

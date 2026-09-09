@@ -125,10 +125,11 @@ Deep green, warm paper, clay accent. The green is drawn from the attorney's own 
 
 ### 2.4 Photography
 
-**Confirm two imported images.**
+**Confirm three imported images.**
 
-1. **The environmental photograph on the attorney page** is a frame lifted from one of the firm's own Spanish explainer videos, cropped to remove the other firm's watermark. It shows the attorney at a desk with framed diplomas behind him. It is captioned as him at work and **never** as the Orlando office, because the room has not been confirmed. Confirm which office it is and whether it may be used.
-2. **The texture behind the statement band** is a dark, near-abstract detail of flag fabric from the same asset library. It is a material, not a flag hero: no waving flag, no seal, and a heavy overlay. Confirm the direction.
+1. **The seated portrait** now carries the home page, the attorney page and the gallery. It comes from the firm's own Google Business Profile for the Orlando entity, fetched at full resolution rather than as the 228px thumbnail the listing shows. It is a professional environmental portrait: seated in a wooden chair, a real room, symmetric composition. **Confirm permission and whether the photographer needs a credit.**
+2. **The environmental photograph in the biography** is a frame lifted from one of the firm's own Spanish explainer videos, cropped to remove the other firm's watermark. It is captioned as him at work and **never** as the Orlando office, because the room has not been confirmed. Confirm which office it is and whether it may be used.
+3. **The texture behind the statement band** is a dark, near-abstract detail of flag fabric. It is a material, not a flag hero: no waving flag, no seal, and a heavy overlay. Confirm the direction.
 
 Deliberately **not** used from that library, and why:
 

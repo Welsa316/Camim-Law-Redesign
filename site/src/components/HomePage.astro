@@ -3,6 +3,8 @@ import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import SituationFinder from "./SituationFinder.astro";
 import ServiceRows from "./ServiceRows.astro";
+import AccordionGallery from "./AccordionGallery.astro";
+import type { GalleryItem } from "./AccordionGallery.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, ATTORNEY, MEDIA, COURT, show } from "../lib/org";
 import { liveGroups } from "../lib/services";
@@ -18,6 +20,46 @@ const media = MEDIA.filter((m) => m.verified);
 const rating = show(ORG.googleRating);
 const consultation = show(ORG.consultation);
 const portrait = ATTORNEY.portrait.value;
+const heroImg = ATTORNEY.hero.value;
+const seated = ATTORNEY.seated.value;
+const atWork = show(ATTORNEY.atWork);
+
+/* The gallery uses only real photographs of the attorney and real broadcast
+   stills. There is no filler panel: if an image is not confirmed it is not in
+   the set, and the gallery renders with however many are. */
+const gallery: GalleryItem[] = [
+  {
+    image: seated.src, width: seated.width, height: seated.height,
+    label: "Juan Campos, Esq.",
+    meta: es ? "Abogado de inmigración" : "Immigration attorney",
+    focus: "50% 18%",
+    alt: es
+      ? "Retrato de Juan Campos con saco de lino claro y corbatín."
+      : "Portrait of Juan Campos in a light linen jacket and bow tie.",
+  },
+  ...(atWork
+    ? [{
+        image: atWork.src, width: atWork.width, height: atWork.height,
+        label: es ? "En el escritorio" : "At the desk",
+        meta: es ? "Explicaciones en español cada semana" : "Explanations in Spanish every week",
+        focus: "62% 40%",
+        alt: es
+          ? "Juan Campos en su escritorio, explicando un tema de inmigración a cámara."
+          : "Juan Campos at his desk, explaining an immigration topic to camera.",
+      } as GalleryItem]
+    : []),
+  ...media
+    .filter((m) => m.width >= 1000)
+    .map((m) => ({
+      image: m.still, width: m.width, height: m.height,
+      label: m.outlet,
+      meta: m.station ? `${m.station} · ${m.programme}` : m.programme,
+      focus: "50% 22%",
+      alt: es
+        ? `Juan Campos entrevistado en ${m.outlet}.`
+        : `Juan Campos interviewed on ${m.outlet}.`,
+    } as GalleryItem)),
+];
 
 const copy = {
   es: {
@@ -44,7 +86,8 @@ const copy = {
       { t: "Usted siempre sabrá qué sigue y cuándo.", d: "Qué se presentó, qué falta, qué esperamos del gobierno y en qué plazo aproximado." },
     ],
     mediaEyebrow: "En los medios",
-    mediaTitle: "Dónde nos han entrevistado",
+    mediaTitle: "El abogado, y dónde lo han entrevistado",
+    mediaLead: "Todas las fotografías de este sitio son de él. No usamos imágenes de archivo de personas.",
     officeEyebrow: "La oficina",
     officeTitle: "Dónde estamos",
     officeBody:
@@ -82,7 +125,8 @@ const copy = {
       { t: "You will always know what happens next.", d: "What was filed, what is missing, what we expect from the government, and roughly when." },
     ],
     mediaEyebrow: "In the media",
-    mediaTitle: "Where we have been interviewed",
+    mediaTitle: "The attorney, and where he has been interviewed",
+    mediaLead: "Every photograph on this site is of him. We use no stock imagery of people.",
     officeEyebrow: "The office",
     officeTitle: "Where we are",
     officeBody:
@@ -108,45 +152,47 @@ const schema = graph([
 <Base lang={lang} title={copy.title} description={copy.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema}>
 
   <!--
-    01 / Opening frame. Full height, the portrait full-bleed in its own column
-    on the institutional ground, the statement set large and low in the frame.
-    The scale contrast between the apparatus line and the display type is the
-    device; there is no decoration doing that work.
+    01 / Opening frame.
+
+    A 2:3 portrait cannot fill a wide frame without either cropping through the
+    subject or shrinking him, and a head cut off at the top edge is the one
+    framing error a reader always notices. So the photograph gets its own
+    full-height column at close to its native ratio, and the type gets the
+    institutional ground beside it. His whole figure stays in frame, nothing
+    overlaps him, and the contrast under the type is a flat token rather than
+    a scrim over an image.
   -->
-  <section class="opener" data-surface="paper">
+  <section class="opener" data-surface="navy-deep">
     <div class="opener-grid">
       <div class="opener-text">
-        <div class="opener-text-inner">
-          <p class="eyebrow opener-eyebrow" data-reveal="text">
-            <span class="eyebrow-full">{_("home.eyebrow")}</span>
-            <span class="eyebrow-short">{es ? "Abogado de inmigración" : "Immigration attorney"}</span>
-          </p>
-          <h1 class="hero-type opener-display" data-split-lines="hero">{copy.display}</h1>
-          <p class="lead opener-lead" data-reveal="text">{copy.lead}</p>
-          <div class="opener-actions" data-reveal="control">
-            <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
-            {/* The phone lives in the persistent bottom bar on phones, so a
-                second call button here would only push the fold down. */}
-            <a class="btn btn-secondary opener-call" href={`tel:${ORG.phone.value}`}>
-              {_("cta.call")} {ORG.phoneDisplay.value}
-            </a>
-          </div>
-          <p class="opener-meta apparatus" data-reveal="text">
-            Orlando, Florida &middot; {es ? "Atendemos en español e inglés" : "Spanish and English"}
-          </p>
+        <p class="eyebrow opener-eyebrow" data-reveal="text">
+          <span class="eyebrow-full">{_("home.eyebrow")}</span>
+          <span class="eyebrow-short">{es ? "Abogado de inmigración" : "Immigration attorney"}</span>
+        </p>
+        <h1 class="hero-type opener-display" data-split-lines="hero">{copy.display}</h1>
+        <p class="lead opener-lead" data-reveal="text">{copy.lead}</p>
+        <div class="opener-actions" data-reveal="control">
+          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+          <a class="btn btn-ghost opener-call" href={`tel:${ORG.phone.value}`}>
+            {_("cta.call")} {ORG.phoneDisplay.value}
+          </a>
         </div>
+        <p class="opener-meta apparatus" data-reveal="text">
+          Orlando, Florida &middot; {es ? "Atendemos en español e inglés" : "Spanish and English"}
+        </p>
       </div>
 
-      <figure class="opener-figure" data-scrub-portrait data-reveal="portrait">
+      <figure class="opener-figure" data-reveal="portrait">
         <img
-          src={portrait.src}
-          width={portrait.width}
-          height={portrait.height}
+          src={heroImg.src}
+          width={heroImg.width}
+          height={heroImg.height}
           alt={es
-            ? "Juan Campos, abogado de inmigración, de pie con saco de lino claro y corbatín."
-            : "Juan Campos, immigration attorney, standing in a light linen jacket and bow tie."}
+            ? "Juan Campos, abogado de inmigración, sentado en una silla de madera en la oficina."
+            : "Juan Campos, immigration attorney, seated in a wooden chair in the office."}
           fetchpriority="high"
           decoding="async"
+          data-scrub-portrait-img
         />
       </figure>
     </div>
@@ -255,26 +301,16 @@ const schema = graph([
     </div>
   </Section>
 
-  {media.length > 0 && (
-    <Section surface="paper-2">
-      <div class="editorial">
+  {gallery.length > 1 && (
+    <Section surface="paper-2" wide>
+      <div class="editorial gal-head">
         <div><p class="eyebrow">{copy.mediaEyebrow}</p></div>
         <div>
           <h2 class="h2" data-split-lines>{copy.mediaTitle}</h2>
-          <ul class="media" data-stagger>
-            {media.map((m) => (
-              <li data-reveal="media">
-                <img src={m.still} width={m.width} height={m.height} loading="lazy" decoding="async"
-                     alt={es ? `Juan Campos entrevistado en ${m.outlet}.` : `Juan Campos interviewed on ${m.outlet}.`} />
-                <p class="apparatus media-meta">
-                  {m.outlet}{m.station ? ` · ${m.station}` : ""} · {m.programme}
-                </p>
-                <p class="media-topic">{m.chyron[lang]}</p>
-              </li>
-            ))}
-          </ul>
+          <p class="lead gal-lead">{copy.mediaLead}</p>
         </div>
       </div>
+      <AccordionGallery items={gallery} id="galeria" defaultIndex={0} height={540} expandRatio={0.5} />
     </Section>
   )}
 
@@ -331,55 +367,61 @@ const schema = graph([
 
 <style>
   /* --- opening frame --- */
-  .opener { padding: 0; }
+  .opener { position: relative; padding: 0; overflow: hidden; }
   .opener-grid { display: grid; }
-  .opener-text { display: grid; align-content: center; padding: var(--spacing-s7) var(--gutter) var(--spacing-s8); }
-  .opener-text-inner { display: grid; gap: var(--spacing-s5); width: 100%; max-width: var(--container-content); margin-inline: auto; }
-  .opener-eyebrow { margin-bottom: var(--spacing-s2); }
+
+  .opener-text {
+    display: grid;
+    align-content: center;
+    gap: var(--spacing-s4);
+    padding: var(--spacing-s8) var(--gutter);
+  }
+  .opener-eyebrow { margin-bottom: var(--spacing-s2); color: var(--color-brass-light); }
   .eyebrow-short { display: none; }
   @media (max-width: 520px) {
     .eyebrow-full { display: none; }
     .eyebrow-short { display: inline; }
   }
-  .opener-display { margin: 0; max-width: 13ch; }
-  .opener-lead { max-width: 46ch; }
-  .opener-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
+  .opener-display { margin: 0; max-width: 13ch; color: var(--color-paper); }
+  .opener-lead { max-width: 44ch; color: #d5dde5; }
+  .opener-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); margin-top: var(--spacing-s2); }
   .opener-actions .btn { flex: 0 0 auto; }
-  .opener-call { display: none; }
-  @media (min-width: 900px) { .opener-call { display: inline-flex; } }
-  .opener-meta { color: var(--color-ink-2); }
+  .opener-meta { color: #a8b6c6; }
 
-  .opener-figure { margin: 0; background: var(--color-paper-2); overflow: hidden; }
-  .opener-figure img { transform-origin: 60% 30%; }
-  .opener-figure img { width: 100%; height: 100%; object-fit: cover; }
+  .btn-ghost { background: transparent; color: var(--color-paper); border-color: rgb(252 252 250 / 0.45); }
+  @media (any-hover: hover) {
+    .btn-ghost:hover { background: rgb(252 252 250 / 0.12); border-color: var(--color-paper); }
+  }
 
-  /* Phone: the portrait is a band at the top, capped so the statement, the
-     lead and both buttons clear a 375x667 screen without scrolling. */
+  .opener-figure { margin: 0; overflow: hidden; background: var(--color-navy-deep); }
+  .opener-figure img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+
+  /* Phone: the photograph is a band at the top, cropped so his head and the
+     chair are both in frame, then the type below on the navy ground. */
   @media (max-width: 899px) {
     .opener-grid { grid-template-areas: "fig" "text"; }
-    .opener-figure { grid-area: fig; height: 24svh; min-height: 168px; max-height: 240px; }
-    .opener-figure img { object-position: 58% 10%; }
-    .opener-text { grid-area: text; padding-block: var(--spacing-s6) var(--spacing-s7); }
-    .opener-text-inner { gap: var(--spacing-s4); }
+    .opener-figure { grid-area: fig; height: 32svh; min-height: 220px; max-height: 300px; }
+    .opener-figure img { object-position: 50% 22%; }
+    .opener-text { grid-area: text; padding-block: var(--spacing-s6) var(--spacing-s7); gap: var(--spacing-s3); }
     .opener-lead { font-size: var(--text-base); }
+    .opener-call { display: none; }
   }
 
-  /* Desktop: a true two-column frame that fills the viewport, the portrait
-     running edge to edge and floor to ceiling in its own column. */
+  /* Desktop: two full-height panels. The image column is close to the
+     photograph's own 4:5, so covering it barely crops and his whole figure
+     stays in the frame. */
   @media (min-width: 900px) {
     .opener-grid {
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-      /* The real measured header height, not a guess. Set on :root and kept
-         in sync by the header's own stylesheet. */
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.62fr);
       min-height: calc(100svh - var(--header-h));
     }
-    .opener-text { padding-block: var(--spacing-s7) var(--spacing-s7); padding-inline: var(--gutter); }
-    .opener-text-inner { margin-inline: 0 0; margin-left: auto; max-width: 40rem; gap: var(--spacing-s4); }
+    .opener-text { padding-block: var(--spacing-s9); padding-inline: var(--gutter); }
+    .opener-text > * { max-width: 42rem; margin-left: auto; margin-right: 0; width: 100%; }
     .opener-figure { height: 100%; }
-    .opener-figure img { object-position: 62% 22%; }
+    .opener-figure img { object-position: 50% 28%; }
   }
   @media (min-width: 1440px) {
-    .opener-text-inner { max-width: 46rem; }
+    .opener-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); }
   }
 
   /* --- sections --- */
@@ -412,11 +454,8 @@ const schema = graph([
   .commit-t { margin: 0 0 var(--spacing-s3); max-width: 20ch; }
   .commit-d { color: var(--surface-ink-2); max-width: var(--container-m-short); }
 
-  .media { list-style: none; display: grid; gap: var(--spacing-s6); margin-top: var(--spacing-s6); }
-  @media (min-width: 700px) { .media { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .media img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-md); }
-  .media-meta { margin-top: var(--spacing-s3); }
-  .media-topic { font-size: var(--text-base); }
+  .gal-head { margin-bottom: var(--spacing-s7); }
+  .gal-lead { margin-top: var(--spacing-s4); }
 
   .consult-steps { margin-top: var(--spacing-s5); max-width: var(--container-m-read); }
   .consult-d { color: var(--surface-ink-2); }

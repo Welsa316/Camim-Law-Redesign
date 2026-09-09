@@ -155,6 +155,21 @@ export const ATTORNEY = {
     ],
     "Avvo Work Experience; camulaw.com bio",
   ),
+  /**
+   * The seated environmental portrait, from the firm's own Google Business
+   * Profile for the Orlando entity, fetched at full resolution. Professional,
+   * symmetric, and in a real room — it replaces the white-ground studio
+   * cut-out as the site's primary image.
+   * [CLIENT VERIFICATION REQUIRED: permission and the photographer's credit.]
+   */
+  hero: v(
+    { src: "/img/juan-campos-hero.jpg", width: 1627, height: 2000 },
+    "Google Business Profile, Campos Immigration Law Firm LLC",
+  ),
+  seated: v(
+    { src: "/img/juan-campos-seated.jpg", width: 1200, height: 1500 },
+    "Google Business Profile, Campos Immigration Law Firm LLC",
+  ),
   portrait: v(
     { src: "/img/juan-campos-portrait.jpg", width: 1100, height: 1600 },
     "camimlaw.com (LCO07573-Edit.jpg)",

@@ -438,7 +438,25 @@ a { color: inherit; }
 .prose { max-width: var(--container-m-read); }
 .prose > * + * { margin-top: var(--spacing-s5); }
 .prose p { font-size: var(--text-base); }
-.prose a { color: var(--surface-accent-ink); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+/* A wipe rather than a fade: the rule grows from the left on hover and
+   retracts to the left on exit, so the two directions are not symmetrical.
+   Cheaper and steadier than animating text-decoration. */
+.prose a {
+  color: var(--surface-accent-ink);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  padding-bottom: 0.08em;
+  transition: background-size var(--d-state) var(--ease-reveal);
+}
+@media (any-hover: hover) {
+  .prose a:hover { background-size: 0 1px; background-position: 100% 100%; }
+}
+@media (any-hover: none) {
+  .prose a { text-decoration: underline; text-underline-offset: 0.2em; }
+}
 [data-surface="navy"] .prose a, [data-surface="navy-deep"] .prose a { color: var(--surface-ink); }
 
 /* --- rules --------------------------------------------------------------- */
@@ -479,7 +497,15 @@ a { color: inherit; }
 [data-surface="navy"] .link-arrow, [data-surface="navy-deep"] .link-arrow { color: var(--surface-ink); }
 .link-arrow span[aria-hidden] { transition: transform var(--d-quick) var(--ease-state); }
 @media (any-hover: hover) { .link-arrow:hover span[aria-hidden] { transform: translateX(4px); } }
-.link-arrow:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.link-arrow {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 1px;
+  padding-bottom: 0.1em;
+  transition: background-size var(--d-state) var(--ease-reveal);
+}
+@media (any-hover: hover) { .link-arrow:hover { background-size: 100% 1px; } }
 
 /* --- the service row: the replacement for the service card --------------- */
 .rows { list-style: none; border-top: 1px solid var(--surface-line); }

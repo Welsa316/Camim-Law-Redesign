@@ -1,0 +1,244 @@
+---
+/**
+ * Accordion gallery — a port of the React Bits `AccordionGallery` component.
+ *
+ * Ported rather than installed: the original is React, this site ships no
+ * React, and the whole component is a GSAP timeline over `flex-grow` plus a
+ * little state. Adding a framework runtime to render five panels would cost
+ * more than the component is worth. GSAP is already here for the heading
+ * reveals, so the marginal cost is zero.
+ *
+ * Faithful to the original's behaviour and props. Three deliberate changes:
+ *
+ *  1. Real list semantics. The original puts `role="listitem"` on the anchors,
+ *     which overrides their link role and hides them from a screen reader's
+ *     link list. This uses a genuine `ul`/`li` with the anchor inside.
+ *  2. Grayscale defaults to off. These are photographs of a real person and of
+ *     broadcast stills whose station colour is part of what makes them
+ *     credible; desaturating a face and restoring it on hover reads as an
+ *     effect applied to him.
+ *  3. Captions are real text rather than `aria-hidden` decoration, so the
+ *     label is available to assistive technology and to search.
+ */
+
+export interface GalleryItem {
+  image: string;
+  label: string;
+  meta?: string;
+  alt: string;
+  width: number;
+  height: number;
+  link?: string;
+  /**
+   * Focal point, as an `object-position` value. Required, not optional: a
+   * fixed-width media box centred in a narrow panel crops a tall portrait
+   * straight through the head, and a face cut off at the eyeline is the one
+   * framing error a reader always notices.
+   */
+  focus: string;
+}
+
+interface Props {
+  items: GalleryItem[];
+  defaultIndex?: number;
+  height?: number;
+  gap?: number;
+  radius?: number;
+  expandRatio?: number;
+  duration?: number;
+  ease?: string;
+  parallax?: number;
+  tilt?: number;
+  stagger?: number;
+  trigger?: "hover" | "click";
+  grayscale?: boolean;
+  id?: string;
+}
+
+const {
+  items,
+  defaultIndex = 0,
+  height = 520,
+  gap = 8,
+  radius = 4,
+  expandRatio = 0.52,
+  duration = 0.6,
+  ease = "power3.out",
+  parallax = 0.5,
+  tilt = 3,
+  stagger = 0.06,
+  trigger = "hover",
+  grayscale = false,
+  id = "gallery",
+} = Astro.props;
+
+const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
+---
+
+<ul
+  class="ag"
+  id={id}
+  data-accordion-gallery
+  data-default-index={active}
+  data-height={height}
+  data-gap={gap}
+  data-expand-ratio={expandRatio}
+  data-duration={duration}
+  data-ease={ease}
+  data-parallax={parallax}
+  data-tilt={tilt}
+  data-stagger={stagger}
+  data-trigger={trigger}
+  data-grayscale={String(grayscale)}
+  style={`--ag-gap:${gap}px; --ag-radius:${radius}px; --ag-height:${height}px;`}
+>
+  {items.map((item, i) => (
+    <li class="ag-item" data-ag-panel data-index={i} data-active={i === active ? "" : undefined}>
+      <a class="ag-link" href={item.link ?? `#${id}`} aria-current={i === active ? "true" : undefined}>
+        <span class="ag-frame">
+          <span class="ag-media" data-ag-media>
+            <img
+              src={item.image}
+              width={item.width}
+              height={item.height}
+              alt={item.alt}
+              style={`object-position:${item.focus};`}
+              loading={i === active ? "eager" : "lazy"}
+              decoding="async"
+              draggable="false"
+            />
+          </span>
+          <span class="ag-overlay" aria-hidden="true"></span>
+        </span>
+        <span class="ag-caption">
+          <span class="ag-bar" data-ag-bar aria-hidden="true"></span>
+          <span class="ag-text" data-ag-text>
+            <span class="ag-label">{item.label}</span>
+            {item.meta && <span class="ag-meta apparatus">{item.meta}</span>}
+          </span>
+        </span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .ag {
+    --ag-gap: 8px;
+    --ag-radius: 4px;
+    --ag-height: 520px;
+    --ag-media-size: 340px;
+    list-style: none;
+    display: flex;
+    gap: var(--ag-gap);
+    width: 100%;
+    height: var(--ag-height);
+    perspective: 1600px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ag-item {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    will-change: flex-grow, transform;
+  }
+
+  .ag-link {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--ag-radius);
+    background: var(--color-navy-deep);
+    text-decoration: none;
+    color: var(--color-paper);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ag-link:focus-visible {
+    outline: 2px solid var(--color-paper);
+    outline-offset: 3px;
+  }
+
+  .ag-frame { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+
+  .ag-media {
+    --ag-gray: 0;
+    --ag-dim: 0.42;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--ag-media-size);
+    height: 100%;
+    transform: translate(-50%, -50%);
+    filter: grayscale(var(--ag-gray));
+    will-change: transform, filter;
+  }
+  .ag-media img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+
+  .ag-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, transparent 42%, rgb(11 31 51 / 0.86) 100%),
+      rgb(11 31 51 / var(--ag-dim, 0.42));
+  }
+
+  .ag-caption {
+    position: absolute;
+    left: var(--spacing-s5);
+    right: var(--spacing-s5);
+    bottom: var(--spacing-s5);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-s3);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ag-bar {
+    flex: 0 0 auto;
+    width: 2px;
+    height: 2.4em;
+    background: var(--color-brass-light);
+    opacity: 0;
+  }
+  .ag-text { display: grid; gap: 2px; min-width: 0; opacity: 0; }
+  .ag-label {
+    font-size: var(--text-h4);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.25;
+    color: var(--color-paper);
+    text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
+  }
+  .ag-meta { color: #c8d2dd; text-shadow: 0 1px 10px rgb(0 0 0 / 0.5); }
+
+  /* Below the breakpoint the accordion is a stack: an accordion whose panels
+     are 60px wide tells a phone user nothing, and hiding options behind a
+     hover a phone does not have is how a visitor loses the thing they came
+     for. Every panel is open, captioned, and tappable. */
+  @media (max-width: 767px) {
+    .ag {
+      flex-direction: column;
+      height: auto;
+      perspective: none;
+      gap: var(--spacing-s4);
+    }
+    .ag-item { flex: none; transform: none !important; }
+    .ag-link { position: relative; inset: auto; display: block; aspect-ratio: 3 / 2; }
+    .ag-media {
+      position: absolute; width: 100%; height: 100%;
+      transform: translate(-50%, -50%) !important;
+      filter: none !important;
+    }
+    .ag-overlay { background: linear-gradient(180deg, transparent 40%, rgb(11 31 51 / 0.86) 100%); }
+    .ag-bar, .ag-text { opacity: 1 !important; transform: none !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ag-item, .ag-media { will-change: auto; }
+  }
+</style>

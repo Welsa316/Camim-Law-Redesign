@@ -49,7 +49,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 <Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
   <section class="head wrap" data-surface="paper">
     <p class="eyebrow">{_("nav.services")}</p>
-    <h1 class="h1">{copy.h1}</h1>
+    <h1 class="h1" data-split-lines="hero">{copy.h1}</h1>
     <p class="lead">{copy.lead}</p>
   </section>
 
@@ -65,7 +65,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
     <div class="editorial">
       <div><p class="eyebrow">{es ? "Índice" : "Index"}</p></div>
       <div>
-        <h2 class="h2">{copy.indexTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.indexTitle}</h2>
         <ul class="az">
           {all.map((m) => (
             <li>
@@ -84,7 +84,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
     <div class="editorial">
       <div><p class="eyebrow">{es ? "Alcance" : "Scope"}</p></div>
       <div class="prose">
-        <h2 class="h2">{copy.scopeTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.scopeTitle}</h2>
         <p>{copy.scopeBody}</p>
       </div>
     </div>
@@ -95,7 +95,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
   .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
   .az { list-style: none; display: grid; gap: var(--spacing-s3); margin-top: var(--spacing-s5); }
   @media (min-width: 700px) { .az { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacing-s8); } }
-  .az a { display: inline-flex; align-items: baseline; min-height: 40px;
+  .az a { display: inline-flex; align-items: center; min-height: 44px;
           color: var(--surface-ink); text-decoration: none; }
   @media (any-hover: hover) { .az a:hover { color: var(--surface-accent-ink); text-decoration: underline; text-underline-offset: 0.2em; } }
 </style>

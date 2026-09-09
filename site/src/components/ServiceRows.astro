@@ -2,15 +2,16 @@
 import { langPath, type Lang } from "../i18n/ui";
 import { mattersInGroup, type Group } from "../lib/services";
 
-interface Props { lang: Lang; group: Group }
-const { lang, group } = Astro.props;
+interface Props { lang: Lang; group: Group; index?: number }
+const { lang, group, index } = Astro.props;
 const matters = mattersInGroup(group.id);
 ---
 {matters.length > 0 && (
   <div class="grp" id={group.id}>
     <hr class="rule-accent" />
     <div class="editorial grp-head">
-      <div>
+      <div class="grp-label">
+        {index && <span class="grp-n apparatus">{String(index).padStart(2, "0")}</span>}
         <h3 class="h3 grp-name">{group.name[lang]}</h3>
       </div>
       <p class="grp-line">{group.line[lang]}</p>
@@ -35,6 +36,8 @@ const matters = mattersInGroup(group.id);
   .grp { margin-top: var(--spacing-s8); }
   .grp:first-of-type { margin-top: 0; }
   .grp-head { margin-block: var(--spacing-s5) var(--spacing-s4); }
+  .grp-label { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--spacing-s3); align-items: baseline; }
+  .grp-n { color: var(--surface-accent-ink); }
   .grp-name { margin: 0; }
   .grp-line { color: var(--surface-ink-2); max-width: var(--container-m-short); }
 </style>

@@ -35,9 +35,11 @@ const copy = {
       "Hizo una maestría en Derecho Comparado en la Universidad de Florida y encontró ahí el trabajo al que se dedica hoy. Trabajó como abogado de planta en Caridades Católicas de la Arquidiócesis de Nueva Orleans, representando a personas inmigrantes en algunos de los procesos más delicados del sistema.",
       "Hoy dedica su práctica por completo al derecho de inmigración, y publica cada semana explicaciones en español para que la gente entienda sus opciones antes de que sea tarde.",
     ],
+    statement: "Usted no está hablando con un notario. Está hablando con un abogado.",
+    statementMeta: "Juan Campos, Esq. · Admitido para ejercer en Louisiana Supreme Court · Miembro de AILA",
     commitmentsEyebrow: "Cómo trabajamos",
     commitments: [
-      { t: "Inmigración es lo único que hacemos.", d: "No llevamos otros tipos de caso. Todo el tiempo del despacho está en un solo cuerpo de leyes." },
+      { t: "No aceptamos un caso que no podamos llevar.", d: "Si su asunto necesita otro tipo de abogado, se lo decimos en la consulta en vez de aceptarlo." },
       { t: "Le explicamos su caso hasta que lo entienda.", d: "En español, sin términos que no le hayamos explicado antes, y las veces que haga falta." },
       { t: "Usted siempre sabrá qué sigue y cuándo.", d: "Qué se presentó, qué falta, qué esperamos del gobierno y en qué plazo aproximado." },
     ],
@@ -71,9 +73,11 @@ const copy = {
       "He took a master's in comparative law at the University of Florida and found there the work he does now. He served as a staff attorney at Catholic Charities of the Archdiocese of New Orleans, representing immigrants in some of the most sensitive proceedings in the system.",
       "Today his practice is entirely immigration law, and he publishes explanations in Spanish every week so that people understand their options before it is too late.",
     ],
+    statement: "You are not talking to a notario. You are talking to a lawyer.",
+    statementMeta: "Juan Campos, Esq. · Admitted to the Louisiana Supreme Court · Member of AILA",
     commitmentsEyebrow: "How we work",
     commitments: [
-      { t: "Immigration law is all we do.", d: "We take no other kind of case. The whole firm's attention sits on one body of law." },
+      { t: "We do not take a case we cannot carry.", d: "If your matter needs a different kind of lawyer, we say so at the consultation instead of taking it on." },
       { t: "We explain your case until it makes sense.", d: "In your language, with no term we have not defined first, as many times as it takes." },
       { t: "You will always know what happens next.", d: "What was filed, what is missing, what we expect from the government, and roughly when." },
     ],
@@ -117,7 +121,7 @@ const schema = graph([
             <span class="eyebrow-full">{_("home.eyebrow")}</span>
             <span class="eyebrow-short">{es ? "Abogado de inmigración" : "Immigration attorney"}</span>
           </p>
-          <h1 class="hero-type opener-display" data-split-lines>{copy.display}</h1>
+          <h1 class="hero-type opener-display" data-split-lines="hero">{copy.display}</h1>
           <p class="lead opener-lead" data-reveal="text">{copy.lead}</p>
           <div class="opener-actions" data-reveal="control">
             <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
@@ -133,7 +137,7 @@ const schema = graph([
         </div>
       </div>
 
-      <figure class="opener-figure" data-reveal="portrait">
+      <figure class="opener-figure" data-scrub-portrait data-reveal="portrait">
         <img
           src={portrait.src}
           width={portrait.width}
@@ -160,11 +164,11 @@ const schema = graph([
         <p class="eyebrow">{copy.scopeEyebrow}</p>
       </div>
       <div>
-        <h2 class="h2">{copy.scopeTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.scopeTitle}</h2>
       </div>
     </div>
     <div class="scope-rows">
-      {groups.map((g) => <ServiceRows lang={lang} group={g} />)}
+      {groups.map((g, i) => <ServiceRows lang={lang} group={g} index={i + 1} />)}
     </div>
     <p class="scope-more">
       <a class="link-arrow" href={langPath(lang, es ? "servicios" : "services")}>
@@ -174,13 +178,13 @@ const schema = graph([
   </Section>
 
   <!-- 04 / The attorney. The one dark band on the page. -->
-  <Section surface="green">
+  <Section surface="navy">
     <div class="editorial">
       <div>
         <p class="eyebrow">{copy.attorneyEyebrow}</p>
       </div>
       <div class="att">
-        <h2 class="h2">{copy.attorneyTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.attorneyTitle}</h2>
         <div class="prose att-body">
           {copy.attorneyBody.map((p) => <p>{p}</p>)}
         </div>
@@ -192,7 +196,7 @@ const schema = graph([
           </div>
           <div class="meta-item">
             <dt class="meta-term">{es ? "Estudios" : "Education"}</dt>
-            <dd>{(show(ATTORNEY.education) ?? []).map((e) => `${e.degree}, ${e.school}`).join(" · ")}</dd>
+            <dd>{(show(ATTORNEY.education) ?? []).map((e) => `${e.degree[lang]}, ${e.school}`).join(" · ")}</dd>
           </div>
           <div class="meta-item">
             <dt class="meta-term">{es ? "Membresía" : "Membership"}</dt>
@@ -213,18 +217,41 @@ const schema = graph([
     </div>
   </Section>
 
-  <!-- 05 / Commitments, as type. Not cards. -->
+  <!--
+    A single statement given a whole band. One line, display scale, on the
+    institutional ground. It is the page's one rhetorical moment and it says
+    something true and checkable rather than something performative.
+  -->
+  <section class="statement" data-surface="navy-deep">
+    {/*
+      A dark, near-abstract detail of flag fabric, heavily overlaid. It is a
+      material and a texture, not a patriotic hero image: no waving flag, no
+      seal, nothing implying a government connection. It carries the heritage
+      palette and gives the page its one full-bleed moment.
+    */}
+    <img class="statement-bg" src="/img/flag-texture.jpg" width="1600" height="926"
+         alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    <div class="wrap-wide statement-inner">
+      <p class="hero-type statement-line" data-split-lines>{copy.statement}</p>
+      <p class="apparatus statement-meta">{copy.statementMeta}</p>
+    </div>
+  </section>
+
+  <!-- 06 / Commitments, as type. Not cards. -->
   <Section surface="paper">
     <div class="editorial">
       <div><p class="eyebrow">{copy.commitmentsEyebrow}</p></div>
-      <ul class="commit" data-stagger>
-        {copy.commitments.map((c) => (
+      <ol class="commit" data-stagger>
+        {copy.commitments.map((c, i) => (
           <li data-reveal="text">
-            <p class="h3 commit-t">{c.t}</p>
-            <p class="commit-d">{c.d}</p>
+            <span class="commit-n apparatus">{String(i + 1).padStart(2, "0")}</span>
+            <div>
+              <p class="h2 commit-t">{c.t}</p>
+              <p class="commit-d">{c.d}</p>
+            </div>
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   </Section>
 
@@ -233,7 +260,7 @@ const schema = graph([
       <div class="editorial">
         <div><p class="eyebrow">{copy.mediaEyebrow}</p></div>
         <div>
-          <h2 class="h2">{copy.mediaTitle}</h2>
+          <h2 class="h2" data-split-lines>{copy.mediaTitle}</h2>
           <ul class="media" data-stagger>
             {media.map((m) => (
               <li data-reveal="media">
@@ -256,7 +283,7 @@ const schema = graph([
     <div class="editorial">
       <div><p class="eyebrow">{copy.consultEyebrow}</p></div>
       <div>
-        <h2 class="h2">{copy.consultTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.consultTitle}</h2>
         <ol class="steps consult-steps">
           {copy.consultSteps.map((s) => (
             <li>
@@ -282,7 +309,7 @@ const schema = graph([
     <div class="editorial">
       <div><p class="eyebrow">{copy.officeEyebrow}</p></div>
       <div class="office">
-        <h2 class="h2">{copy.officeTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.officeTitle}</h2>
         <p class="lead">{copy.officeBody}</p>
         <address class="office-addr">
           <span>{ORG.address.value.street}</span>
@@ -323,7 +350,7 @@ const schema = graph([
   .opener-meta { color: var(--color-ink-2); }
 
   .opener-figure { margin: 0; background: var(--color-paper-2); overflow: hidden; }
-  .opener-figure img { transform: scale(1.06); transform-origin: 60% 30%; }
+  .opener-figure img { transform-origin: 60% 30%; }
   .opener-figure img { width: 100%; height: 100%; object-fit: cover; }
 
   /* Phone: the portrait is a band at the top, capped so the statement, the
@@ -364,8 +391,25 @@ const schema = graph([
   .att-meta { margin-top: var(--spacing-s3); gap: var(--spacing-s3); }
   .att-meta dd { margin: 0; }
 
-  .commit { list-style: none; display: grid; gap: var(--spacing-s7); }
-  .commit-t { margin: 0 0 var(--spacing-s2); max-width: 22ch; }
+  .statement { position: relative; padding-block: var(--spacing-s11); overflow: hidden; isolation: isolate; }
+  .statement-bg {
+    position: absolute; inset: 0; z-index: -2;
+    width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%;
+  }
+  /* The overlay is what keeps this a texture rather than a picture, and it is
+     what makes the type contrast measurable rather than hopeful. */
+  .statement::after {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgb(11 31 51 / 0.955), rgb(11 31 51 / 0.975));
+  }
+  .statement-inner { position: relative; }
+  .statement-line { margin: 0; max-width: 18ch; color: var(--color-paper); }
+  .statement-meta { margin-top: var(--spacing-s6); color: #a8b6c6; }
+
+  .commit { list-style: none; display: grid; gap: var(--spacing-s9); counter-reset: c; }
+  .commit > li { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: var(--spacing-s4); }
+  .commit-n { color: var(--surface-accent-ink); padding-top: 0.55em; }
+  .commit-t { margin: 0 0 var(--spacing-s3); max-width: 20ch; }
   .commit-d { color: var(--surface-ink-2); max-width: var(--container-m-short); }
 
   .media { list-style: none; display: grid; gap: var(--spacing-s6); margin-top: var(--spacing-s6); }

@@ -34,17 +34,30 @@
    from a min/max pair across a 375→1440 viewport (§2.2).
    ========================================================================== */
 @theme {
-  /* --- colour ------------------------------------------------------------ */
-  --color-paper: #faf8f4;
-  --color-paper-2: #f1ede6;
-  --color-ink: #16211c;
-  --color-ink-2: #4a5a52;
-  --color-green: #1f4034;
-  --color-green-deep: #132a22;
-  --color-clay: #b4553a;
-  --color-clay-ink: #8f4029;
-  --color-line: #ddd7cc;
-  --color-line-strong: #8a8071;
+  /* --- colour ------------------------------------------------------------
+     An American heritage palette: federal navy, oxblood, warm ivory. Supplied
+     by the client. Every value below was measured before it was accepted; the
+     table lives in docs/CAMIM_DESIGN_SYSTEM.md section 5.2.
+
+     Two adjustments were forced by measurement and are noted where they occur:
+     the muted text is one step darker than the supplied Slate Gray, and the
+     brass accent is lightened on dark bands. Nothing else was changed.
+     ---------------------------------------------------------------------- */
+  --color-paper: #fcfcfa;        /* Soft White  — page ground              */
+  --color-paper-2: #f7f4ee;      /* Warm Ivory  — alternate band           */
+  --color-ink: #25282b;          /* Charcoal    — 14.43 / 13.50, AAA both  */
+  --color-ink-2: #656c74;        /* Slate, one step darker: the supplied
+                                    #6D747C is 4.31 on Warm Ivory, under AA.
+                                    This is 5.17 / 4.84.                   */
+  --color-navy: #163a5f;         /* Federal Blue — institutional band      */
+  --color-navy-deep: #0b1f33;    /* Midnight Navy — footer                 */
+  --color-accent: #9a2f3b;       /* Heritage Burgundy — marks, rules       */
+  --color-accent-ink: #7a1f2b;   /* Oxblood — accent text and links, 9.93  */
+  --color-brass: #b08a4a;        /* Antique Brass — dark surfaces only:
+                                    3.11 on Soft White fails as text.      */
+  --color-brass-light: #c9a063;  /* The on-dark brass: 4.82 / 6.91.        */
+  --color-line: #d9d7d1;         /* Stone Gray — decorative hairlines only */
+  --color-line-strong: #8a867a;  /* Control borders — 3.54, clears 1.4.11  */
 
   /* --- type -------------------------------------------------------------- */
   --font-serif: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
@@ -155,9 +168,9 @@
   --surface-ink-2: var(--color-ink-2);
   --surface-line: var(--color-line);
   --surface-line-strong: var(--color-line-strong);
-  --surface-accent: var(--color-clay);
-  --surface-accent-ink: var(--color-clay-ink);
-  --focus: var(--color-clay-ink);
+  --surface-accent: var(--color-accent);
+  --surface-accent-ink: var(--color-accent-ink);
+  --focus: var(--color-accent-ink);
 }
 
 @media (min-width: 768px)  { :root { --gutter: 32px; } }
@@ -176,9 +189,9 @@
   --surface-ink-2: var(--color-ink-2);
   --surface-line: var(--color-line);
   --surface-line-strong: var(--color-line-strong);
-  --surface-accent: var(--color-clay);
-  --surface-accent-ink: var(--color-clay-ink);
-  --focus: var(--color-clay-ink);
+  --surface-accent: var(--color-accent);
+  --surface-accent-ink: var(--color-accent-ink);
+  --focus: var(--color-accent-ink);
   background-color: var(--surface-bg);
   color: var(--surface-ink);
 }
@@ -186,31 +199,33 @@
   --surface-bg: var(--color-paper-2);
   --surface-ink: var(--color-ink);
   --surface-ink-2: var(--color-ink-2);
-  --surface-line: #d5cec1;
+  --surface-line: #cfccc4;
   --surface-line-strong: var(--color-line-strong);
-  --surface-accent: var(--color-clay);
-  --surface-accent-ink: var(--color-clay-ink);
-  --focus: var(--color-clay-ink);
+  --surface-accent: var(--color-accent);
+  --surface-accent-ink: var(--color-accent-ink);
+  --focus: var(--color-accent-ink);
   background-color: var(--surface-bg);
   color: var(--surface-ink);
 }
-[data-surface="green"],
-[data-surface="green-deep"] {
+/* The dark bands. Burgundy is unusable here — 1.58 on Federal Blue — so the
+   accent role resolves to the lightened brass, which measures 4.82 / 6.91. */
+[data-surface="navy"],
+[data-surface="navy-deep"] {
   --surface-ink: var(--color-paper);
-  --surface-ink-2: #a9bdb2;
-  --surface-line: rgb(250 248 244 / 0.16);
-  --surface-line-strong: rgb(250 248 244 / 0.45);
-  --surface-accent: #e0a083;   /* 5.17:1 on green, 6.89:1 on green-deep */
+  --surface-ink-2: #a8b6c6;                    /* 5.64 / 8.09 */
+  --surface-line: rgb(252 252 250 / 0.16);     /* decorative  */
+  --surface-line-strong: rgb(252 252 250 / 0.45); /* 3.59 / 4.26, clears 1.4.11 */
+  --surface-accent: var(--color-brass-light);
   --surface-accent-ink: var(--color-paper);
   --focus: var(--color-paper);
   color: var(--surface-ink);
 }
-[data-surface="green"] { --surface-bg: var(--color-green); background-color: var(--surface-bg); }
-[data-surface="green-deep"] { --surface-bg: var(--color-green-deep); background-color: var(--surface-bg); }
+[data-surface="navy"] { --surface-bg: var(--color-navy); background-color: var(--surface-bg); }
+[data-surface="navy-deep"] { --surface-bg: var(--color-navy-deep); background-color: var(--surface-bg); }
 
 /* A shadow on a dark ground is a lie — there is nothing for it to fall on.
    Elevation there comes from a surface step and a hairline. */
-[data-surface="green"] *, [data-surface="green-deep"] * { --shadow-lift: none; }
+[data-surface="navy"] *, [data-surface="navy-deep"] * { --shadow-lift: none; }
 
 /* ============================================================================
    BASE
@@ -268,7 +283,7 @@ a { color: inherit; }
   border-radius: var(--radius-sm);
 }
 
-::selection { background: var(--color-clay); color: var(--color-paper); }
+::selection { background: var(--color-accent); color: var(--color-paper); }
 
 /* Touch has no hover. Anything that only appears on hover is undiscoverable on
    a phone, so hover is an enhancement and :active is the touch equivalent. */
@@ -282,7 +297,7 @@ a { color: inherit; }
   top: 0;
   z-index: 200;
   padding: var(--spacing-s3) var(--spacing-s5);
-  background: var(--color-green);
+  background: var(--color-navy);
   color: var(--color-paper);
   font-weight: 600;
   text-decoration: none;
@@ -366,8 +381,8 @@ a { color: inherit; }
   color: var(--surface-accent-ink);
   margin: 0;
 }
-[data-surface="green"] .eyebrow,
-[data-surface="green-deep"] .eyebrow { color: var(--surface-accent); }
+[data-surface="navy"] .eyebrow,
+[data-surface="navy-deep"] .eyebrow { color: var(--surface-accent); }
 
 /* --- type roles -----------------------------------------------------------
    Each role carries its own size, line-height and tracking. Tailwind's paired
@@ -424,7 +439,7 @@ a { color: inherit; }
 .prose > * + * { margin-top: var(--spacing-s5); }
 .prose p { font-size: var(--text-base); }
 .prose a { color: var(--surface-accent-ink); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
-[data-surface="green"] .prose a, [data-surface="green-deep"] .prose a { color: var(--surface-ink); }
+[data-surface="navy"] .prose a, [data-surface="navy-deep"] .prose a { color: var(--surface-ink); }
 
 /* --- rules --------------------------------------------------------------- */
 .rule { border: 0; border-top: 1px solid var(--surface-line); margin: 0; }
@@ -442,14 +457,14 @@ a { color: inherit; }
               border-color var(--d-quick) var(--ease-state),
               color var(--d-quick) var(--ease-state);
 }
-.btn-primary { background: var(--color-green); color: var(--color-paper); }
+.btn-primary { background: var(--color-navy); color: var(--color-paper); }
 .btn-secondary { background: transparent; color: var(--surface-ink); border-color: var(--surface-line-strong); }
-[data-surface="green"] .btn-primary,
-[data-surface="green-deep"] .btn-primary { background: var(--color-paper); color: var(--color-green-deep); }
+[data-surface="navy"] .btn-primary,
+[data-surface="navy-deep"] .btn-primary { background: var(--color-paper); color: var(--color-navy-deep); }
 @media (any-hover: hover) {
-  .btn-primary:hover { background: var(--color-green-deep); }
-  [data-surface="green"] .btn-primary:hover,
-  [data-surface="green-deep"] .btn-primary:hover { background: #ffffff; }
+  .btn-primary:hover { background: var(--color-navy-deep); }
+  [data-surface="navy"] .btn-primary:hover,
+  [data-surface="navy-deep"] .btn-primary:hover { background: #ffffff; }
   .btn-secondary:hover { background: var(--color-paper-2); border-color: var(--surface-ink); }
 }
 .btn:active { transform: translateY(1px); }
@@ -461,7 +476,7 @@ a { color: inherit; }
   font-weight: var(--font-weight-medium); text-decoration: none;
   color: var(--surface-accent-ink);
 }
-[data-surface="green"] .link-arrow, [data-surface="green-deep"] .link-arrow { color: var(--surface-ink); }
+[data-surface="navy"] .link-arrow, [data-surface="navy-deep"] .link-arrow { color: var(--surface-ink); }
 .link-arrow span[aria-hidden] { transition: transform var(--d-quick) var(--ease-state); }
 @media (any-hover: hover) { .link-arrow:hover span[aria-hidden] { transform: translateX(4px); } }
 .link-arrow:hover { text-decoration: underline; text-underline-offset: 0.2em; }
@@ -505,7 +520,7 @@ a { color: inherit; }
   letter-spacing: 0.06em; font-variant-numeric: tabular-nums;
   color: var(--surface-accent-ink); padding-top: 0.15em;
 }
-[data-surface="green"] .steps > li::before { color: var(--surface-accent); }
+[data-surface="navy"] .steps > li::before { color: var(--surface-accent); }
 
 /* --- the fixed three-slot meta row --------------------------------------- */
 .meta { display: grid; gap: var(--spacing-s2); }
@@ -536,7 +551,7 @@ a { color: inherit; }
   padding: var(--spacing-s5) var(--spacing-s6);
   max-width: var(--container-m-read);
 }
-.callout-urgent { background: #f7ece7; border-left-color: var(--color-clay); }
+.callout-urgent { background: #f6ecec; border-left-color: var(--color-accent); }
 
 /* --- notice -------------------------------------------------------------- */
 .notice { font-size: var(--text-sm); color: var(--surface-ink-2); max-width: var(--container-m-read); }
@@ -559,4 +574,53 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .js-reveal [data-split-lines] { visibility: visible !important; }
   .line-mask > .line { transform: none !important; }
+}
+
+
+/* ============================================================================
+   EDITORIAL STICKY LABEL
+   In the two-column editorial grid the eyebrow pins while its section scrolls
+   past, which is what makes a long page read as a publication rather than a
+   stack of blocks. Only above the breakpoint where the two columns exist, and
+   only where the section is tall enough for the pin to mean anything.
+   ========================================================================== */
+@media (min-width: 1024px) {
+  .editorial > :first-child {
+    position: sticky;
+    top: calc(var(--header-h) + var(--spacing-s7));
+    align-self: start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editorial > :first-child { position: static; }
+}
+
+/* The opening frame's image is scrubbed by script; give it room to move
+   without revealing an edge, and a defined resting transform if script
+   never runs. */
+[data-scrub-portrait] { overflow: hidden; }
+[data-scrub-portrait] img { will-change: transform; }
+
+
+/* ============================================================================
+   TOUCH TARGETS
+   WCAG 2.2 SC 2.5.8 asks 24px; this audience is overwhelmingly on phones, so
+   below the desktop breakpoint every standalone link gets the 44px target the
+   mobile guideline asks for. Links inline in a sentence are exempt, since
+   padding them would break the line box of the prose around them.
+   ========================================================================== */
+@media (max-width: 899px) {
+  a.link-arrow,
+  a.apparatus,
+  .ftr a,
+  .az a,
+  .row-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .row-link { display: grid; align-content: center; }
+  .ftr a { display: inline-flex; }
+  /* Never inside running prose: the inline exemption applies there. */
+  .prose a, .crumbs a, .qa-body a { min-height: 0; display: inline; }
 }

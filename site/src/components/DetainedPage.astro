@@ -91,7 +91,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 <Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
   <!-- No imagery, no eyebrow flourish, no sales language anywhere on this page. -->
   <section class="dhead wrap" data-surface="paper">
-    <h1 class="h1">{copy.h1}</h1>
+    <h1 class="h1" data-split-lines="hero">{copy.h1}</h1>
     <p class="lead">{copy.lead}</p>
     <p class="dhead-call">
       <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.callNow")} {ORG.phoneDisplay.value}</a>
@@ -127,7 +127,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
     </div>
   </Section>
 
-  <Section surface="green">
+  <Section surface="navy">
     <div class="editorial">
       <div><p class="eyebrow">{copy.helpTitle}</p></div>
       <div>
@@ -159,7 +159,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
   .plain { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
   .plain > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); font-size: var(--text-lead); }
   .plain > li::before { content: "\2014"; color: var(--surface-accent-ink); }
-  [data-surface="green"] .plain > li::before { color: var(--surface-accent); }
+  [data-surface="navy"] .plain > li::before { color: var(--surface-accent); }
   .dcta { margin-top: var(--spacing-s7); }
   .daddr { display: grid; gap: var(--spacing-s2); font-style: normal; font-size: var(--text-lead); }
   .daddr a { color: var(--surface-ink); }

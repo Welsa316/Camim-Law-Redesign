@@ -109,6 +109,9 @@ const nav = [
     /* Shrinkable, so a 320px screen does not push the actions off-canvas. */
     flex: 0 1 auto; min-width: 0; overflow: hidden;
     font-family: var(--font-serif); font-size: var(--text-h4); line-height: 1;
+    /* WCAG 2.2 SC 2.5.8 wants 24px; the wordmark's own line box is 22. */
+    padding-block: 6px;
+    min-height: 44px; align-items: center;
   }
   .hdr-mark-name { font-weight: 400; letter-spacing: -0.02em; }
   .hdr-mark-rest {
@@ -128,7 +131,7 @@ const nav = [
     border-bottom: 2px solid transparent;
     transition: border-color var(--d-quick) var(--ease-state);
   }
-  .hdr-link[aria-current="page"] { border-bottom-color: var(--color-clay); }
+  .hdr-link[aria-current="page"] { border-bottom-color: var(--color-accent); }
   @media (any-hover: hover) { .hdr-link:hover { border-bottom-color: var(--color-line-strong); } }
 
   .hdr-actions { display: flex; align-items: center; gap: var(--spacing-s2); margin-inline-start: auto; flex: none; }
@@ -137,7 +140,7 @@ const nav = [
   .hdr-phone, .hdr-pay { display: none; text-decoration: none; }
   .hdr-phone { color: var(--color-ink); font-size: var(--text-sm); }
   .hdr-pay { color: var(--color-ink-2); font-size: var(--text-sm); font-weight: var(--font-weight-medium); }
-  @media (any-hover: hover) { .hdr-phone:hover, .hdr-pay:hover { color: var(--color-clay-ink); } }
+  @media (any-hover: hover) { .hdr-phone:hover, .hdr-pay:hover { color: var(--color-accent-ink); } }
 
   .hdr-lang {
     display: inline-flex; align-items: center; justify-content: center;
@@ -177,7 +180,7 @@ const nav = [
   .drawer-group { padding-block: var(--spacing-s4); border-bottom: 1px solid var(--color-line); }
   .drawer-group-name {
     font-family: var(--font-mono); font-size: var(--text-eyebrow);
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-clay-ink);
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent-ink);
     margin-bottom: var(--spacing-s2);
   }
   .drawer-group ul { list-style: none; }

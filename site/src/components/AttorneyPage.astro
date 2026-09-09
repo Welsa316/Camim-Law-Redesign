@@ -82,7 +82,7 @@ const schema = graph([
     <div class="wrap-wide ahead-inner">
       <div class="ahead-text">
         <p class="eyebrow">{copy.role}</p>
-        <h1 class="h1">{copy.h1}, {ATTORNEY.credentialSuffix.value}</h1>
+        <h1 class="h1" data-split-lines="hero">{copy.h1}, {ATTORNEY.credentialSuffix.value}</h1>
         <p class="lead">
           {es
             ? "Practico solo derecho de inmigración. Le explico su caso en español hasta que lo entienda."
@@ -111,11 +111,11 @@ const schema = graph([
 
   <!-- The jurisdiction question, answered rather than avoided. It is also the
        reason he can serve clients in other states. -->
-  <Section surface="green">
+  <Section surface="navy">
     <div class="editorial">
       <div><p class="eyebrow">{es ? "Jurisdicción" : "Jurisdiction"}</p></div>
       <div class="prose">
-        <h2 class="h2">{copy.jurisdictionTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.jurisdictionTitle}</h2>
         <p>{copy.jurisdictionBody}</p>
       </div>
     </div>
@@ -131,7 +131,7 @@ const schema = graph([
         </div>
         <div class="meta-item">
           <dt class="meta-term">{es ? "Estudios" : "Education"}</dt>
-          <dd><ul>{education.map((e) => <li>{e.degree}, {e.school}, {e.year}</li>)}</ul></dd>
+          <dd><ul>{education.map((e) => <li>{e.degree[lang]}, {e.school}, <span class="apparatus">{e.year}</span></li>)}</ul></dd>
         </div>
         <div class="meta-item">
           <dt class="meta-term">{es ? "Membresías" : "Memberships"}</dt>
@@ -139,7 +139,7 @@ const schema = graph([
         </div>
         <div class="meta-item">
           <dt class="meta-term">{es ? "Antes" : "Previously"}</dt>
-          <dd><ul>{prior.map((r) => <li>{r.role} <span class="apparatus">{r.years}</span></li>)}</ul></dd>
+          <dd><ul>{prior.map((r) => <li>{r.role[lang]} <span class="apparatus">{r.years[lang]}</span></li>)}</ul></dd>
         </div>
         <div class="meta-item">
           <dt class="meta-term">{_("label.languages")}</dt>
@@ -171,7 +171,7 @@ const schema = graph([
     <div class="editorial">
       <div><p class="eyebrow">{_("label.nextStep")}</p></div>
       <div class="acta">
-        <h2 class="h2">{copy.contactTitle}</h2>
+        <h2 class="h2" data-split-lines>{copy.contactTitle}</h2>
         <div class="acta-actions">
           <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
           <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
@@ -182,14 +182,17 @@ const schema = graph([
 </Base>
 
 <style>
-  .ahead { padding-block: var(--spacing-s8) var(--section-y); }
+  .ahead { padding-block: var(--spacing-s7) var(--spacing-s8); }
   .ahead-inner { display: grid; gap: var(--spacing-s7); align-items: center; }
-  @media (min-width: 900px) { .ahead-inner { grid-template-columns: minmax(0,1fr) minmax(0,0.8fr); gap: var(--spacing-s10); } }
+  @media (min-width: 900px) { .ahead-inner { grid-template-columns: minmax(0,1fr) minmax(0,0.72fr); gap: var(--spacing-s9); align-items: center; } }
   .ahead-text { display: grid; gap: var(--spacing-s4); }
   .ahead-meta { color: var(--color-ink-2); }
   .ahead-figure { margin: 0; }
-  .ahead-figure img { width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
-                      object-position: 50% 20%; border-radius: var(--radius-md); }
+  .ahead-figure img {
+    width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
+    object-position: 58% 20%; border-radius: var(--radius-md);
+    background: var(--color-paper-2);
+  }
   @media (max-width: 899px) {
     .ahead-inner { grid-template-areas: "fig" "text"; }
     .ahead-figure { grid-area: fig; }

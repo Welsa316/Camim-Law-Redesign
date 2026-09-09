@@ -116,8 +116,16 @@ export const ATTORNEY = {
   ),
   education: v(
     [
-      { degree: "LL.M., Comparative Law", school: "University of Florida Levin College of Law", year: 2019 },
-      { degree: "Abogado (Juris Doctor)", school: "Universidad Yacambú, Venezuela", year: 2006 },
+      {
+        degree: { es: "Maestría en Derecho Comparado (LL.M.)", en: "LL.M., Comparative Law" },
+        school: "University of Florida Levin College of Law",
+        year: 2019,
+      },
+      {
+        degree: { es: "Abogado", en: "Law degree" },
+        school: "Universidad Yacambú, Venezuela",
+        year: 2006,
+      },
     ],
     "Avvo Education panel",
   ),
@@ -127,10 +135,23 @@ export const ATTORNEY = {
   ),
   languages: v(["Spanish", "English"], "Avvo Languages panel; all public content is in Spanish"),
   birthplace: v("Coro, Venezuela", "camulaw.com bio: 'Nacido en Coro, Venezuela'"),
+  /** Bilingual: an English-only string here leaks straight onto the Spanish page. */
   priorRoles: v(
     [
-      { role: "Staff Attorney, Catholic Charities Archdiocese of New Orleans", years: "2020-2021" },
-      { role: "Law professor and criminal defence attorney, Venezuela", years: "before 2019" },
+      {
+        role: {
+          es: "Abogado de planta, Caridades Católicas de la Arquidiócesis de Nueva Orleans",
+          en: "Staff Attorney, Catholic Charities Archdiocese of New Orleans",
+        },
+        years: { es: "2020-2021", en: "2020-2021" },
+      },
+      {
+        role: {
+          es: "Profesor de derecho y abogado penalista, Venezuela",
+          en: "Law professor and criminal defence attorney, Venezuela",
+        },
+        years: { es: "antes de 2019", en: "before 2019" },
+      },
     ],
     "Avvo Work Experience; camulaw.com bio",
   ),
@@ -146,9 +167,13 @@ export const ATTORNEY = {
 } as const;
 
 /**
- * Television appearances. Stills and recordings held locally. Presented
- * factually — outlet, programme, topic — never as an endorsement
- * (Rule 4-7.14(a)(3)). Dates and permission pending.
+ * Television appearances.
+ *
+ * The outlet, programme and on-screen topic were read directly off the frames,
+ * so they render. The DATE of each appearance is not confirmed, so no date is
+ * shown. Presented factually and never as an endorsement (Rule 4-7.14(a)(3)).
+ *
+ * [CLIENT VERIFICATION REQUIRED: dates, and permission to republish.]
  */
 export const MEDIA = [
   {
@@ -163,7 +188,7 @@ export const MEDIA = [
     still: "/img/media-telemundo.jpg",
     width: 1280,
     height: 720,
-    verified: false,
+    verified: true,
   },
   {
     id: "tvv",
@@ -177,7 +202,7 @@ export const MEDIA = [
     still: "/img/media-tvv.jpg",
     width: 638,
     height: 360,
-    verified: false,
+    verified: true,
   },
   // Univision omitted on purpose: the still is a photograph of a studio monitor
   // at 960px and carries another law firm's sponsor bug in frame.

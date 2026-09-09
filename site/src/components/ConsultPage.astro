@@ -79,7 +79,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 <Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
   <section class="head wrap" data-surface="paper">
     <p class="eyebrow">{_("nav.consultation")}</p>
-    <h1 class="h1">{copy.h1}</h1>
+    <h1 class="h1" data-split-lines="hero">{copy.h1}</h1>
     <p class="lead">{copy.lead}</p>
   </section>
 
@@ -220,8 +220,8 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
     border-radius: var(--radius-sm); width: 100%;
   }
   .field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .field input[aria-invalid="true"], .field select[aria-invalid="true"] { border-color: var(--color-clay-ink); border-width: 2px; }
-  .field-err:not(:empty) { font-size: var(--text-sm); color: var(--color-clay-ink); }
+  .field input[aria-invalid="true"], .field select[aria-invalid="true"] { border-color: var(--color-accent-ink); border-width: 2px; }
+  .field-err:not(:empty) { font-size: var(--text-sm); color: var(--color-accent-ink); }
   .field--radio { border: 0; padding: 0; display: grid; gap: var(--spacing-s2); }
   .field--radio legend { font-weight: var(--font-weight-medium); font-size: var(--text-sm); padding: 0; margin-bottom: var(--spacing-s2); }
   .field--radio { display: flex; flex-wrap: wrap; gap: var(--spacing-s3) var(--spacing-s6); align-items: center; }
@@ -231,14 +231,14 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
     min-height: 44px; font-weight: 400; font-size: var(--text-base);
     white-space: nowrap;
   }
-  .field--radio input { width: 20px; height: 20px; accent-color: var(--color-green); flex: none; }
+  .field--radio input { width: 24px; height: 24px; accent-color: var(--color-navy); flex: none; }
   .form-status:empty { display: none; }
   .form-status { padding: var(--spacing-s4) var(--spacing-s5); border-left: 2px solid var(--surface-accent); background: var(--color-paper-2); }
-  .form-status[data-state="error"] { border-left-color: var(--color-clay); }
+  .form-status[data-state="error"] { border-left-color: var(--color-accent); }
   .bring { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
   .bring > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); }
   .bring > li::before { content: "\2014"; color: var(--surface-accent-ink); }
   .ways { display: grid; gap: var(--spacing-s4); justify-items: start; }
   .ways-addr { display: grid; gap: var(--spacing-s1); font-style: normal; }
-  .ways-addr a { color: var(--surface-ink); }
+  .ways-addr a { color: var(--surface-ink); display: inline-flex; align-items: center; min-height: 44px; }
 </style>

@@ -159,6 +159,9 @@
   --gutter: 20px;
   /* Sticky header height. Used by the opening frame and by scroll-padding. */
   --header-h: 66px;
+  /* The fixed call bar covers the last strip of the viewport below 1024px.
+     One number, so the bar and anything sized against the viewport agree. */
+  --mbar-h: 76px;
 
   /* Surface-aware tokens. Redefined by [data-surface] below. No single focus
      colour clears 3:1 on both grounds — clay is 4.60 on paper but 2.34 on
@@ -174,7 +177,7 @@
 }
 
 @media (min-width: 768px)  { :root { --gutter: 32px; } }
-@media (min-width: 1024px) { :root { --gutter: 48px; --header-h: 82px; } }
+@media (min-width: 1024px) { :root { --gutter: 48px; --header-h: 82px; --mbar-h: 0px; } }
 @media (min-width: 1440px) { :root { --gutter: 64px; } }
 
 /* ============================================================================

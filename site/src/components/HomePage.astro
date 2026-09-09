@@ -152,49 +152,68 @@ const schema = graph([
 <Base lang={lang} title={copy.title} description={copy.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema}>
 
   <!--
-    01 / Opening frame.
+    01 / Opening frame — full bleed, type over image.
 
-    A 2:3 portrait cannot fill a wide frame without either cropping through the
-    subject or shrinking him, and a head cut off at the top edge is the one
-    framing error a reader always notices. So the photograph gets its own
-    full-height column at close to its native ratio, and the type gets the
-    institutional ground beside it. His whole figure stays in frame, nothing
-    overlaps him, and the contrast under the type is a flat token rather than
-    a scrim over an image.
+    The type frames the subject rather than sitting beside him or across him:
+    apparatus top-left, the statement bottom-left, the actions bottom-right,
+    and he holds the centre where the photograph puts him. That is the only
+    arrangement that lets a front-facing centred portrait carry a cinematic
+    hero without either covering his face or cropping his head.
+
+    The vignette is heavier top and bottom, where the type is, and lightest
+    across the middle band, where he is. Contrast under each text block is
+    measured from real pixels, not assumed from an opacity.
   -->
   <section class="opener" data-surface="navy-deep">
-    <div class="opener-grid">
-      <div class="opener-text">
+    <picture>
+      <source media="(min-aspect-ratio: 1/1)" srcset={heroImg.wide.src} width={heroImg.wide.width} height={heroImg.wide.height} />
+      <img
+        class="opener-img"
+        src={heroImg.tall.src}
+        width={heroImg.tall.width}
+        height={heroImg.tall.height}
+        alt={es
+          ? "Juan Campos, abogado de inmigración, sentado en una silla de madera en la recepción de la oficina."
+          : "Juan Campos, immigration attorney, seated in a wooden chair in the office reception."}
+        fetchpriority="high"
+        decoding="async"
+        data-scrub-portrait-img
+      />
+    </picture>
+    <div class="opener-veil" aria-hidden="true"></div>
+
+    <div class="opener-frame wrap-wide">
+      <div class="opener-top">
         <p class="eyebrow opener-eyebrow" data-reveal="text">
           <span class="eyebrow-full">{_("home.eyebrow")}</span>
           <span class="eyebrow-short">{es ? "Abogado de inmigración" : "Immigration attorney"}</span>
         </p>
-        <h1 class="hero-type opener-display" data-split-lines="hero">{copy.display}</h1>
-        <p class="lead opener-lead" data-reveal="text">{copy.lead}</p>
-        <div class="opener-actions" data-reveal="control">
-          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
-          <a class="btn btn-ghost opener-call" href={`tel:${ORG.phone.value}`}>
-            {_("cta.call")} {ORG.phoneDisplay.value}
-          </a>
-        </div>
-        <p class="opener-meta apparatus" data-reveal="text">
-          Orlando, Florida &middot; {es ? "Atendemos en español e inglés" : "Spanish and English"}
+        <p class="opener-note apparatus" data-reveal="text">
+          {es
+            ? "Admitido en Louisiana. La inmigración es federal, así que representamos a personas en Florida, en otros estados y fuera del país."
+            : "Admitted in Louisiana. Immigration is federal, so we represent people in Florida, in other states and outside the country."}
         </p>
       </div>
 
-      <figure class="opener-figure" data-reveal="portrait">
-        <img
-          src={heroImg.src}
-          width={heroImg.width}
-          height={heroImg.height}
-          alt={es
-            ? "Juan Campos, abogado de inmigración, sentado en una silla de madera en la oficina."
-            : "Juan Campos, immigration attorney, seated in a wooden chair in the office."}
-          fetchpriority="high"
-          decoding="async"
-          data-scrub-portrait-img
-        />
-      </figure>
+      <div class="opener-bottom">
+        <div class="opener-statement">
+          <h1 class="hero-type opener-display" data-split-lines="hero">{copy.display}</h1>
+        </div>
+        <div class="opener-side">
+          <p class="opener-lead" data-reveal="text">{copy.lead}</p>
+          <div class="opener-actions" data-reveal="control">
+            <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+            <a class="btn btn-ghost opener-call" href={`tel:${ORG.phone.value}`}>
+              {_("cta.call")} {ORG.phoneDisplay.value}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="opener-rule" aria-hidden="true"></div>
+      <p class="opener-meta apparatus" data-reveal="text">
+        Orlando, Florida &middot; {es ? "Español e inglés" : "Spanish and English"}
+      </p>
     </div>
   </section>
 
@@ -367,61 +386,192 @@ const schema = graph([
 
 <style>
   /* --- opening frame --- */
-  .opener { position: relative; padding: 0; overflow: hidden; }
-  .opener-grid { display: grid; }
-
-  .opener-text {
+  .opener {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    /* The fixed call bar sits over the last 76px of the viewport below 1024px.
+       Without subtracting it the frame's closing line lands underneath it. */
+    min-height: calc(100svh - var(--header-h) - var(--mbar-h));
     display: grid;
-    align-content: center;
-    gap: var(--spacing-s4);
-    padding: var(--spacing-s8) var(--gutter);
   }
-  .opener-eyebrow { margin-bottom: var(--spacing-s2); color: var(--color-brass-light); }
+  .opener-img {
+    position: absolute; inset: 0; z-index: -2;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: 50% 38%;
+    will-change: transform;
+  }
+
+  /* Three layers, each doing one job.
+     1. A vertical wash: heavy where the type is, lightest across the middle
+        band, which is where his face is.
+     2. A horizontal wash: darkens the left and right margins, which is where
+        the corners of type sit, and leaves the centre column alone.
+     3. A bottom-left corner wash under the display line, which is the largest
+        block of type and the one sitting over the busiest part of the frame.
+     The values are not guesses. They were set by measuring the composited
+     pixels under each text block and raising each layer until the worst pixel
+     in every block cleared its WCAG threshold. */
+  .opener-veil {
+    position: absolute; inset: 0; z-index: -1;
+    background:
+      radial-gradient(120% 85% at 8% 100%, rgb(11 31 51 / 0.82) 0%, rgb(11 31 51 / 0) 62%),
+      linear-gradient(180deg,
+        rgb(11 31 51 / 0.86) 0%,
+        rgb(11 31 51 / 0.58) 14%,
+        rgb(11 31 51 / 0.30) 36%,
+        rgb(11 31 51 / 0.62) 62%,
+        rgb(11 31 51 / 0.93) 82%,
+        rgb(11 31 51 / 0.97) 100%),
+      linear-gradient(90deg,
+        rgb(11 31 51 / 0.72) 0%, rgb(11 31 51 / 0.22) 34%,
+        rgb(11 31 51 / 0.18) 60%, rgb(11 31 51 / 0.62) 100%);
+  }
+
+  .opener-frame {
+    position: relative;
+    display: grid;
+    /* Declared even though there is only ever one column: with no explicit
+       column line, `grid-column: 1 / -1` on the scrim resolves to a zero-width
+       track and the scrim silently renders 40px wide. */
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto auto auto;
+    width: 100%;
+    padding-block: var(--spacing-s7);
+  }
+
+  .opener-top { display: grid; gap: var(--spacing-s3); align-content: start; }
+  .opener-eyebrow { color: var(--color-brass-light); margin: 0; }
   .eyebrow-short { display: none; }
-  @media (max-width: 520px) {
-    .eyebrow-full { display: none; }
-    .eyebrow-short { display: inline; }
-  }
+  @media (max-width: 520px) { .eyebrow-full { display: none; } .eyebrow-short { display: inline; } }
+  .opener-note { color: #c3cfdb; max-width: 46ch; margin: 0; }
+
+  .opener-bottom { grid-row: 3; display: grid; gap: var(--spacing-s5); align-items: end; }
   .opener-display { margin: 0; max-width: 13ch; color: var(--color-paper); }
-  .opener-lead { max-width: 44ch; color: #d5dde5; }
-  .opener-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); margin-top: var(--spacing-s2); }
+  .opener-lead { color: #dde4eb; max-width: 40ch; font-size: var(--text-base); margin: 0; }
+  .opener-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); margin-top: var(--spacing-s4); }
   .opener-actions .btn { flex: 0 0 auto; }
-  .opener-meta { color: #a8b6c6; }
+  .opener-rule { grid-row: 4; height: 1px; background: rgb(252 252 250 / 0.3); margin-top: var(--spacing-s5); }
+  .opener-meta { grid-row: 5; color: #b6c3d1; margin: var(--spacing-s3) 0 0; }
 
-  .btn-ghost { background: transparent; color: var(--color-paper); border-color: rgb(252 252 250 / 0.45); }
+  .btn-ghost { background: transparent; color: var(--color-paper); border-color: rgb(252 252 250 / 0.5); }
   @media (any-hover: hover) {
-    .btn-ghost:hover { background: rgb(252 252 250 / 0.12); border-color: var(--color-paper); }
+    .btn-ghost:hover { background: rgb(252 252 250 / 0.14); border-color: var(--color-paper); }
   }
 
-  .opener-figure { margin: 0; overflow: hidden; background: var(--color-navy-deep); }
-  .opener-figure img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
-
-  /* Phone: the photograph is a band at the top, cropped so his head and the
-     chair are both in frame, then the type below on the navy ground. */
   @media (max-width: 899px) {
-    .opener-grid { grid-template-areas: "fig" "text"; }
-    .opener-figure { grid-area: fig; height: 32svh; min-height: 220px; max-height: 300px; }
-    .opener-figure img { object-position: 50% 22%; }
-    .opener-text { grid-area: text; padding-block: var(--spacing-s6) var(--spacing-s7); gap: var(--spacing-s3); }
-    .opener-lead { font-size: var(--text-base); }
+    /* The phone frame is the tall crop, so he reads head to shoe, and his face
+       lands in the upper third. So the apparatus line moves down and joins the
+       rest of the type in the lower band instead of sitting across the bright
+       part of the frame. Measured, not assumed: at 390 and 430 the eyebrow in
+       the top corner read 3.1:1 against the wall behind him, and darkening the
+       veil enough to fix it would have put his face in shadow. Moving the type
+       to where the scrim already is costs nothing and reads better — the image
+       is clean at the top and every word sits over the same dark ground. */
+    .opener-frame { grid-template-rows: 1fr auto auto auto auto; padding-block: var(--spacing-s6); }
+    .opener-top { grid-row: 2; }
+    .opener-bottom { grid-row: 3; gap: var(--spacing-s4); }
+    .opener-rule { grid-row: 4; margin-top: var(--spacing-s4); }
+    .opener-meta { grid-row: 5; }
+    .opener-img { object-position: 50% 26%; }
+    .opener-note { display: none; }
     .opener-call { display: none; }
+    /* The floor in this photograph is pale polished concrete, so the bottom of
+       the portrait crop is the brightest part of the frame — and it is exactly
+       where the type now sits.
+
+       The scrim for it is a grid item spanning from the first type row to the
+       end, not a percentage stop in the veil. That distinction matters: the
+       type block is a fixed height while the frame is a viewport height, so at
+       390x844 the type starts at 42% of the frame and at 320x720 it starts at
+       21%. A viewport-anchored gradient cannot serve both, and chasing it with
+       stops is how the eyebrow ended up at 1.4:1. Anchored to the rows, the
+       image dissolves into the ground exactly where the words begin, whatever
+       the screen. */
+    /* The scrim is anchored to the first row of type, not to a percentage of
+       the viewport. That distinction is the whole fix: the type block is a
+       fixed height while the frame is a viewport height, so the words begin at
+       42% of the frame on a 390x844 phone and at 21% on a 320x720 one. No
+       single set of gradient stops serves both, and chasing it with stops is
+       what left the eyebrow at 1.4:1.
+
+       It hangs off .opener-top as a pseudo-element rather than sitting in the
+       grid as its own row-spanning item: placed in the grid it resolved to a
+       zero-width track and rendered 40px wide, which is only the two negative
+       margins with nothing between them. The stops are absolute lengths, so
+       the dissolve is the same 150px everywhere and the ground below it is
+       solid regardless of how tall the box ends up. */
+    .opener-top { position: relative; }
+    .opener-top::after {
+      content: "";
+      position: absolute;
+      left: calc(var(--gutter) * -1);
+      right: calc(var(--gutter) * -1);
+      top: -150px;
+      bottom: -2400px;
+      z-index: -1;
+      background: linear-gradient(180deg,
+        rgb(11 31 51 / 0) 0px,
+        rgb(11 31 51 / 0.62) 96px,
+        rgb(11 31 51 / 0.93) 150px,
+        rgb(11 31 51 / 0.97) 300px,
+        rgb(11 31 51 / 0.97) 100%);
+    }
   }
 
-  /* Desktop: two full-height panels. The image column is close to the
-     photograph's own 4:5, so covering it barely crops and his whole figure
-     stays in the frame. */
-  @media (min-width: 900px) {
-    .opener-grid {
-      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.62fr);
-      min-height: calc(100svh - var(--header-h));
-    }
-    .opener-text { padding-block: var(--spacing-s9); padding-inline: var(--gutter); }
-    .opener-text > * { max-width: 42rem; margin-left: auto; margin-right: 0; width: 100%; }
-    .opener-figure { height: 100%; }
-    .opener-figure img { object-position: 50% 28%; }
+  /* Landscape phones. The frame is shorter than the type wants to be, so the
+     headline was running underneath the fixed call bar. Sizing to content and
+     stepping the display down keeps the whole statement above it. */
+  @media (max-height: 560px) and (orientation: landscape) {
+    .opener { min-height: auto; }
+    .opener-frame { padding-block: var(--spacing-s5); }
+    .opener-display { font-size: clamp(2rem, 4.6vw, 3rem); line-height: 1.04; max-width: min(12ch, 32vw); }
+    /* A landscape phone is still landscape: the statement and the actions sit
+       either side of him rather than stacking through the middle of the frame,
+       which is where the lead paragraph was crossing his face. */
+    .opener-bottom { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.6fr); gap: var(--spacing-s7); }
+    .opener-rule, .opener-meta { display: none; }
   }
-  @media (min-width: 1440px) {
-    .opener-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); }
+
+  /* Narrow phones. The type block is nearly as tall as the frame, so it climbs
+     until the first line sits on his face. Stepping the display down and
+     raising the framing gives it somewhere to go. */
+  @media (max-width: 360px) {
+    /* At 320 the frame is 578px and the tall crop covers it exactly, so there
+       is no vertical slack left and object-position can no longer move him at
+       all. The only lever is the height of the type block: it has to end up
+       shorter than the frame minus his face. Hence the smaller display, the
+       tighter gaps and the dropped rule. */
+    .opener-display { font-size: clamp(1.8rem, 9.4vw, 2.15rem); line-height: 1.06; }
+    .opener-lead { font-size: 0.95rem; }
+    .opener-bottom { gap: var(--spacing-s3); }
+    .opener-actions { margin-top: var(--spacing-s3); }
+    .opener-rule { display: none; }
+    .opener-meta { margin-top: var(--spacing-s4); }
+  }
+
+  @media (min-width: 900px) {
+    .opener-frame { padding-block: var(--spacing-s8); }
+    /* The frame breaks out of the centred container and runs to the edges of
+       the viewport. Two reasons, one compositional and one about him: type in
+       the true corners is what makes a full-bleed frame read as cinematic
+       rather than as a centred block sitting on a photograph, and pushing the
+       columns outward is what keeps the display line off his face. Inside the
+       1240px container at 1920 the headline crossed his eyes and mouth. */
+    .opener-frame { max-width: none; padding-inline: clamp(28px, 3.6vw, 84px); }
+    /* Sized against the frame, not against the page's display scale. He is
+       centred in the photograph, so the left column has the viewport's left
+       third to work in and no more. At the page's own display size the last
+       line reached his glasses between 1024 and 1440 — verified by projecting
+       his face box through object-fit and testing the glyph rects against it,
+       not by looking at a screenshot. */
+    .opener-display { font-size: clamp(2.4rem, 5.6vw, 7rem); line-height: 1.02; max-width: min(12ch, 32vw); }
+    .opener-lead, .opener-note { margin-left: auto; }
+    .opener-bottom { grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr); gap: var(--spacing-s9); }
+    .opener-top { grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr); align-items: start; gap: var(--spacing-s8); }
+    .opener-note { justify-self: end; text-align: right; }
+    .opener-rule { margin-top: var(--spacing-s6); }
+    .opener-meta { justify-self: start; }
   }
 
   /* --- sections --- */

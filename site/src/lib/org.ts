@@ -162,8 +162,17 @@ export const ATTORNEY = {
    * cut-out as the site's primary image.
    * [CLIENT VERIFICATION REQUIRED: permission and the photographer's credit.]
    */
+  /**
+   * Two frames cut from the same original, because one aspect ratio cannot
+   * serve both a landscape hero and a phone. The wide frame is a mid shot with
+   * air above his head; the tall frame keeps the whole figure and the chair.
+   * Cropping one to serve both is what put his head outside the frame.
+   */
   hero: v(
-    { src: "/img/juan-campos-hero.jpg", width: 1627, height: 2000 },
+    {
+      wide: { src: "/img/juan-campos-hero-wide.jpg", width: 2400, height: 1331 },
+      tall: { src: "/img/juan-campos-hero-tall.jpg", width: 1500, height: 1956 },
+    },
     "Google Business Profile, Campos Immigration Law Firm LLC",
   ),
   seated: v(

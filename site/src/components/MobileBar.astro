@@ -42,7 +42,7 @@ const whatsapp = show(ORG.whatsapp);
   .mbar-num { font-size: var(--text-eyebrow); color: inherit; opacity: 0.85; }
   .mbar-btn:active { filter: brightness(0.94); }
   /* The bar covers the last strip of the page, so the page reserves room. */
-  :global(body) { padding-bottom: 76px; }
+  :global(body) { padding-bottom: var(--mbar-h); }
   @media (min-width: 1024px) {
     .mbar { display: none; }
     :global(body) { padding-bottom: 0; }

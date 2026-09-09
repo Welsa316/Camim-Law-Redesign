@@ -1,0 +1,50 @@
+---
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, show } from "../lib/org";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const whatsapp = show(ORG.whatsapp);
+---
+<!--
+  The single most valuable action on this site is "call this office", and it has
+  to be one thumb-reach away at every scroll position. A persistent designed bar
+  rather than a floating bubble that covers content.
+-->
+<div class="mbar" data-mobile-bar>
+  <a class="mbar-btn mbar-btn--primary" href={`tel:${ORG.phone.value}`}>
+    {_("cta.call")}
+    <span class="mbar-num apparatus">{ORG.phoneDisplay.value}</span>
+  </a>
+  {whatsapp ? (
+    <a class="mbar-btn" href={whatsapp} rel="noopener">WhatsApp</a>
+  ) : (
+    <a class="mbar-btn" href={langPath(lang, lang === "es" ? "consulta" : "consultation")}>{_("cta.write")}</a>
+  )}
+</div>
+
+<style>
+  .mbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    display: grid; grid-template-columns: 1.6fr 1fr;
+    gap: 1px; background: var(--color-line-strong);
+    border-top: 1px solid var(--color-line-strong);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mbar-btn {
+    display: grid; place-items: center; gap: 2px;
+    min-height: 56px; padding: var(--spacing-s2);
+    background: var(--color-paper); color: var(--color-ink);
+    text-decoration: none; font-weight: var(--font-weight-semibold);
+  }
+  .mbar-btn--primary { background: var(--color-green); color: var(--color-paper); }
+  .mbar-num { font-size: var(--text-eyebrow); color: inherit; opacity: 0.85; }
+  .mbar-btn:active { filter: brightness(0.94); }
+  /* The bar covers the last strip of the page, so the page reserves room. */
+  :global(body) { padding-bottom: 76px; }
+  @media (min-width: 1024px) {
+    .mbar { display: none; }
+    :global(body) { padding-bottom: 0; }
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG } from "../lib/org";
+import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const path = langPath(lang, es ? "pagos" : "payment");
+const alternates = { es: "/pagos/", en: "/en/payment/" };
+
+const copy = es
+  ? {
+      title: "Hacer un Pago | Campos Immigration Law, Orlando",
+      description: "Cómo pagar una factura o un depósito a Campos Immigration Law, y qué pasa después de pagar.",
+      h1: "Hacer un pago",
+      lead: "Puede pagar en línea con tarjeta. Si no está seguro de cuál de las dos opciones le corresponde, llámenos antes de pagar y se lo decimos.",
+      invoiceT: "Pagar una factura",
+      invoiceB: "Para honorarios que ya le facturamos por trabajo realizado.",
+      depositT: "Depósito para un caso nuevo",
+      depositB: "Para un anticipo de honorarios o de costos en un caso que apenas empieza. Estos fondos se mantienen aparte hasta que se ganan o se gastan.",
+      afterT: "Después de pagar",
+      afterB: "Recibirá un comprobante del procesador. Nosotros le confirmamos por separado que aplicamos el pago a su caso. Si algo no cuadra, llámenos y lo revisamos.",
+      feesT: "Sobre los costos del gobierno",
+      feesB: "Las tarifas de USCIS y del Departamento de Estado son aparte de nuestros honorarios y se pagan al gobierno, no a nosotros. Se lo desglosamos por escrito antes de empezar.",
+      btn: "Ir a la página de pago",
+    }
+  : {
+      title: "Make a Payment | Campos Immigration Law, Orlando",
+      description: "How to pay an invoice or a deposit to Campos Immigration Law, and what happens after you pay.",
+      h1: "Make a payment",
+      lead: "You can pay online by card. If you are not sure which of the two applies to you, call before paying and we will tell you.",
+      invoiceT: "Pay an invoice",
+      invoiceB: "For fees already billed for work carried out.",
+      depositT: "Deposit for a new matter",
+      depositB: "For an advance on fees or costs in a matter that is just starting. Those funds are held separately until they are earned or spent.",
+      afterT: "After you pay",
+      afterB: "You will get a receipt from the processor. We confirm separately that the payment has been applied to your matter. If anything does not match, call us and we will check.",
+      feesT: "About government fees",
+      feesB: "USCIS and State Department fees are separate from our fees and are paid to the government, not to us. We break them out in writing before we start.",
+      btn: "Go to the payment page",
+    };
+
+const crumbs = [
+  { name: es ? "Inicio" : "Home", url: langPath(lang) },
+  { name: _("nav.payment"), url: path },
+];
+const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
+---
+<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+  <section class="head wrap" data-surface="paper">
+    <p class="eyebrow">{_("nav.payment")}</p>
+    <h1 class="h1">{copy.h1}</h1>
+    <p class="lead">{copy.lead}</p>
+  </section>
+
+  <!--
+    Two clearly labelled destinations rather than one ambiguous button.
+    Advance fees and cost deposits are held differently from earned fees, and
+    the page should not blur the two.  [CLIENT VERIFICATION REQUIRED: whether a
+    separate trust destination exists; today both point at the one published
+    LawPay page.]
+  -->
+  <Section surface="paper-2">
+    <div class="pays">
+      <div class="pay">
+        <h2 class="h3">{copy.invoiceT}</h2>
+        <p class="dim">{copy.invoiceB}</p>
+        <a class="btn btn-primary" href={ORG.paymentUrl.value} rel="noopener">{copy.btn}</a>
+      </div>
+      <div class="pay">
+        <h2 class="h3">{copy.depositT}</h2>
+        <p class="dim">{copy.depositB}</p>
+        <a class="btn btn-secondary" href={ORG.paymentUrl.value} rel="noopener">{copy.btn}</a>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.afterT}</p></div>
+      <div class="prose">
+        <p>{copy.afterB}</p>
+        <h2 class="h3 pay-h">{copy.feesT}</h2>
+        <p>{copy.feesB}</p>
+        <p>
+          <a class="link-arrow" href={`tel:${ORG.phone.value}`}>
+            {_("cta.call")} {ORG.phoneDisplay.value} <span aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
+  .pays { display: grid; gap: var(--spacing-s8); }
+  @media (min-width: 760px) { .pays { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--spacing-s10); } }
+  .pay { display: grid; gap: var(--spacing-s4); justify-items: start; align-content: start; }
+  .dim { color: var(--surface-ink-2); max-width: var(--container-m-short); }
+  .pay-h { margin-top: var(--spacing-s6); }
+</style>

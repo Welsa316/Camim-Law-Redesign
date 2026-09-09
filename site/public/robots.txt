@@ -1,0 +1,23 @@
+# Explicit groups. The inherited Squarespace file stacked 29 User-agent lines
+# with no Disallow between them and the wildcard group, which reads as a block
+# on AI crawlers and is not one. This says what it means.
+
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://www.camimlaw.com/sitemap-index.xml

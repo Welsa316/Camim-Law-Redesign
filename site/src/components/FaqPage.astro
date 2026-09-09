@@ -1,0 +1,73 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG } from "../lib/org";
+import { FAQS } from "../lib/faqs";
+import { graph, orgSchema, breadcrumbSchema, faqSchema } from "../lib/seo";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const path = langPath(lang, es ? "preguntas" : "faq");
+const alternates = { es: "/preguntas/", en: "/en/faq/" };
+
+const copy = es
+  ? {
+      title: "Preguntas Frecuentes | Campos Immigration Law, Orlando",
+      description:
+        "Respuestas claras a las preguntas que más recibimos: si es tarde, cuánto cuesta, si es privado, y cómo saber que habla con un abogado y no con un notario.",
+      h1: "Preguntas frecuentes",
+      lead: "Estas son las preguntas que más nos hacen, contestadas como las contestaríamos por teléfono.",
+    }
+  : {
+      title: "Common Questions | Campos Immigration Law, Orlando",
+      description:
+        "Plain answers to the questions we get most: whether it is too late, what it costs, whether it is private, and how to know you are talking to a lawyer.",
+      h1: "Common questions",
+      lead: "These are the questions we are asked most, answered the way we would answer them on the phone.",
+    };
+
+const crumbs = [
+  { name: es ? "Inicio" : "Home", url: langPath(lang) },
+  { name: _("nav.faq"), url: path },
+];
+const schema = graph([
+  orgSchema(),
+  breadcrumbSchema(crumbs),
+  faqSchema(FAQS.map((f) => ({ q: f.q[lang], a: f.a[lang].join(" ") }))),
+]);
+---
+<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+  <section class="head wrap" data-surface="paper">
+    <p class="eyebrow">{_("nav.faq")}</p>
+    <h1 class="h1">{copy.h1}</h1>
+    <p class="lead">{copy.lead}</p>
+  </section>
+
+  <Section surface="paper">
+    <div class="faqs">
+      {FAQS.map((f) => (
+        <details class="qa">
+          <summary>{f.q[lang]}</summary>
+          <div class="qa-body prose" id={f.id}>
+            {f.a[lang].map((p) => <p>{p}</p>)}
+          </div>
+        </details>
+      ))}
+    </div>
+    <p class="notice faq-note">{_("disclaimer.general")}</p>
+    <p class="faq-cta">
+      <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+      <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+    </p>
+  </Section>
+</Base>
+
+<style>
+  .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
+  .faqs { max-width: var(--container-m-read); border-bottom: 1px solid var(--surface-line); }
+  .faq-note { margin-top: var(--spacing-s7); }
+  .faq-cta { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); margin-top: var(--spacing-s6); }
+</style>

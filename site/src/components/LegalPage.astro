@@ -1,0 +1,140 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, ATTORNEY, show } from "../lib/org";
+import { graph, orgSchema } from "../lib/seo";
+
+interface Props { lang: Lang; kind: "legal" | "privacy" }
+const { lang, kind } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const admissions = show(ATTORNEY.admissions) ?? [];
+const a = ORG.address.value;
+
+const slug = kind === "legal" ? (es ? "aviso-legal" : "legal") : es ? "privacidad" : "privacy";
+const path = langPath(lang, slug);
+const alternates =
+  kind === "legal"
+    ? { es: "/aviso-legal/", en: "/en/legal/" }
+    : { es: "/privacidad/", en: "/en/privacy/" };
+
+const legal = es
+  ? {
+      title: "Aviso Legal | Campos Immigration Law",
+      description: "Aviso legal, divulgaciones de publicidad de abogados y limitaciones de jurisdicción de Campos Immigration Law, Orlando, Florida.",
+      h1: "Aviso legal",
+      blocks: [
+        { h: "Responsable del contenido", p: [`${ORG.name.value}. Abogado responsable: ${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}. Oficina: ${a.locality}, ${a.region}.`] },
+        { h: "Jurisdicción", p: [
+          `${ATTORNEY.displayName.value} está admitido para ejercer la abogacía en ${admissions.join(", ")}. No está admitido en Florida.`,
+          "El derecho de inmigración es una materia federal. Un abogado admitido en cualquier estado puede representar a personas ante el Servicio de Ciudadanía e Inmigración (USCIS), ante las cortes de inmigración (EOIR) y ante los consulados de Estados Unidos, independientemente de dónde viva el cliente.",
+          "Este bufete no acepta asuntos que requieran licencia del estado de Florida, porque no acepta ningún asunto que no sea de inmigración.",
+        ]},
+        { h: "Publicidad", p: ["Este sitio es publicidad de servicios legales."] },
+        { h: "No es asesoría legal", p: [
+          "La información de este sitio es general y educativa. No es asesoría legal sobre su caso, y leerla no crea una relación abogado-cliente.",
+          "La ley de inmigración cambia con frecuencia. Antes de tomar cualquier decisión, hable con un abogado sobre sus hechos concretos.",
+        ]},
+        { h: "Resultados", p: ["Cada caso depende de sus propios hechos y de la ley aplicable. Ningún resultado anterior garantiza un resultado igual o similar."] },
+        { h: "No somos notarios", p: [
+          "Somos un bufete de abogados. No somos notarios, notarías, consultores de inmigración ni especialistas certificados.",
+          "En Estados Unidos, un notary public no es abogado y no puede darle asesoría legal ni representarle ante inmigración.",
+        ]},
+        { h: "Enlaces externos", p: ["Enlazamos a páginas del gobierno y a otros sitios para su conveniencia. No controlamos su contenido ni respondemos por él."] },
+      ],
+    }
+  : {
+      title: "Legal Notice | Campos Immigration Law",
+      description: "Legal notice, attorney advertising disclosures and jurisdictional limitations for Campos Immigration Law, Orlando, Florida.",
+      h1: "Legal notice",
+      blocks: [
+        { h: "Responsible for this content", p: [`${ORG.name.value}. Responsible attorney: ${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}. Office: ${a.locality}, ${a.region}.`] },
+        { h: "Jurisdiction", p: [
+          `${ATTORNEY.displayName.value} is admitted to practise law in ${admissions.join(", ")}. He is not admitted in Florida.`,
+          "Immigration law is a federal practice. A lawyer admitted in any state may represent people before U.S. Citizenship and Immigration Services (USCIS), the immigration courts (EOIR) and U.S. consulates, regardless of where the client lives.",
+          "This firm does not accept matters requiring a Florida licence, because it does not accept any matter that is not an immigration matter.",
+        ]},
+        { h: "Advertising", p: ["This website is attorney advertising."] },
+        { h: "Not legal advice", p: [
+          "The information on this site is general and educational. It is not legal advice about your case, and reading it does not create an attorney-client relationship.",
+          "Immigration law changes often. Before making any decision, speak to a lawyer about your specific facts.",
+        ]},
+        { h: "Results", p: ["Every case depends on its own facts and on the applicable law. No prior result guarantees the same or a similar outcome."] },
+        { h: "We are not notarios", p: [
+          "We are a law firm. We are not notarios, notaries, immigration consultants or certified specialists.",
+          "In the United States, a notary public is not a lawyer and cannot give legal advice or represent you in immigration matters.",
+        ]},
+        { h: "External links", p: ["We link to government pages and other sites for convenience. We do not control their content and are not responsible for it."] },
+      ],
+    };
+
+const privacy = es
+  ? {
+      title: "Privacidad | Campos Immigration Law",
+      description: "Qué información recogemos en camimlaw.com, para qué la usamos y con quién no la compartimos.",
+      h1: "Privacidad",
+      blocks: [
+        { h: "Qué recogemos", p: [
+          "Solo lo que usted nos envía en el formulario de contacto: su nombre, su teléfono, su correo si lo da, el idioma que prefiere y el tema general de su consulta.",
+          "El formulario público no le pide detalles de su historial migratorio, y le pedimos que no los escriba ahí. Esos detalles se hablan en la consulta.",
+        ]},
+        { h: "Para qué la usamos", p: ["Únicamente para responderle y agendar su consulta."] },
+        { h: "Con quién la compartimos", p: [
+          "Con nadie. No vendemos ni cedemos su información. No somos una agencia del gobierno y no compartimos su información con ninguna.",
+        ]},
+        { h: "Confidencialidad", p: [
+          "Enviar el formulario no crea por sí solo una relación abogado-cliente. Hasta que acordemos por escrito representarle, la información que envíe podría no estar protegida como confidencial.",
+        ]},
+        { h: "Cookies", p: ["Este sitio no usa cookies de publicidad ni de seguimiento entre sitios."] },
+        { h: "Contacto", p: [`Si quiere que borremos su información, escríbanos a ${ORG.email.value} o llame al ${ORG.phoneDisplay.value}.`] },
+      ],
+    }
+  : {
+      title: "Privacy | Campos Immigration Law",
+      description: "What information camimlaw.com collects, what it is used for, and who it is not shared with.",
+      h1: "Privacy",
+      blocks: [
+        { h: "What we collect", p: [
+          "Only what you send us in the contact form: your name, your phone number, your email if you give one, your preferred language and the general topic of your enquiry.",
+          "The public form does not ask for details of your immigration history, and we ask you not to write them there. Those details belong in the consultation.",
+        ]},
+        { h: "What we use it for", p: ["Only to reply to you and arrange your consultation."] },
+        { h: "Who we share it with", p: [
+          "Nobody. We do not sell or pass on your information. We are not a government agency and we do not share your information with one.",
+        ]},
+        { h: "Confidentiality", p: [
+          "Sending the form does not by itself create an attorney-client relationship. Until we agree in writing to represent you, information you send may not be protected as confidential.",
+        ]},
+        { h: "Cookies", p: ["This site uses no advertising or cross-site tracking cookies."] },
+        { h: "Contact", p: [`If you want your information deleted, write to ${ORG.email.value} or call ${ORG.phoneDisplay.value}.`] },
+      ],
+    };
+
+const copy = kind === "legal" ? legal : privacy;
+const schema = graph([orgSchema()]);
+---
+<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+  <section class="head wrap" data-surface="paper">
+    <h1 class="h1">{copy.h1}</h1>
+  </section>
+  <Section surface="paper">
+    <div class="doc prose">
+      {copy.blocks.map((b) => (
+        <section class="doc-block">
+          <h2 class="h3">{b.h}</h2>
+          {b.p.map((p) => <p>{p}</p>)}
+        </section>
+      ))}
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .head { padding-block: var(--spacing-s8) var(--spacing-s6); }
+  .doc { max-width: var(--container-m-read); }
+  .doc-block { margin-top: var(--spacing-s7); }
+  .doc-block:first-child { margin-top: 0; }
+  .doc-block h2 { margin-bottom: var(--spacing-s3); }
+  .doc-block p + p { margin-top: var(--spacing-s4); }
+</style>

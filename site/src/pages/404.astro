@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import { t, langPath } from "../i18n/ui";
+import { ORG } from "../lib/org";
+const lang = "es" as const;
+const _ = t(lang);
+const links = [
+  { href: langPath("es", "servicios"), es: "Servicios", en: "Services" },
+  { href: langPath("es", "juan-campos"), es: "El abogado", en: "The attorney" },
+  { href: langPath("es", "consulta"), es: "Agendar consulta", en: "Book a consultation" },
+  { href: langPath("es", "detenido"), es: "Detuvieron a un familiar", en: "A relative was detained" },
+  { href: langPath("es"), es: "Inicio", en: "Home" },
+];
+---
+<Base
+  lang={lang}
+  title="Página no encontrada | Campos Immigration Law"
+  description="No encontramos esa página. Estas son las páginas que la mayoría de las personas busca."
+  path="/404/"
+  alternates={{ es: "/404/", en: "/404/" }}
+  noindex
+>
+  <section class="nf wrap" data-surface="paper">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="h1">{_("notFound.title")}</h1>
+    <p class="lead">{_("notFound.body")}</p>
+    <p class="lead nf-en" lang="en">We could not find that page. These are the pages most people are looking for.</p>
+    <ul class="rows nf-rows">
+      {links.map((l) => (
+        <li class="row-item">
+          <a class="row-link" href={l.href}>
+            <span class="row-title">{l.es} <span class="row-form" lang="en">{l.en}</span></span>
+            <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="nf-call">
+      <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+    </p>
+  </section>
+</Base>
+<style>
+  .nf { padding-block: var(--spacing-s9) var(--section-y); display: grid; gap: var(--spacing-s4); }
+  .nf-en { color: var(--color-ink-2); }
+  .nf-rows { margin-top: var(--spacing-s5); max-width: var(--container-m-read); }
+  .nf-call { margin-top: var(--spacing-s5); }
+</style>

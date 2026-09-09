@@ -1,0 +1,195 @@
+---
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG } from "../lib/org";
+import { liveGroups, mattersInGroup } from "../lib/services";
+import type { Alternates } from "../lib/seo";
+
+interface Props { lang: Lang; alternates: Alternates }
+const { lang, alternates } = Astro.props;
+const _ = t(lang);
+const other: Lang = lang === "es" ? "en" : "es";
+const otherHref = other === "es" ? alternates.es : alternates.en;
+const groups = liveGroups();
+
+const nav = [
+  { href: langPath(lang, lang === "es" ? "servicios" : "services"), label: _("nav.services"), hasPanel: true },
+  { href: langPath(lang, "juan-campos"), label: _("nav.attorney") },
+  { href: langPath(lang, lang === "es" ? "consulta" : "consultation"), label: _("nav.consultation") },
+  { href: langPath(lang, lang === "es" ? "preguntas" : "faq"), label: _("nav.faq") },
+];
+---
+<header class="hdr" data-header>
+  <div class="hdr-inner wrap-wide">
+    <a class="hdr-mark" href={langPath(lang)}>
+      <span class="hdr-mark-name">Campos</span>
+      <span class="hdr-mark-rest">Immigration Law</span>
+    </a>
+
+    <nav class="hdr-nav" aria-label={_("a11y.mainNav")}>
+      {nav.map((item) => (
+        <a class="hdr-link" href={item.href} aria-current={Astro.url.pathname === item.href ? "page" : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="hdr-actions">
+      <a class="hdr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+      <a class="hdr-pay" href={langPath(lang, lang === "es" ? "pagos" : "payment")}>{_("nav.payment")}</a>
+      <a class="hdr-lang" href={otherHref} lang={other} hreflang={other} aria-label={_("a11y.langSwitch")}>
+        <span aria-hidden="true">{lang === "es" ? "EN" : "ES"}</span>
+        <span class="sr-only">{other === "en" ? "View this page in English" : "Ver esta página en español"}</span>
+      </a>
+      <a class="btn btn-primary hdr-cta" href={langPath(lang, lang === "es" ? "consulta" : "consultation")}>
+        {_("cta.book")}
+      </a>
+      <button class="hdr-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu">
+        <span class="sr-only" data-menu-label>{_("nav.openMenu")}</span>
+        <span class="hdr-toggle-bars" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer: ruled rows, always labelled, never a grid of icons. -->
+  <div class="drawer" id="site-menu" data-menu hidden>
+    <nav class="drawer-inner wrap" aria-label={_("a11y.mainNav")}>
+      <ul class="drawer-list">
+        {groups.map((g) => (
+          <li class="drawer-group">
+            <p class="drawer-group-name">{g.name[lang]}</p>
+            <ul>
+              {mattersInGroup(g.id).map((m) => (
+                <li>
+                  <a class="drawer-link" href={langPath(lang, m.slug[lang])}>
+                    {m.name[lang]}
+                    {m.form && <span class="row-form">{m.form}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+        {nav.map((item) => (
+          <li><a class="drawer-link drawer-link--big" href={item.href}>{item.label}</a></li>
+        ))}
+        <li><a class="drawer-link drawer-link--big" href={langPath(lang, lang === "es" ? "detenido" : "detained")}>{_("nav.detained")}</a></li>
+        <li><a class="drawer-link drawer-link--big" href={langPath(lang, lang === "es" ? "pagos" : "payment")}>{_("nav.payment")}</a></li>
+      </ul>
+      <div class="drawer-actions">
+        <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+        <a class="btn btn-secondary" href={otherHref} lang={other} hreflang={other}>
+          {other === "en" ? "English" : "Español"}
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky; top: 0; z-index: 100;
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--color-line);
+    transition: padding-block var(--d-state) var(--ease-state);
+  }
+  .hdr-inner {
+    display: flex; align-items: center; gap: var(--spacing-s3);
+    padding-block: var(--spacing-s4);
+    transition: padding-block var(--d-state) var(--ease-state);
+  }
+  @media (min-width: 480px) { .hdr-inner { gap: var(--spacing-s5); } }
+  /* The scrolled state is designed, not incidental: the bar condenses and the
+     phone number stays reachable at every scroll position. */
+  .hdr[data-scrolled] .hdr-inner { padding-block: var(--spacing-s2); }
+
+  .hdr-mark {
+    display: flex; align-items: baseline; gap: 0.4ch;
+    text-decoration: none; color: var(--color-ink);
+    /* Shrinkable, so a 320px screen does not push the actions off-canvas. */
+    flex: 0 1 auto; min-width: 0; overflow: hidden;
+    font-family: var(--font-serif); font-size: var(--text-h4); line-height: 1;
+  }
+  .hdr-mark-name { font-weight: 400; letter-spacing: -0.02em; }
+  .hdr-mark-rest {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-2);
+  }
+  .hdr[data-scrolled] .hdr-mark-rest { display: none; }
+  /* Below 420px only the name survives; the descriptor is in the <title> and
+     in the footer, so nothing is lost. */
+  @media (max-width: 419px) { .hdr-mark-rest { display: none; } }
+
+  .hdr-nav { display: none; gap: var(--spacing-s6); margin-inline-start: auto; }
+  .hdr-link {
+    text-decoration: none; color: var(--color-ink);
+    font-weight: var(--font-weight-medium); font-size: var(--text-base);
+    padding-block: var(--spacing-s2);
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--d-quick) var(--ease-state);
+  }
+  .hdr-link[aria-current="page"] { border-bottom-color: var(--color-clay); }
+  @media (any-hover: hover) { .hdr-link:hover { border-bottom-color: var(--color-line-strong); } }
+
+  .hdr-actions { display: flex; align-items: center; gap: var(--spacing-s2); margin-inline-start: auto; flex: none; }
+  @media (min-width: 480px) { .hdr-actions { gap: var(--spacing-s3); } }
+  .hdr-nav + .hdr-actions { margin-inline-start: 0; }
+  .hdr-phone, .hdr-pay { display: none; text-decoration: none; }
+  .hdr-phone { color: var(--color-ink); font-size: var(--text-sm); }
+  .hdr-pay { color: var(--color-ink-2); font-size: var(--text-sm); font-weight: var(--font-weight-medium); }
+  @media (any-hover: hover) { .hdr-phone:hover, .hdr-pay:hover { color: var(--color-clay-ink); } }
+
+  .hdr-lang {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; min-height: 44px;
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: 0.08em;
+    text-decoration: none; color: var(--color-ink);
+    border: 1px solid var(--color-line-strong); border-radius: var(--radius-sm);
+  }
+  @media (any-hover: hover) { .hdr-lang:hover { border-color: var(--color-ink); } }
+
+  .hdr-cta { display: none; }
+
+  .hdr-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; padding: 0;
+    background: transparent; border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .hdr-toggle-bars { display: grid; gap: 5px; width: 18px; }
+  .hdr-toggle-bars i { display: block; height: 1.5px; background: var(--color-ink); }
+
+  @media (min-width: 1024px) {
+    .hdr-nav { display: flex; }
+    .hdr-phone, .hdr-pay, .hdr-cta { display: inline-flex; }
+    .hdr-toggle { display: none; }
+  }
+
+  /* --- drawer --- */
+  .drawer {
+    position: fixed; inset: 0; top: auto; height: calc(100dvh - 100%);
+    background: var(--color-paper); overflow-y: auto;
+    border-top: 1px solid var(--color-line);
+  }
+  .drawer[hidden] { display: none; }
+  .drawer-inner { padding-block: var(--spacing-s6) var(--spacing-s9); }
+  .drawer-list { list-style: none; }
+  .drawer-group { padding-block: var(--spacing-s4); border-bottom: 1px solid var(--color-line); }
+  .drawer-group-name {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-clay-ink);
+    margin-bottom: var(--spacing-s2);
+  }
+  .drawer-group ul { list-style: none; }
+  .drawer-link {
+    display: flex; align-items: baseline; min-height: 44px;
+    padding-block: var(--spacing-s2);
+    text-decoration: none; color: var(--color-ink); font-size: var(--text-base);
+  }
+  .drawer-link--big {
+    font-size: var(--text-h4); font-weight: var(--font-weight-medium);
+    border-bottom: 1px solid var(--color-line); padding-block: var(--spacing-s4);
+  }
+  .drawer-actions { display: grid; gap: var(--spacing-s3); margin-top: var(--spacing-s7); }
+  @media (min-width: 1024px) { .drawer { display: none !important; } }
+</style>

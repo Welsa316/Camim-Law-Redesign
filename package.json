@@ -1,0 +1,12 @@
+{
+  "name": "camimlaw-redesign",
+  "private": true,
+  "description": "Campos Immigration Law. Frontend in site/. Root scripts exist so a builder detects this as a Node project.",
+  "scripts": {
+    "postinstall": "cd site && npm ci",
+    "dev": "cd site && npm run dev",
+    "build": "cd site && npm run build",
+    "preview": "cd site && npm run preview",
+    "start": "cd site && npm run preview"
+  }
+}

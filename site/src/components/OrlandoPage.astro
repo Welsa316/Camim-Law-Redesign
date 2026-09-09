@@ -1,0 +1,126 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, COURT } from "../lib/org";
+import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const path = langPath(lang, "orlando");
+const alternates = { es: "/orlando/", en: "/en/orlando/" };
+const a = ORG.address.value;
+const mapsQuery = encodeURIComponent(`${a.street}, ${a.locality}, ${a.region} ${a.postalCode}`);
+
+const copy = es
+  ? {
+      title: "Corte de Inmigración y Oficina de USCIS en Orlando",
+      description:
+        "Dónde queda la Corte de Inmigración de Orlando, qué es una audiencia de calendario maestro, qué llevar y qué esperar. Información práctica en español.",
+      h1: "Inmigración en Orlando: dónde, cuándo y qué esperar",
+      lead: "Información práctica sobre los lugares a los que va a tener que ir, escrita para alguien que nunca ha estado en ninguno de ellos.",
+      courtTitle: "La Corte de Inmigración de Orlando",
+      courtBody: [
+        `Queda en ${COURT.address}. Es una corte federal administrativa: los jueces de inmigración no son jueces penales y el proceso no es un juicio criminal.`,
+        "La primera cita normalmente es una audiencia de calendario maestro. Es corta. El juez confirma quién es usted, si tiene abogado y qué va a pedir, y le da una fecha posterior para la audiencia de fondo, que sí es larga.",
+        "Llegue con tiempo, con identificación, y con todos los papeles que le haya enviado el gobierno. Si le cambian la dirección o el teléfono, hay que avisarle a la corte: la mayoría de las órdenes de deportación en ausencia ocurren porque el aviso llegó a una dirección vieja.",
+      ],
+      bringTitle: "Qué llevar a una audiencia",
+      bring: [
+        "Identificación con foto.",
+        "Todos los documentos que le haya mandado la corte o el gobierno.",
+        "El nombre y el número de su abogado.",
+        "Llegar temprano: hay control de seguridad.",
+      ],
+      officeTitle: "Nuestra oficina",
+      officeBody: `Estamos en ${a.street}, ${a.locality}. Llame antes de venir para confirmar la hora.`,
+      areaTitle: "A quién atendemos",
+      areaBody:
+        "Atendemos a personas en Orlando y en Orange, Osceola y Seminole County, incluidas Kissimmee, Metrowest, Pine Hills, Ocoee y Winter Garden. Como la inmigración es materia federal, también representamos a personas que viven en otros estados y fuera del país.",
+    }
+  : {
+      title: "Orlando Immigration Court and USCIS Office",
+      description:
+        "Where the Orlando Immigration Court is, what a master calendar hearing is, what to bring and what to expect. Practical local information.",
+      h1: "Immigration in Orlando: where, when and what to expect",
+      lead: "Practical information about the places you may have to go, written for someone who has never been to any of them.",
+      courtTitle: "The Orlando Immigration Court",
+      courtBody: [
+        `It is at ${COURT.address}. It is a federal administrative court: immigration judges are not criminal judges and the process is not a criminal trial.`,
+        "The first appointment is usually a master calendar hearing. It is short. The judge confirms who you are, whether you have a lawyer and what you intend to apply for, then gives you a later date for the individual hearing, which is the long one.",
+        "Arrive early, with identification and every paper the government has sent you. If your address or phone number changes, the court must be told: most in-absentia removal orders happen because the notice went to an old address.",
+      ],
+      bringTitle: "What to bring to a hearing",
+      bring: [
+        "Photo identification.",
+        "Every document the court or the government has sent you.",
+        "Your lawyer's name and number.",
+        "Extra time: there is a security screening.",
+      ],
+      officeTitle: "Our office",
+      officeBody: `We are at ${a.street}, ${a.locality}. Call before coming so we can confirm a time.`,
+      areaTitle: "Who we serve",
+      areaBody:
+        "We serve people in Orlando and across Orange, Osceola and Seminole County, including Kissimmee, Metrowest, Pine Hills, Ocoee and Winter Garden. Because immigration is federal law, we also represent people living in other states and outside the country.",
+    };
+
+const crumbs = [
+  { name: es ? "Inicio" : "Home", url: langPath(lang) },
+  { name: "Orlando", url: path },
+];
+const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
+---
+<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+  <section class="head wrap" data-surface="paper">
+    <p class="eyebrow">Orlando, Florida</p>
+    <h1 class="h1">{copy.h1}</h1>
+    <p class="lead">{copy.lead}</p>
+  </section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.courtTitle}</p></div>
+      <div class="prose">{copy.courtBody.map((p) => <p>{p}</p>)}</div>
+    </div>
+  </Section>
+
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.bringTitle}</p></div>
+      <ul class="plain">{copy.bring.map((b) => <li>{b}</li>)}</ul>
+    </div>
+  </Section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.officeTitle}</p></div>
+      <div class="prose">
+        <p>{copy.officeBody}</p>
+        <address class="oaddr">
+          <a href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} rel="noopener">
+            {a.street}<br />{a.locality}, {a.region} {a.postalCode}
+          </a>
+          <a class="apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+        </address>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.areaTitle}</p></div>
+      <div class="prose"><p>{copy.areaBody}</p></div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
+  .plain { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
+  .plain > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); }
+  .plain > li::before { content: "\2014"; color: var(--surface-accent-ink); }
+  .oaddr { display: grid; gap: var(--spacing-s2); font-style: normal; }
+  .oaddr a { color: var(--surface-ink); }
+</style>

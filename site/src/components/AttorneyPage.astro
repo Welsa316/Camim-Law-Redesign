@@ -1,0 +1,207 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, ATTORNEY, MEDIA, show } from "../lib/org";
+import { graph, orgSchema, attorneySchema, breadcrumbSchema, abs } from "../lib/seo";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const path = langPath(lang, "juan-campos");
+const alternates = { es: "/juan-campos/", en: "/en/juan-campos/" };
+const admissions = show(ATTORNEY.admissions) ?? [];
+const education = show(ATTORNEY.education) ?? [];
+const memberships = show(ATTORNEY.memberships) ?? [];
+const prior = show(ATTORNEY.priorRoles) ?? [];
+const portrait = ATTORNEY.portrait.value;
+const media = MEDIA.filter((m) => m.verified);
+
+const copy = es
+  ? {
+      title: "Juan Campos, Abogado de Inmigración en Orlando",
+      description:
+        "Juan Campos es abogado de inmigración con oficina en Orlando. Nacido en Venezuela, ex profesor de derecho, admitido en Louisiana y miembro de AILA.",
+      h1: "Juan Campos",
+      role: "Abogado de inmigración",
+      body: [
+        "Nací en Coro, Venezuela. Antes de emigrar fui profesor de derecho y abogado penalista, y llevaba años trabajando en los tribunales de mi país.",
+        "Empezar de nuevo en otro idioma y en otro sistema legal es algo que hice yo mismo. Es la razón por la que entiendo lo que le pasa a alguien que llega a mi oficina sin saber si puede quedarse.",
+        "Hice una maestría en Derecho Comparado en la Universidad de Florida. Ahí encontré el derecho migratorio, y decidí reconstruir mi carrera entera alrededor de esa materia.",
+        "Trabajé como abogado de planta en Caridades Católicas de la Arquidiócesis de Nueva Orleans, representando a personas inmigrantes en algunos de los procesos más delicados del sistema.",
+        "Hoy dedico mi práctica por completo al derecho de inmigración. También publico explicaciones en español cada semana, porque la mayoría de los errores que veo se cometen antes de que alguien hable con un abogado.",
+      ],
+      jurisdictionTitle: "Por qué una oficina en Orlando con licencia de Louisiana",
+      jurisdictionBody:
+        "El derecho de inmigración es federal. Un abogado admitido en cualquier estado puede representar a personas ante USCIS, ante las cortes de inmigración y ante los consulados de Estados Unidos, sin importar dónde viva el cliente. Estoy admitido en Louisiana, no en Florida, y desde la oficina de Orlando represento a personas en Florida, en otros estados y fuera del país. No llevo asuntos que requieran licencia de Florida, porque no llevo ningún asunto que no sea de inmigración.",
+      credentialsTitle: "Credenciales",
+      mediaTitle: "En los medios",
+      contactTitle: "Hablemos de su caso",
+    }
+  : {
+      title: "Juan Campos, Immigration Attorney in Orlando",
+      description:
+        "Juan Campos is an immigration attorney with an Orlando office. Born in Venezuela, a former law professor, admitted in Louisiana and a member of AILA.",
+      h1: "Juan Campos",
+      role: "Immigration attorney",
+      body: [
+        "I was born in Coro, Venezuela. Before I emigrated I was a law professor and a criminal defence lawyer, and I had spent years in my country's courts.",
+        "Starting again in another language and another legal system is something I did myself. It is why I understand what is happening to someone who walks into my office not knowing whether they can stay.",
+        "I took a master's in comparative law at the University of Florida. That is where I found immigration law, and I decided to rebuild my whole career around it.",
+        "I served as a staff attorney at Catholic Charities of the Archdiocese of New Orleans, representing immigrants in some of the most sensitive proceedings in the system.",
+        "Today my practice is entirely immigration law. I also publish explanations in Spanish every week, because most of the mistakes I see are made before anyone speaks to a lawyer.",
+      ],
+      jurisdictionTitle: "Why an Orlando office with a Louisiana licence",
+      jurisdictionBody:
+        "Immigration law is federal. A lawyer admitted in any state may represent people before USCIS, the immigration courts and U.S. consulates, wherever the client lives. I am admitted in Louisiana, not in Florida, and from the Orlando office I represent people in Florida, in other states and outside the country. I do not take matters that would require a Florida licence, because I do not take any matter that is not immigration.",
+      credentialsTitle: "Credentials",
+      mediaTitle: "In the media",
+      contactTitle: "Let us talk about your case",
+    };
+
+const crumbs = [
+  { name: es ? "Inicio" : "Home", url: langPath(lang) },
+  { name: copy.h1, url: path },
+];
+const schema = graph([
+  orgSchema(),
+  attorneySchema(lang),
+  breadcrumbSchema(crumbs),
+  {
+    "@type": "ProfilePage",
+    "@id": `${abs(path)}#page`,
+    mainEntity: { "@id": `${Astro.url.origin}/#juan-campos` },
+    name: copy.title,
+    description: copy.description,
+  },
+]);
+---
+<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+  <section class="ahead" data-surface="paper">
+    <div class="wrap-wide ahead-inner">
+      <div class="ahead-text">
+        <p class="eyebrow">{copy.role}</p>
+        <h1 class="h1">{copy.h1}, {ATTORNEY.credentialSuffix.value}</h1>
+        <p class="lead">
+          {es
+            ? "Practico solo derecho de inmigración. Le explico su caso en español hasta que lo entienda."
+            : "I practise immigration law only. I explain your case in your language until it makes sense."}
+        </p>
+        <p class="apparatus ahead-meta">
+          {admissions.join(" · ")} &middot; {memberships.join(" · ")} &middot; {es ? "Español e inglés" : "Spanish and English"}
+        </p>
+      </div>
+      <figure class="ahead-figure" data-reveal="portrait">
+        <img src={portrait.src} width={portrait.width} height={portrait.height}
+             alt={es
+               ? "Retrato de Juan Campos, abogado de inmigración, con saco de lino claro y corbatín."
+               : "Portrait of Juan Campos, immigration attorney, in a light linen jacket and bow tie."}
+             fetchpriority="high" decoding="async" />
+      </figure>
+    </div>
+  </section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{es ? "En sus palabras" : "In his words"}</p></div>
+      <div class="prose">{copy.body.map((p) => <p>{p}</p>)}</div>
+    </div>
+  </Section>
+
+  <!-- The jurisdiction question, answered rather than avoided. It is also the
+       reason he can serve clients in other states. -->
+  <Section surface="green">
+    <div class="editorial">
+      <div><p class="eyebrow">{es ? "Jurisdicción" : "Jurisdiction"}</p></div>
+      <div class="prose">
+        <h2 class="h2">{copy.jurisdictionTitle}</h2>
+        <p>{copy.jurisdictionBody}</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.credentialsTitle}</p></div>
+      <dl class="creds">
+        <div class="meta-item">
+          <dt class="meta-term">{es ? "Admisión" : "Admission"}</dt>
+          <dd>{admissions.join(", ")}<br /><span class="notice">{es ? "No admitido en Florida." : "Not admitted in Florida."}</span></dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-term">{es ? "Estudios" : "Education"}</dt>
+          <dd><ul>{education.map((e) => <li>{e.degree}, {e.school}, {e.year}</li>)}</ul></dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-term">{es ? "Membresías" : "Memberships"}</dt>
+          <dd>{memberships.join(", ")}</dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-term">{es ? "Antes" : "Previously"}</dt>
+          <dd><ul>{prior.map((r) => <li>{r.role} <span class="apparatus">{r.years}</span></li>)}</ul></dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-term">{_("label.languages")}</dt>
+          <dd>{es ? "Español e inglés" : "Spanish and English"}</dd>
+        </div>
+      </dl>
+    </div>
+  </Section>
+
+  {media.length > 0 && (
+    <Section surface="paper-2">
+      <div class="editorial">
+        <div><p class="eyebrow">{copy.mediaTitle}</p></div>
+        <ul class="media" data-stagger>
+          {media.map((m) => (
+            <li data-reveal="media">
+              <img src={m.still} width={m.width} height={m.height} loading="lazy" decoding="async"
+                   alt={es ? `Juan Campos entrevistado en ${m.outlet}.` : `Juan Campos interviewed on ${m.outlet}.`} />
+              <p class="apparatus">{m.outlet}{m.station ? ` · ${m.station}` : ""} · {m.programme}</p>
+              <p>{m.chyron[lang]}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+  )}
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("label.nextStep")}</p></div>
+      <div class="acta">
+        <h2 class="h2">{copy.contactTitle}</h2>
+        <div class="acta-actions">
+          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+          <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+        </div>
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .ahead { padding-block: var(--spacing-s8) var(--section-y); }
+  .ahead-inner { display: grid; gap: var(--spacing-s7); align-items: center; }
+  @media (min-width: 900px) { .ahead-inner { grid-template-columns: minmax(0,1fr) minmax(0,0.8fr); gap: var(--spacing-s10); } }
+  .ahead-text { display: grid; gap: var(--spacing-s4); }
+  .ahead-meta { color: var(--color-ink-2); }
+  .ahead-figure { margin: 0; }
+  .ahead-figure img { width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
+                      object-position: 50% 20%; border-radius: var(--radius-md); }
+  @media (max-width: 899px) {
+    .ahead-inner { grid-template-areas: "fig" "text"; }
+    .ahead-figure { grid-area: fig; }
+    .ahead-text { grid-area: text; }
+    .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 16%; }
+  }
+  .creds { display: grid; gap: var(--spacing-s5); max-width: var(--container-m-read); }
+  .creds dd { margin: 0; }
+  .creds ul { list-style: none; display: grid; gap: var(--spacing-s1); }
+  .media { list-style: none; display: grid; gap: var(--spacing-s6); }
+  @media (min-width: 700px) { .media { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .media img { width: 100%; height: auto; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-md); }
+  .acta { display: grid; gap: var(--spacing-s5); }
+  .acta-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
+</style>

@@ -1,0 +1,14 @@
+---
+interface Props {
+  surface?: "paper" | "paper-2" | "green" | "green-deep";
+  id?: string;
+  wide?: boolean;
+  class?: string;
+}
+const { surface = "paper", id, wide = false, class: cls = "" } = Astro.props;
+---
+<section class:list={["section", cls]} data-surface={surface} id={id}>
+  <div class={wide ? "wrap-wide" : "wrap"}>
+    <slot />
+  </div>
+</section>

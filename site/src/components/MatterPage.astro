@@ -1,0 +1,224 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, ATTORNEY, COURT, show } from "../lib/org";
+import { groupById, matterById, isDraft, liveMatters, type Matter } from "../lib/services";
+import { graph, orgSchema, attorneySchema, breadcrumbSchema, serviceSchema, faqSchema } from "../lib/seo";
+
+interface Props { lang: Lang; matter: Matter }
+const { lang, matter } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const group = groupById(matter.group)!;
+const path = langPath(lang, matter.slug[lang]);
+const servicesPath = langPath(lang, es ? "servicios" : "services");
+// Related links use the same renderable set as the navigation, so a review
+// build cross-links its drafts and a production build never links to one.
+const renderableIds = new Set(liveMatters().map((m) => m.id));
+const related = matter.related
+  .map(matterById)
+  .filter((m): m is Matter => !!m && renderableIds.has(m.id));
+const admissions = show(ATTORNEY.admissions) ?? [];
+const updated = "2026-09-09";
+const draft = isDraft(matter);
+
+const alternates = { es: langPath("es", matter.slug.es), en: langPath("en", matter.slug.en) };
+const crumbs = [
+  { name: es ? "Inicio" : "Home", url: langPath(lang) },
+  { name: _("nav.services"), url: servicesPath },
+  { name: matter.name[lang], url: path },
+];
+const schema = graph([
+  orgSchema(),
+  attorneySchema(lang),
+  breadcrumbSchema(crumbs),
+  serviceSchema(matter.name[lang], path, lang),
+  ...(matter.faqs.length
+    ? [faqSchema(matter.faqs.map((f) => ({ q: f.q[lang], a: f.a[lang] })))]
+    : []),
+]);
+---
+<Base lang={lang} title={matter.title[lang]} description={matter.description[lang]} path={path} alternates={alternates} schema={schema} noindex={draft}>
+
+  {draft && (
+    <div class="reviewbar">
+      <p>
+        <strong>Borrador para revisión.</strong>{" "}
+        Esta página está redactada pero el bufete todavía no ha confirmado que
+        lleva este tipo de caso. No se publica ni se indexa hasta esa
+        confirmación. Evidencia: {matter.evidence}
+      </p>
+    </div>
+  )}
+
+  <nav class="crumbs wrap" aria-label={_("a11y.breadcrumb")}>
+    <ol>
+      {crumbs.map((c, i) => (
+        <li>
+          {i < crumbs.length - 1
+            ? <a href={c.url}>{c.name}</a>
+            : <span aria-current="page">{c.name}</span>}
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <!-- The opening block is a self-contained direct answer naming the firm, the
+       city and the phone number, so an extracted chunk carries the brand. -->
+  <section class="mhead wrap" data-surface="paper">
+    <p class="eyebrow">{group.name[lang]}</p>
+    <h1 class="h1 mhead-title">
+      {matter.name[lang]}
+      {matter.form && <span class="mhead-form">{matter.form}</span>}
+    </h1>
+    <p class="lead mhead-summary">{matter.summary[lang]}</p>
+    <div class="mhead-actions">
+      <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+      <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+    </div>
+    <p class="apparatus mhead-by">
+      {_("label.reviewedBy")} {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value} &middot;
+      {es ? "Admitido en" : "Admitted in"} {admissions.join(", ")} &middot;
+      {_("label.updated")} <time datetime={updated}>{updated}</time>
+    </p>
+  </section>
+
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("label.whoFor")}</p></div>
+      <ul class="who" data-stagger>
+        {matter.whoFor[lang].map((w) => <li data-reveal="text">{w}</li>)}
+      </ul>
+    </div>
+  </Section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("label.whatItIs")}</p></div>
+      <div class="prose"><p>{matter.what[lang]}</p></div>
+    </div>
+  </Section>
+
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("label.howItWorks")}</p></div>
+      <ol class="steps mstep">
+        {matter.steps[lang].map((s) => <li><p>{s}</p></li>)}
+      </ol>
+    </div>
+  </Section>
+
+  <Section surface="green">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("label.howWeHelp")}</p></div>
+      <div>
+        <ul class="help" data-stagger>
+          {matter.weHelp[lang].map((h) => <li data-reveal="text">{h}</li>)}
+        </ul>
+        <p class="help-cta">
+          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  {matter.faqs.length > 0 && (
+    <Section surface="paper">
+      <div class="editorial">
+        <div><p class="eyebrow">{_("label.questions")}</p></div>
+        <div class="faqs">
+          {matter.faqs.map((f, i) => (
+            <details class="qa">
+              <summary>{f.q[lang]}</summary>
+              {/* The fragment id is on the CONTENT, never on the summary: a
+                  summary is always visible, so an id there scrolls without
+                  ever opening the answer. */}
+              <div class="qa-body prose" id={`q${i + 1}`}>
+                <p>{f.a[lang]}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </Section>
+  )}
+
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("label.nextStep")}</p></div>
+      <div class="next">
+        <p class="lead">
+          {es
+            ? "Si algo de esta página se parece a su situación, hablemos antes de que presente nada."
+            : "If anything on this page sounds like your situation, let us talk before you file anything."}
+        </p>
+        <div class="mhead-actions">
+          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+          <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+        </div>
+
+        {related.length > 0 && (
+          <div class="rel">
+            <p class="eyebrow">{_("label.related")}</p>
+            <ul class="rows">
+              {related.map((r) => (
+                <li class="row-item">
+                  <a class="row-link" href={langPath(lang, r.slug[lang])}>
+                    <span class="row-title">{r.name[lang]}{r.form && <span class="row-form">{r.form}</span>}</span>
+                    <span class="row-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <p class="notice next-note">{_("disclaimer.general")}</p>
+        <p class="notice">{es ? `La Corte de Inmigración de Orlando queda en ${COURT.address}.` : `The Orlando Immigration Court is at ${COURT.address}.`}</p>
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  /* Only ever visible in a review build. Deliberately loud. */
+  .reviewbar {
+    background: #3a2a12; color: #fdf6e8;
+    padding: var(--spacing-s4) var(--gutter);
+    font-size: var(--text-sm);
+  }
+  .reviewbar p { max-width: var(--container-content); margin-inline: auto; }
+  .reviewbar strong { color: #ffd79a; }
+
+  .crumbs { padding-block: var(--spacing-s5) 0; }
+  .crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--spacing-s2);
+               font-family: var(--font-mono); font-size: var(--text-eyebrow);
+               letter-spacing: 0.06em; color: var(--color-ink-2); }
+  .crumbs li + li::before { content: "/"; margin-right: var(--spacing-s2); color: var(--color-line-strong); }
+  .crumbs a { color: inherit; text-decoration: none; }
+  @media (any-hover: hover) { .crumbs a:hover { color: var(--color-clay-ink); } }
+
+  .mhead { padding-block: var(--spacing-s6) var(--spacing-s9); display: grid; gap: var(--spacing-s5); }
+  .mhead-title { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--spacing-s4); }
+  .mhead-form { font-family: var(--font-mono); font-size: var(--text-h4);
+                letter-spacing: 0.04em; font-variant-numeric: tabular-nums; color: var(--color-clay-ink); }
+  .mhead-summary { max-width: var(--container-m-read); }
+  .mhead-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
+  .mhead-by { color: var(--color-ink-2); }
+
+  .who { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
+  .who > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); font-size: var(--text-lead); }
+  .who > li::before { content: "\2014"; color: var(--surface-accent-ink); }
+
+  .mstep { max-width: var(--container-m-read); }
+  .help { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
+  .help > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); }
+  .help > li::before { content: "\2014"; color: var(--surface-accent); }
+  .help-cta { margin-top: var(--spacing-s7); }
+
+  .faqs { max-width: var(--container-m-read); border-bottom: 1px solid var(--surface-line); }
+  .next { display: grid; gap: var(--spacing-s5); }
+  .rel { margin-top: var(--spacing-s5); display: grid; gap: var(--spacing-s3); }
+  .next-note { margin-top: var(--spacing-s5); }
+</style>

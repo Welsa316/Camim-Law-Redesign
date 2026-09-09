@@ -1,0 +1,132 @@
+---
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, ATTORNEY, show } from "../lib/org";
+import { liveGroups, mattersInGroup } from "../lib/services";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const a = ORG.address.value;
+const groups = liveGroups();
+const admissions = show(ATTORNEY.admissions) ?? [];
+const year = new Date().getFullYear();
+const mapsQuery = encodeURIComponent(`${a.street}, ${a.locality}, ${a.region} ${a.postalCode}`);
+---
+<footer class="ftr" data-surface="green-deep">
+  <div class="wrap-wide ftr-inner">
+    <div class="ftr-cols">
+      <div class="ftr-col">
+        <p class="eyebrow">{_("nav.services")}</p>
+        <ul class="ftr-list">
+          {groups.map((g) => (
+            <li>
+              <a href={`${langPath(lang, lang === "es" ? "servicios" : "services")}#${g.id}`}>{g.name[lang]}</a>
+            </li>
+          ))}
+          {groups.flatMap((g) => mattersInGroup(g.id)).map((m) => (
+            <li><a href={langPath(lang, m.slug[lang])}>{m.name[lang]}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="ftr-col">
+        <p class="eyebrow">{lang === "es" ? "El bufete" : "The firm"}</p>
+        <ul class="ftr-list">
+          <li><a href={langPath(lang, "juan-campos")}>{_("nav.attorney")}</a></li>
+          <li><a href={langPath(lang, lang === "es" ? "consulta" : "consultation")}>{_("nav.consultation")}</a></li>
+          <li><a href={langPath(lang, lang === "es" ? "preguntas" : "faq")}>{_("nav.faq")}</a></li>
+          <li><a href={langPath(lang, lang === "es" ? "detenido" : "detained")}>{_("nav.detained")}</a></li>
+          <li><a href={langPath(lang, "orlando")}>{_("nav.orlando")}</a></li>
+          <li><a href={langPath(lang, lang === "es" ? "pagos" : "payment")}>{_("nav.payment")}</a></li>
+        </ul>
+      </div>
+
+      <div class="ftr-col">
+        <p class="eyebrow">{lang === "es" ? "Contacto" : "Contact"}</p>
+        <address class="ftr-address">
+          <a href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} rel="noopener">
+            {a.street}<br />{a.locality}, {a.region} {a.postalCode}
+          </a>
+          <a class="ftr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+          <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
+        </address>
+        <p class="ftr-hours apparatus">
+          {lang === "es" ? "Lunes a viernes" : "Monday to Friday"} · {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}
+        </p>
+        <ul class="ftr-social">
+          <li><a href={ORG.social.value.instagram} rel="noopener">Instagram</a></li>
+          <li><a href={ORG.social.value.facebook} rel="noopener">Facebook</a></li>
+          <li><a href={ORG.social.value.youtube} rel="noopener">YouTube</a></li>
+          <li><a href={ORG.social.value.tiktok} rel="noopener">TikTok</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="rule ftr-rule" />
+
+    <!-- Rule 4-7.12(a): the responsible lawyer and a bona fide office location
+         must appear. Rule 4-7.21(d) and the 4-7.11 comment: the jurisdictional
+         limitation is stated because the attorney is admitted in Louisiana. -->
+    <div class="ftr-legal">
+      <p class="ftr-firm">
+        {ORG.name.value} &middot; {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}
+      </p>
+      <p class="ftr-note">
+        {lang === "es"
+          ? `Oficina en ${a.locality}, ${a.region}. Admitido para ejercer en ${admissions.join(", ")}. No admitido en Florida. La inmigración es una práctica federal, así que representamos a clientes ante USCIS, las cortes de inmigración (EOIR) y los consulados de Estados Unidos desde nuestra oficina de Orlando, incluyendo a personas que viven en otros estados.`
+          : `Office in ${a.locality}, ${a.region}. Admitted to practise in ${admissions.join(", ")}. Not admitted in Florida. Immigration is a federal practice, so we represent clients before USCIS, the immigration courts (EOIR) and U.S. consulates from our Orlando office, including people who live in other states.`}
+      </p>
+      <p class="ftr-note ftr-note--strong">{_("footer.notNotarios")}</p>
+      <p class="ftr-note">
+        {lang === "es"
+          ? "Este sitio es publicidad de servicios legales. La información aquí es general y no es asesoría legal; visitarlo o escribirnos no crea una relación abogado-cliente."
+          : "This website is attorney advertising. The information here is general and is not legal advice; visiting the site or writing to us does not create an attorney-client relationship."}
+      </p>
+      <p class="ftr-meta apparatus">
+        &copy; {year} {ORG.legalName.value}. {_("footer.rights")}
+        <a href={langPath(lang, lang === "es" ? "aviso-legal" : "legal")}>{_("footer.legal")}</a>
+        <a href={langPath(lang, lang === "es" ? "privacidad" : "privacy")}>{_("footer.privacy")}</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr { margin-top: var(--section-y); padding-block: var(--spacing-s10) var(--spacing-s8); }
+  .ftr-inner { display: grid; gap: var(--spacing-s8); }
+  .ftr-cols { display: grid; gap: var(--spacing-s8); }
+  @media (min-width: 768px) { .ftr-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .ftr-col {
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-s4); align-content: start; min-width: 0;
+  }
+  .ftr-col > * { min-width: 0; }
+  .ftr-list, .ftr-social { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--spacing-s2); min-width: 0; }
+  /* Flex-wrap, not a column grid: four links in fixed columns cannot fit a
+     192px track and pushed the document wider than the viewport. */
+  .ftr-social {
+    display: flex; flex-wrap: wrap;
+    gap: var(--spacing-s2) var(--spacing-s5);
+  }
+  /* Not inline-flex: an inline-flex link sizes to max-content and will not
+     wrap, which pushed the address past its grid track and widened the whole
+     document at 768 and 1024. Padding gives the touch height instead. */
+  .ftr a { color: var(--surface-ink); text-decoration: none; display: inline-block; padding-block: 4px; }
+  .ftr-list a, .ftr-social a { padding-block: 6px; }
+  @media (any-hover: hover) { .ftr a:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+  /* An implicit `auto` grid track sizes to max-content, and a grid item's
+     default `min-width: auto` resolves to min-content, so the address grew to
+     fit its longest line and widened the whole document. Both are pinned. */
+  .ftr-address {
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-s2); font-style: normal; min-width: 0;
+  }
+  .ftr-address > * { min-width: 0; }
+  .ftr-hours { color: var(--surface-ink-2); }
+  .ftr-rule { border-color: var(--surface-line); }
+  .ftr-legal { display: grid; gap: var(--spacing-s4); max-width: 72ch; }
+  .ftr-firm { font-family: var(--font-serif); font-size: var(--text-h4); color: var(--surface-ink); }
+  .ftr-note { font-size: var(--text-sm); color: var(--surface-ink-2); }
+  .ftr-note--strong { color: var(--surface-ink); }
+  .ftr-meta { display: flex; flex-wrap: wrap; gap: var(--spacing-s4); font-size: var(--text-eyebrow); }
+</style>

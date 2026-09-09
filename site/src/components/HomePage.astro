@@ -1,0 +1,386 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "./Section.astro";
+import SituationFinder from "./SituationFinder.astro";
+import ServiceRows from "./ServiceRows.astro";
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG, ATTORNEY, MEDIA, COURT, show } from "../lib/org";
+import { liveGroups } from "../lib/services";
+import { graph, orgSchema, attorneySchema } from "../lib/seo";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const es = lang === "es";
+const groups = liveGroups();
+const admissions = show(ATTORNEY.admissions) ?? [];
+const media = MEDIA.filter((m) => m.verified);
+const rating = show(ORG.googleRating);
+const consultation = show(ORG.consultation);
+const portrait = ATTORNEY.portrait.value;
+
+const copy = {
+  es: {
+    title: "Abogado de Inmigración en Orlando, FL | Campos Immigration Law",
+    description:
+      "Juan Campos, abogado dedicado exclusivamente a la ley de inmigración, con oficina en Orlando. Asilo y otros casos migratorios, explicados en español. (407) 418-9193.",
+    display: "Inmigración es lo único que hacemos.",
+    lead: "Juan Campos es abogado de inmigración. Le explicamos su caso en español, hasta que lo entienda, y usted siempre sabe qué sigue.",
+    scopeEyebrow: "Lo que hacemos",
+    scopeTitle: "Casos que llevamos",
+    attorneyEyebrow: "El abogado",
+    attorneyTitle: "Un abogado, con nombre y cara",
+    attorneyBody: [
+      "Nació en Coro, Venezuela. Fue profesor de derecho y abogado penalista antes de emigrar.",
+      "Hizo una maestría en Derecho Comparado en la Universidad de Florida y encontró ahí el trabajo al que se dedica hoy. Trabajó como abogado de planta en Caridades Católicas de la Arquidiócesis de Nueva Orleans, representando a personas inmigrantes en algunos de los procesos más delicados del sistema.",
+      "Hoy dedica su práctica por completo al derecho de inmigración, y publica cada semana explicaciones en español para que la gente entienda sus opciones antes de que sea tarde.",
+    ],
+    commitmentsEyebrow: "Cómo trabajamos",
+    commitments: [
+      { t: "Inmigración es lo único que hacemos.", d: "No llevamos otros tipos de caso. Todo el tiempo del despacho está en un solo cuerpo de leyes." },
+      { t: "Le explicamos su caso hasta que lo entienda.", d: "En español, sin términos que no le hayamos explicado antes, y las veces que haga falta." },
+      { t: "Usted siempre sabrá qué sigue y cuándo.", d: "Qué se presentó, qué falta, qué esperamos del gobierno y en qué plazo aproximado." },
+    ],
+    mediaEyebrow: "En los medios",
+    mediaTitle: "Dónde nos han entrevistado",
+    officeEyebrow: "La oficina",
+    officeTitle: "Dónde estamos",
+    officeBody:
+      "La oficina está en Orlando. Como la inmigración es una materia federal, representamos también a personas que viven en otros estados y fuera del país.",
+    courtNote: `La Corte de Inmigración de Orlando queda en ${COURT.address}.`,
+    consultEyebrow: "La consulta",
+    consultTitle: "Cómo funciona una consulta",
+    consultSteps: [
+      { t: "Nos escribe o nos llama", d: "Nos dice su nombre, cómo contactarle y de qué se trata. Todavía no hacen falta detalles." },
+      { t: "Revisamos si podemos ayudarle", d: "Confirmamos que no haya conflicto de interés y que su caso sea de los que llevamos." },
+      { t: "Hablamos de su caso", d: "Repasamos fechas, entradas y salidas, documentos y opciones reales. Sale sabiendo qué sigue." },
+    ],
+  },
+  en: {
+    title: "Orlando Immigration Lawyer | Campos Immigration Law",
+    description:
+      "Juan Campos practises United States immigration law exclusively, from an Orlando office, for clients in Florida and other states. Asylum and other matters. (407) 418-9193.",
+    display: "Immigration law is all we do.",
+    lead: "Juan Campos is an immigration attorney. We explain your case in your language, until it makes sense, and you always know what happens next.",
+    scopeEyebrow: "What we do",
+    scopeTitle: "Matters we handle",
+    attorneyEyebrow: "The attorney",
+    attorneyTitle: "A lawyer with a name and a face",
+    attorneyBody: [
+      "He was born in Coro, Venezuela. He was a law professor and a criminal defence lawyer before he emigrated.",
+      "He took a master's in comparative law at the University of Florida and found there the work he does now. He served as a staff attorney at Catholic Charities of the Archdiocese of New Orleans, representing immigrants in some of the most sensitive proceedings in the system.",
+      "Today his practice is entirely immigration law, and he publishes explanations in Spanish every week so that people understand their options before it is too late.",
+    ],
+    commitmentsEyebrow: "How we work",
+    commitments: [
+      { t: "Immigration law is all we do.", d: "We take no other kind of case. The whole firm's attention sits on one body of law." },
+      { t: "We explain your case until it makes sense.", d: "In your language, with no term we have not defined first, as many times as it takes." },
+      { t: "You will always know what happens next.", d: "What was filed, what is missing, what we expect from the government, and roughly when." },
+    ],
+    mediaEyebrow: "In the media",
+    mediaTitle: "Where we have been interviewed",
+    officeEyebrow: "The office",
+    officeTitle: "Where we are",
+    officeBody:
+      "The office is in Orlando. Because immigration is federal law, we also represent people who live in other states and outside the country.",
+    courtNote: `The Orlando Immigration Court is at ${COURT.address}.`,
+    consultEyebrow: "The consultation",
+    consultTitle: "How a consultation works",
+    consultSteps: [
+      { t: "You write or call", d: "Your name, how to reach you, and roughly what it is about. No details needed yet." },
+      { t: "We check whether we can help", d: "We confirm there is no conflict of interest and that your matter is one we handle." },
+      { t: "We go through your case", d: "Dates, entries and departures, documents and real options. You leave knowing what happens next." },
+    ],
+  },
+}[lang];
+
+const alternates = { es: "/", en: "/en/" };
+const schema = graph([
+  orgSchema(),
+  attorneySchema(lang),
+  { "@type": "WebPage", "@id": `${Astro.url.origin}${es ? "/" : "/en/"}#page`, name: copy.title, description: copy.description },
+]);
+---
+<Base lang={lang} title={copy.title} description={copy.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema}>
+
+  <!--
+    01 / Opening frame. Full height, the portrait full-bleed in its own column
+    on the institutional ground, the statement set large and low in the frame.
+    The scale contrast between the apparatus line and the display type is the
+    device; there is no decoration doing that work.
+  -->
+  <section class="opener" data-surface="paper">
+    <div class="opener-grid">
+      <div class="opener-text">
+        <div class="opener-text-inner">
+          <p class="eyebrow opener-eyebrow" data-reveal="text">
+            <span class="eyebrow-full">{_("home.eyebrow")}</span>
+            <span class="eyebrow-short">{es ? "Abogado de inmigración" : "Immigration attorney"}</span>
+          </p>
+          <h1 class="hero-type opener-display" data-split-lines>{copy.display}</h1>
+          <p class="lead opener-lead" data-reveal="text">{copy.lead}</p>
+          <div class="opener-actions" data-reveal="control">
+            <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+            {/* The phone lives in the persistent bottom bar on phones, so a
+                second call button here would only push the fold down. */}
+            <a class="btn btn-secondary opener-call" href={`tel:${ORG.phone.value}`}>
+              {_("cta.call")} {ORG.phoneDisplay.value}
+            </a>
+          </div>
+          <p class="opener-meta apparatus" data-reveal="text">
+            Orlando, Florida &middot; {es ? "Atendemos en español e inglés" : "Spanish and English"}
+          </p>
+        </div>
+      </div>
+
+      <figure class="opener-figure" data-reveal="portrait">
+        <img
+          src={portrait.src}
+          width={portrait.width}
+          height={portrait.height}
+          alt={es
+            ? "Juan Campos, abogado de inmigración, de pie con saco de lino claro y corbatín."
+            : "Juan Campos, immigration attorney, standing in a light linen jacket and bow tie."}
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <!-- 02 / Situation finder -->
+  <Section surface="paper-2">
+    <SituationFinder lang={lang} />
+  </Section>
+
+  <!-- 03 / Practice groups -->
+  <Section surface="paper">
+    <div class="editorial">
+      <div>
+        <p class="eyebrow">{copy.scopeEyebrow}</p>
+      </div>
+      <div>
+        <h2 class="h2">{copy.scopeTitle}</h2>
+      </div>
+    </div>
+    <div class="scope-rows">
+      {groups.map((g) => <ServiceRows lang={lang} group={g} />)}
+    </div>
+    <p class="scope-more">
+      <a class="link-arrow" href={langPath(lang, es ? "servicios" : "services")}>
+        {_("nav.allServices")} <span aria-hidden="true">&rarr;</span>
+      </a>
+    </p>
+  </Section>
+
+  <!-- 04 / The attorney. The one dark band on the page. -->
+  <Section surface="green">
+    <div class="editorial">
+      <div>
+        <p class="eyebrow">{copy.attorneyEyebrow}</p>
+      </div>
+      <div class="att">
+        <h2 class="h2">{copy.attorneyTitle}</h2>
+        <div class="prose att-body">
+          {copy.attorneyBody.map((p) => <p>{p}</p>)}
+        </div>
+
+        <dl class="meta att-meta">
+          <div class="meta-item">
+            <dt class="meta-term">{es ? "Admisión" : "Admission"}</dt>
+            <dd>{admissions.join(", ")}</dd>
+          </div>
+          <div class="meta-item">
+            <dt class="meta-term">{es ? "Estudios" : "Education"}</dt>
+            <dd>{(show(ATTORNEY.education) ?? []).map((e) => `${e.degree}, ${e.school}`).join(" · ")}</dd>
+          </div>
+          <div class="meta-item">
+            <dt class="meta-term">{es ? "Membresía" : "Membership"}</dt>
+            <dd>{(show(ATTORNEY.memberships) ?? []).join(", ")}</dd>
+          </div>
+          <div class="meta-item">
+            <dt class="meta-term">{_("label.languages")}</dt>
+            <dd>{es ? "Español e inglés" : "Spanish and English"}</dd>
+          </div>
+        </dl>
+
+        <p class="att-cta">
+          <a class="link-arrow" href={langPath(lang, "juan-campos")}>
+            {_("cta.meetAttorney")} <span aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- 05 / Commitments, as type. Not cards. -->
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.commitmentsEyebrow}</p></div>
+      <ul class="commit" data-stagger>
+        {copy.commitments.map((c) => (
+          <li data-reveal="text">
+            <p class="h3 commit-t">{c.t}</p>
+            <p class="commit-d">{c.d}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+
+  {media.length > 0 && (
+    <Section surface="paper-2">
+      <div class="editorial">
+        <div><p class="eyebrow">{copy.mediaEyebrow}</p></div>
+        <div>
+          <h2 class="h2">{copy.mediaTitle}</h2>
+          <ul class="media" data-stagger>
+            {media.map((m) => (
+              <li data-reveal="media">
+                <img src={m.still} width={m.width} height={m.height} loading="lazy" decoding="async"
+                     alt={es ? `Juan Campos entrevistado en ${m.outlet}.` : `Juan Campos interviewed on ${m.outlet}.`} />
+                <p class="apparatus media-meta">
+                  {m.outlet}{m.station ? ` · ${m.station}` : ""} · {m.programme}
+                </p>
+                <p class="media-topic">{m.chyron[lang]}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Section>
+  )}
+
+  <!-- 06 / Consultation, as a numbered column -->
+  <Section surface="paper">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.consultEyebrow}</p></div>
+      <div>
+        <h2 class="h2">{copy.consultTitle}</h2>
+        <ol class="steps consult-steps">
+          {copy.consultSteps.map((s) => (
+            <li>
+              <div>
+                <p class="h4">{s.t}</p>
+                <p class="consult-d">{s.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        {consultation ? (
+          <p class="consult-price prose">{consultation.price}</p>
+        ) : null}
+        <p class="consult-cta">
+          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- 07 / Office -->
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div><p class="eyebrow">{copy.officeEyebrow}</p></div>
+      <div class="office">
+        <h2 class="h2">{copy.officeTitle}</h2>
+        <p class="lead">{copy.officeBody}</p>
+        <address class="office-addr">
+          <span>{ORG.address.value.street}</span>
+          <span>{ORG.address.value.locality}, {ORG.address.value.region} {ORG.address.value.postalCode}</span>
+          <a class="apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+        </address>
+        <p class="notice">{copy.courtNote}</p>
+        {rating && (
+          <p class="notice office-reviews">
+            {es
+              ? `Nuestros clientes nos han dejado ${rating.count} reseñas en Google, con una calificación de ${rating.value}.`
+              : `Our clients have left ${rating.count} Google reviews, with a ${rating.value} rating.`}
+          </p>
+        )}
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  /* --- opening frame --- */
+  .opener { padding: 0; }
+  .opener-grid { display: grid; }
+  .opener-text { display: grid; align-content: center; padding: var(--spacing-s7) var(--gutter) var(--spacing-s8); }
+  .opener-text-inner { display: grid; gap: var(--spacing-s5); width: 100%; max-width: var(--container-content); margin-inline: auto; }
+  .opener-eyebrow { margin-bottom: var(--spacing-s2); }
+  .eyebrow-short { display: none; }
+  @media (max-width: 520px) {
+    .eyebrow-full { display: none; }
+    .eyebrow-short { display: inline; }
+  }
+  .opener-display { margin: 0; max-width: 13ch; }
+  .opener-lead { max-width: 46ch; }
+  .opener-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
+  .opener-actions .btn { flex: 0 0 auto; }
+  .opener-call { display: none; }
+  @media (min-width: 900px) { .opener-call { display: inline-flex; } }
+  .opener-meta { color: var(--color-ink-2); }
+
+  .opener-figure { margin: 0; background: var(--color-paper-2); overflow: hidden; }
+  .opener-figure img { transform: scale(1.06); transform-origin: 60% 30%; }
+  .opener-figure img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Phone: the portrait is a band at the top, capped so the statement, the
+     lead and both buttons clear a 375x667 screen without scrolling. */
+  @media (max-width: 899px) {
+    .opener-grid { grid-template-areas: "fig" "text"; }
+    .opener-figure { grid-area: fig; height: 24svh; min-height: 168px; max-height: 240px; }
+    .opener-figure img { object-position: 58% 10%; }
+    .opener-text { grid-area: text; padding-block: var(--spacing-s6) var(--spacing-s7); }
+    .opener-text-inner { gap: var(--spacing-s4); }
+    .opener-lead { font-size: var(--text-base); }
+  }
+
+  /* Desktop: a true two-column frame that fills the viewport, the portrait
+     running edge to edge and floor to ceiling in its own column. */
+  @media (min-width: 900px) {
+    .opener-grid {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      /* The real measured header height, not a guess. Set on :root and kept
+         in sync by the header's own stylesheet. */
+      min-height: calc(100svh - var(--header-h));
+    }
+    .opener-text { padding-block: var(--spacing-s7) var(--spacing-s7); padding-inline: var(--gutter); }
+    .opener-text-inner { margin-inline: 0 0; margin-left: auto; max-width: 40rem; gap: var(--spacing-s4); }
+    .opener-figure { height: 100%; }
+    .opener-figure img { object-position: 62% 22%; }
+  }
+  @media (min-width: 1440px) {
+    .opener-text-inner { max-width: 46rem; }
+  }
+
+  /* --- sections --- */
+  .scope-rows { margin-top: var(--spacing-s7); }
+  .scope-more { margin-top: var(--spacing-s6); }
+
+  .att { display: grid; gap: var(--spacing-s5); }
+  .att-body { max-width: var(--container-m-read); }
+  .att-meta { margin-top: var(--spacing-s3); gap: var(--spacing-s3); }
+  .att-meta dd { margin: 0; }
+
+  .commit { list-style: none; display: grid; gap: var(--spacing-s7); }
+  .commit-t { margin: 0 0 var(--spacing-s2); max-width: 22ch; }
+  .commit-d { color: var(--surface-ink-2); max-width: var(--container-m-short); }
+
+  .media { list-style: none; display: grid; gap: var(--spacing-s6); margin-top: var(--spacing-s6); }
+  @media (min-width: 700px) { .media { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .media img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-md); }
+  .media-meta { margin-top: var(--spacing-s3); }
+  .media-topic { font-size: var(--text-base); }
+
+  .consult-steps { margin-top: var(--spacing-s5); max-width: var(--container-m-read); }
+  .consult-d { color: var(--surface-ink-2); }
+  .consult-price { margin-top: var(--spacing-s5); }
+  .consult-cta { margin-top: var(--spacing-s6); }
+
+  .office { display: grid; gap: var(--spacing-s5); }
+  .office-addr { display: grid; gap: var(--spacing-s1); font-style: normal; font-size: var(--text-lead); }
+  .office-addr a { color: var(--surface-ink); text-decoration: none; }
+  .office-reviews { color: var(--surface-ink-2); }
+</style>

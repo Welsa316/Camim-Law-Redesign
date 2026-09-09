@@ -1,0 +1,10 @@
+---
+import MatterPage from "../../components/MatterPage.astro";
+import { liveMatters } from "../../lib/services";
+
+export function getStaticPaths() {
+  return liveMatters().map((m) => ({ params: { matter: m.slug.en }, props: { matter: m } }));
+}
+const { matter } = Astro.props;
+---
+<MatterPage lang="en" matter={matter} />

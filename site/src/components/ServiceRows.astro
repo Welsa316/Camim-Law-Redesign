@@ -1,0 +1,40 @@
+---
+import { langPath, type Lang } from "../i18n/ui";
+import { mattersInGroup, type Group } from "../lib/services";
+
+interface Props { lang: Lang; group: Group }
+const { lang, group } = Astro.props;
+const matters = mattersInGroup(group.id);
+---
+{matters.length > 0 && (
+  <div class="grp" id={group.id}>
+    <hr class="rule-accent" />
+    <div class="editorial grp-head">
+      <div>
+        <h3 class="h3 grp-name">{group.name[lang]}</h3>
+      </div>
+      <p class="grp-line">{group.line[lang]}</p>
+    </div>
+    <ul class="rows" data-stagger>
+      {matters.map((m) => (
+        <li class="row-item" data-reveal="text">
+          <a class="row-link" href={langPath(lang, m.slug[lang])}>
+            <span class="row-title">
+              {m.name[lang]}
+              {m.form && <span class="row-form">{m.form}</span>}
+            </span>
+            <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<style>
+  .grp { margin-top: var(--spacing-s8); }
+  .grp:first-of-type { margin-top: 0; }
+  .grp-head { margin-block: var(--spacing-s5) var(--spacing-s4); }
+  .grp-name { margin: 0; }
+  .grp-line { color: var(--surface-ink-2); max-width: var(--container-m-short); }
+</style>

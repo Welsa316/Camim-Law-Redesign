@@ -79,6 +79,18 @@ export const ORG = {
    * Until confirmed the site states the city and does not invite walk-ins.
    */
   officeIsStaffed: pending<boolean>(false),
+  /**
+   * Whether Juan Campos has actually read and approved the practice-area copy.
+   *
+   * Until he has, no page may say he wrote or reviewed it. The substance of
+   * the asylum page tracks what camimlaw.com already published, but it was
+   * rewritten here, and two form numbers (I-589, I-765) were added that the
+   * old site never mentioned. Asserting attorney authorship before that review
+   * happens is a factually inaccurate statement about the advertising lawyer
+   * under Rule 4-7.13(a)(1). The byline names him as the responsible attorney,
+   * which Rule 4-7.12 requires anyway, and claims nothing further.
+   */
+  copyReviewedByAttorney: pending<boolean>(false),
 } as const;
 
 export const ATTORNEY = {

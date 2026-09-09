@@ -78,7 +78,7 @@ const schema = graph([
       <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
     </div>
     <p class="apparatus mhead-by">
-      {_("label.reviewedBy")} {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value} &middot;
+      {show(ORG.copyReviewedByAttorney) ? `${_("label.reviewedBy")} ` : ""}{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value} &middot;
       {es ? "Admitido en" : "Admitted in"} {admissions.join(", ")} &middot;
       {_("label.updated")} <time datetime={updated}>{updated}</time>
     </p>

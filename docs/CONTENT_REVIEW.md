@@ -47,6 +47,67 @@ Only asylum ships today, because it is the only service the current site publish
 
 **Why it matters:** Rule 4-7.13(b)(4) forbids advertising areas the firm does not practise.
 
+### 1.2b Every legal statement on the asylum page, and where it came from
+
+The asylum page is the only page on this site that states immigration law, and
+it is the only practice page that ships. Its substance was taken from what
+camimlaw.com already publishes, rewritten for plainer Spanish and shorter
+sentences. It was not composed from general knowledge, and nothing on it is
+invented. This table is the audit, so the review is a comparison rather than a
+re-derivation.
+
+**Already published on camimlaw.com. Same substance, new wording.**
+
+| Statement on the new page | On the current site |
+|---|---|
+| Asylum protects people already in the United States who cannot return because of persecution or a well-founded fear of it | Yes |
+| The grounds are race, religion, nationality, political opinion, membership of a particular social group | Yes |
+| Asylum and refugee status protect the same class of person and differ in where you apply | Yes |
+| If asylum is granted you may live and work here, and may apply for permanent residence one year later | Yes |
+| A spouse and unmarried children under 21 may be included if they are in the United States | Yes |
+| Applications filed more than a year after arrival are restricted, with exceptions | Yes ("cambios o circunstancias extraordinarias") |
+| The affirmative route runs before a USCIS asylum officer; the defensive route before an immigration judge | Yes |
+| If the asylum officer does not grant, the case is referred to an immigration judge and there is another opportunity | Yes |
+| Travelling back is inadvisable; a pending applicant may seek a travel document for brief emergency travel, and without prior approval USCIS may treat the application as abandoned | Yes |
+| Processing time varies by jurisdiction and by asylum office caseload | Yes |
+| After a certain number of days with a properly filed pending application you may request employment authorisation, and the work permit cannot be used to travel or re-enter | Yes, near-verbatim, including the deliberate vagueness of "a certain number of days" |
+
+**Not on the current site. Added in this draft, and needs his yes or no.**
+
+| Addition | What it is | Why it was added |
+|---|---|---|
+| **Form I-589** | The asylum application form number, named three times plus the page description | People search by form number, and naming it is how the page answers that search. The current site never mentions it. |
+| **Form I-765** | The employment authorisation form number, in the work-permit answer | Same reason. Also never mentioned on the current site. |
+| **"If you hold a valid status you may remain under it"** | The other half of the answer about a non-grant by the asylum office | The current site describes only the referral to a judge. This sentence is correct but it is an addition. |
+| **Orlando Immigration Court, 3535 Lawton Road, Suite 200, Orlando, FL 32803** | A government address, in `COURT` in `org.ts`, sourced to EOIR | Local specificity for the defensive-asylum section. Not client-supplied. Confirm it is the court he actually appears in. |
+
+**Deliberately dropped from the current site's version.** Each was on camimlaw.com
+and is not carried over: the Convention Against Torture paragraph, the claim
+that USCIS has *eleven* asylum offices, and the statement that a work permit
+*may be approved for two years*. The first needs its own page rather than a
+footnote; the second and third are numbers that go stale.
+
+**Where:** the `asilo` matter in `site/src/lib/services.ts`, and `COURT` in
+`site/src/lib/org.ts`.
+
+**Why it matters:** Rule 4-7.13(a)(1) — a material statement that is factually
+or legally inaccurate makes the whole advertisement deceptive. Form numbers and
+eligibility statements are exactly that kind of material statement.
+
+### 1.2c The byline does not claim he wrote or reviewed the page
+
+The practice-page byline reads "Juan Campos, Esq. · Admitido en Louisiana
+Supreme Court (2020) · Última actualización 2026-09-09". It names the
+responsible attorney, which Rule 4-7.12 requires, and claims nothing more.
+
+An earlier draft read "Escrito y revisado por Juan Campos, Esq." That was
+removed: it asserts an attorney review that has not happened, which is itself a
+factually inaccurate statement under Rule 4-7.13(a)(1).
+
+**To turn it back on, once he has actually read the page:** set
+`ORG.copyReviewedByAttorney` to verified in `site/src/lib/org.ts`. The byline
+then reads "Escrito y revisado por" again. Nothing else changes.
+
 ### 1.3 The consultation
 
 Not published anywhere today. Not on either firm's site, not on any directory. Avvo says it has found no cost information.

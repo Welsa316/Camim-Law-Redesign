@@ -59,7 +59,7 @@ Spanish is the default language at the root. English lives under `/en/` with tra
 /recursos/  /recursos/<article>/           Resources and updates
 /orlando/                                  Orlando USCIS field office and immigration court
 /pagos/                                    Payment
-/aviso-legal/  /privacidad/                Legal notices and privacy
+(no legal-notice or privacy routes: camimlaw.com publishes neither, and nothing is drafted for the client)
 /404
 
 /en/                                       mirrors all of the above with English slugs
@@ -68,7 +68,7 @@ Spanish is the default language at the root. English lives under `/en/` with tra
 /en/deportation-defense-orlando/  /en/citizenship-lawyer-orlando/
 /en/family-petitions-orlando/  /en/marriage-green-card-orlando/
 /en/work-permit-orlando/  /en/consultation/  /en/detained/  /en/faq/
-/en/resources/  /en/orlando/  /en/payment/  /en/legal/  /en/privacy/
+/en/resources/  /en/orlando/  /en/payment/
 ```
 
 The attorney page sits at `/juan-campos/` rather than `/abogado/` because it is the `Person` entity page. Entity resolution is the firm's first problem, and a URL carrying the name helps it.
@@ -160,7 +160,7 @@ Four columns plus a legal band.
 3. **Contacto** — address as a link to the map, phone as a call link, email, hours, Instagram.
 4. **Idioma** — ES / EN, and the "no somos notarios" clarifier.
 
-Legal band: firm name and responsible attorney, "Orlando, Florida", the advertising disclaimer, privacy and legal links. Rule 4-7.12(a) requires the first two on every page and the footer is where they live.
+Legal band: firm name and responsible attorney, "Orlando, Florida", the advertising disclaimer. Rule 4-7.12(a) requires the first two on every page and the footer is where they live.
 
 ## 6. The situation finder
 
@@ -193,7 +193,7 @@ Each answer routes to a group page, not to a result. It is navigation, not a qui
 | Urgent | `/detenido/` |
 | Index | `/servicios/` A-Z, `/recursos/` |
 | Article | `/recursos/<article>/` |
-| Simple | `/preguntas/`, `/orlando/`, `/pagos/`, `/aviso-legal/`, `/privacidad/` |
+| Simple | `/preguntas/`, `/orlando/`, `/pagos/` |
 | 404 | `/404` |
 
 ## 8. Content model

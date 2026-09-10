@@ -247,7 +247,7 @@ Two clearly labelled paths, invoice versus new-matter deposit, each going to the
 
 ---
 
-## Legal — `/aviso-legal/` and `/privacidad/`
+## Legal — `/aviso-legal/` and `/privacidad/` (removed 2026-09-10: camimlaw.com publishes neither, and nothing is drafted for the client; see CONTENT_REVIEW.md §1.1b)
 
 The advertising disclosures, the general-information notice, the no-attorney-client-relationship statement, and the privacy policy. Both languages, both linked from the footer of every page.
 

@@ -47,6 +47,31 @@ Only asylum ships today, because it is the only service the current site publish
 
 **Why it matters:** Rule 4-7.13(b)(4) forbids advertising areas the firm does not practise.
 
+### 1.1b Removed: the legal-notice page, the privacy page, and the copyright line
+
+camimlaw.com publishes no legal notice, no privacy policy and no copyright
+line. Its footer is the address, the hours, the email and the phone number.
+Earlier drafts of this site carried all three, written here, which is
+information the firm never published. They are gone: the four pages, their
+footer links, and the "© 2026 Campos Immigration Law Firm LLC" line.
+
+What remains in the footer is the set of statements the advertising rules
+require and that are verified facts: the firm name and the responsible
+attorney (Rule 4-7.12(a)), the Orlando office and the Louisiana admission
+with the Florida limitation (Rule 4-7.21(d)), "not notaries or immigration
+consultants", and the attorney-advertising line. Strike any of them and the
+rule it serves is the reason to put it back.
+
+**Decide:** whether the firm wants a privacy policy at all. The consultation
+form collects a name, a phone number, an email address and a topic. No
+statute obliges a firm of this size in Florida to publish one, but Google Ads
+and Meta require a privacy-policy URL to run lead campaigns, and a policy is
+the usual place to say what the form does with what it collects. If yes, the
+text has to come from the firm or its counsel. Nothing will be drafted here.
+
+**Where:** `site/src/components/SiteFooter.astro`. A supplied policy becomes
+one page and one footer link.
+
 ### 1.2a The two figures in the opening frame
 
 The frame carries two numbers, both taken from existing sources rather than

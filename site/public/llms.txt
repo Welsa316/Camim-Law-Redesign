@@ -31,7 +31,6 @@ Pages (Spanish is the primary language; each links to its English twin)
 - /preguntas/ — Common questions. https://www.camimlaw.com/en/faq/
 - /orlando/ — Orlando Immigration Court and local information. https://www.camimlaw.com/en/orlando/
 - /pagos/ — Payment. https://www.camimlaw.com/en/payment/
-- /aviso-legal/ — Legal notice. https://www.camimlaw.com/en/legal/
 
 Notes
 - Not a notario, notary or immigration consultant. This is a law firm.

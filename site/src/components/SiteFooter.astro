@@ -9,7 +9,6 @@ const _ = t(lang);
 const a = ORG.address.value;
 const groups = liveGroups();
 const admissions = show(ATTORNEY.admissions) ?? [];
-const year = new Date().getFullYear();
 const mapsQuery = encodeURIComponent(`${a.street}, ${a.locality}, ${a.region} ${a.postalCode}`);
 ---
 <footer class="ftr" data-surface="navy-deep">
@@ -83,9 +82,6 @@ const mapsQuery = encodeURIComponent(`${a.street}, ${a.locality}, ${a.region} ${
           : "This website is attorney advertising. The information here is general and is not legal advice; visiting the site or writing to us does not create an attorney-client relationship."}
       </p>
       <p class="ftr-meta apparatus">
-        &copy; {year} {ORG.legalName.value}. {_("footer.rights")}
-        <a href={langPath(lang, lang === "es" ? "aviso-legal" : "legal")}>{_("footer.legal")}</a>
-        <a href={langPath(lang, lang === "es" ? "privacidad" : "privacy")}>{_("footer.privacy")}</a>
       </p>
     </div>
   </div>

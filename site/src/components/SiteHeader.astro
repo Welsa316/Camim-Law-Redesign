@@ -3,6 +3,7 @@ import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG } from "../lib/org";
 import { SERVICES } from "../lib/services";
 import type { Alternates } from "../lib/seo";
+import { IS_DEMO } from "../lib/site.js";
 
 interface Props { lang: Lang; alternates: Alternates; overHero?: boolean }
 const { lang, alternates, overHero = false } = Astro.props;
@@ -24,20 +25,19 @@ const nav = [
     </a>
 
     <nav class="hdr-nav">
-      {nav.map((item) => (
-        <a class="hdr-link" href={item.href} aria-current={Astro.url.pathname === item.href ? "page" : undefined}>
-          {item.label}
-        </a>
-      ))}
+      {nav.map((item) => IS_DEMO
+        ? <span class="hdr-link">{item.label}</span>
+        : <a class="hdr-link" href={item.href} aria-current={Astro.url.pathname === item.href ? "page" : undefined}>{item.label}</a>
+      )}
     </nav>
 
     <div class="hdr-actions">
       <a class="hdr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
-      <a class="hdr-pay" href={langPath(lang, "pagos")}>{_("nav.payment")}</a>
+      {IS_DEMO ? <span class="hdr-pay">{_("nav.payment")}</span> : <a class="hdr-pay" href={langPath(lang, "pagos")}>{_("nav.payment")}</a>}
       <a class="hdr-lang" href={otherHref} lang={other} hreflang={other} aria-label={other === "en" ? _("lang.en") : _("lang.es")}>
         <span aria-hidden="true">{lang === "es" ? "EN" : "ES"}</span>
       </a>
-      <a class="btn btn-primary hdr-cta" href={langPath(lang, "consulta")}>
+      <a class="btn btn-primary hdr-cta" href={IS_DEMO ? `tel:${ORG.phone.value}` : langPath(lang, "consulta")}>
         {_("cta.book")}
       </a>
       <button class="hdr-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu">
@@ -55,14 +55,14 @@ const nav = [
           <p class="drawer-group-name">{_("nav.services")}</p>
           <ul>
             {SERVICES.map((m) => (
-              <li><a class="drawer-link" href={langPath(lang, m.slug)}>{m.name[lang]}</a></li>
+              <li>{IS_DEMO ? <span class="drawer-link">{m.name[lang]}</span> : <a class="drawer-link" href={langPath(lang, m.slug)}>{m.name[lang]}</a>}</li>
             ))}
           </ul>
         </li>
         {nav.map((item) => (
-          <li><a class="drawer-link drawer-link--big" href={item.href}>{item.label}</a></li>
+          <li>{IS_DEMO ? <span class="drawer-link drawer-link--big">{item.label}</span> : <a class="drawer-link drawer-link--big" href={item.href}>{item.label}</a>}</li>
         ))}
-        <li><a class="drawer-link drawer-link--big" href={langPath(lang, "pagos")}>{_("nav.payment")}</a></li>
+        <li>{IS_DEMO ? <span class="drawer-link drawer-link--big">{_("nav.payment")}</span> : <a class="drawer-link drawer-link--big" href={langPath(lang, "pagos")}>{_("nav.payment")}</a>}</li>
       </ul>
       <div class="drawer-actions">
         <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>

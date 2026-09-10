@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
+import { IS_DEMO } from "../lib/site.js";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileBar from "../components/MobileBar.astro";
 import { t, type Lang } from "../i18n/ui";
@@ -19,7 +20,8 @@ interface Props {
   overHero?: boolean;
 }
 
-const { lang, title, description, path, alternates, schema, ogImage = "/img/og-default.jpg", noindex = false, overHero = false } = Astro.props;
+const { lang, title, description, path, alternates, schema, ogImage = "/img/og-default.jpg", noindex: noindexProp = false, overHero = false } = Astro.props;
+const noindex = noindexProp || IS_DEMO;
 const _ = t(lang);
 const canonical = abs(path);
 const alts = hreflang(alternates);

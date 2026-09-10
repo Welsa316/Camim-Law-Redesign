@@ -10,3 +10,5 @@ dist/
 .vercel
 .netlify
 docs/.parts/
+demo/
+demo.zip

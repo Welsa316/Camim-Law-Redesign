@@ -118,7 +118,12 @@ const nav = [
      in the footer, so nothing is lost. */
   @media (max-width: 419px) { .hdr-mark-rest { display: none; } }
 
-  .hdr-nav { display: none; gap: var(--spacing-s6); margin-inline-start: auto; }
+  /* One rhythm across the bar, measured rather than assumed. Before: links
+     32px apart, then 24px to the phone number, then the four actions 12px
+     apart, which read as two different bars. Now: 28px inside each group,
+     20px inside the actions, and a 40px seam between the two groups, so the
+     seam is the largest gap in the row rather than the smallest. */
+  .hdr-nav { display: none; gap: 28px; margin-inline-start: auto; }
   .hdr-link {
     text-decoration: none; color: var(--color-ink); white-space: nowrap;
     font-weight: var(--font-weight-medium); font-size: var(--text-base);
@@ -131,7 +136,10 @@ const nav = [
 
   .hdr-actions { display: flex; align-items: center; gap: var(--spacing-s2); margin-inline-start: auto; flex: none; }
   @media (min-width: 480px) { .hdr-actions { gap: var(--spacing-s3); } }
-  .hdr-nav + .hdr-actions { margin-inline-start: 0; }
+  @media (min-width: 1160px) {
+    .hdr-actions { gap: 20px; }
+    .hdr-nav + .hdr-actions { margin-inline-start: 40px; }
+  }
   .hdr-phone, .hdr-pay { display: none; text-decoration: none; }
   .hdr-phone { color: var(--color-ink); font-size: var(--text-sm); }
   .hdr-pay { color: var(--color-ink-2); font-size: var(--text-sm); font-weight: var(--font-weight-medium); }

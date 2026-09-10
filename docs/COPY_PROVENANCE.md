@@ -4,7 +4,7 @@ Every visible string on the built site, checked by `verify/copy-provenance.py` a
 
 | Category | Strings | Words |
 |---|---:|---:|
-| verbatim | 506 | 10544 |
+| verbatim | 508 | 10548 |
 | verbatim-fragment | 53 | 747 |
 | verbatim-parts | 45 | 306 |
 | verbatim-part-of-element | 7 | 8 |

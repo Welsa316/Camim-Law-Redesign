@@ -4,8 +4,8 @@ import { ORG } from "../lib/org";
 import { liveGroups, mattersInGroup } from "../lib/services";
 import type { Alternates } from "../lib/seo";
 
-interface Props { lang: Lang; alternates: Alternates }
-const { lang, alternates } = Astro.props;
+interface Props { lang: Lang; alternates: Alternates; overHero?: boolean }
+const { lang, alternates, overHero = false } = Astro.props;
 const _ = t(lang);
 const other: Lang = lang === "es" ? "en" : "es";
 const otherHref = other === "es" ? alternates.es : alternates.en;
@@ -18,7 +18,7 @@ const nav = [
   { href: langPath(lang, lang === "es" ? "preguntas" : "faq"), label: _("nav.faq") },
 ];
 ---
-<header class="hdr" data-header>
+<header class="hdr" data-header data-over={overHero ? "" : undefined}>
   <div class="hdr-inner wrap-wide">
     <a class="hdr-mark" href={langPath(lang)}>
       <span class="hdr-mark-name">Campos</span>
@@ -113,8 +113,9 @@ const nav = [
     padding-block: 6px;
     min-height: 44px; align-items: center;
   }
-  .hdr-mark-name { font-weight: 400; letter-spacing: -0.02em; }
+  .hdr-mark-name { font-weight: 400; letter-spacing: -0.02em; white-space: nowrap; }
   .hdr-mark-rest {
+    white-space: nowrap;
     font-family: var(--font-mono); font-size: var(--text-eyebrow);
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-2);
   }
@@ -125,7 +126,7 @@ const nav = [
 
   .hdr-nav { display: none; gap: var(--spacing-s6); margin-inline-start: auto; }
   .hdr-link {
-    text-decoration: none; color: var(--color-ink);
+    text-decoration: none; color: var(--color-ink); white-space: nowrap;
     font-weight: var(--font-weight-medium); font-size: var(--text-base);
     padding-block: var(--spacing-s2);
     border-bottom: 2px solid transparent;
@@ -162,15 +163,34 @@ const nav = [
   .hdr-toggle-bars { display: grid; gap: 5px; width: 18px; }
   .hdr-toggle-bars i { display: block; height: 1.5px; background: var(--color-ink); }
 
-  @media (min-width: 1024px) {
+  /* 1160, not 1024. At exactly 1024 the wordmark, four nav items, the phone
+     number, the pay link, the language control and the booking button do not
+     fit on one line, so the flex items shrank past their content and the link
+     labels broke in two: the bar rendered 109px tall instead of 81, and the
+     wordmark was clipped to 40px. The drawer covers everything below this. */
+  @media (min-width: 1160px) {
     .hdr-nav { display: flex; }
     .hdr-phone, .hdr-pay, .hdr-cta { display: inline-flex; }
     .hdr-toggle { display: none; }
   }
 
   /* --- drawer --- */
+  /* The drawer is a fixed child of the header, and the header carries a
+     backdrop-filter, which makes the header the containing block for fixed
+     descendants. So `bottom: 0` resolved to the *header's* bottom edge and the
+     drawer was laid out upward from there: at 390x844 its box was -692 to 76,
+     which is off the top of the screen with only its last 76px left, sitting
+     over the button that opens it. The menu opened onto nothing and could not
+     be closed by tapping the control again.
+
+     Anchored from the top instead, `100%` is the header's own height, which is
+     exactly where the drawer should start, and it stays correct when the bar
+     condenses on scroll. */
   .drawer {
-    position: fixed; inset: 0; top: auto; height: calc(100dvh - 100%);
+    position: fixed;
+    left: 0; right: 0;
+    top: 100%; bottom: auto;
+    height: calc(100dvh - 100%);
     background: var(--color-paper); overflow-y: auto;
     border-top: 1px solid var(--color-line);
   }
@@ -194,5 +214,59 @@ const nav = [
     border-bottom: 1px solid var(--color-line); padding-block: var(--spacing-s4);
   }
   .drawer-actions { display: grid; gap: var(--spacing-s3); margin-top: var(--spacing-s7); }
-  @media (min-width: 1024px) { .drawer { display: none !important; } }
+  @media (min-width: 1160px) { .drawer { display: none !important; } }
+
+  /* --- overlay state, while the header is over the opening frame ---------
+     Same bar, same items, same order. Only the ground changes: no fill, a
+     hairline in white instead of stone, and light ink. The script removes
+     `data-over` once the frame has scrolled past, and the transition below is
+     what makes that read as the bar settling rather than blinking. */
+  :global(html.js-on) .hdr[data-over] {
+    background: transparent;
+    /* Not `none`. Any backdrop-filter other than none makes this element the
+       containing block for the fixed drawer inside it, and the drawer is
+       anchored with `top: 100%` against exactly that. Dropping the filter here
+       would silently re-anchor the drawer to the viewport in this state only.
+       `saturate(1)` is a no-op, so the photograph under the bar stays crisp. */
+    backdrop-filter: saturate(1);
+    border-bottom-color: rgb(252 252 250 / 0.14);
+  }
+  .hdr {
+    transition:
+      padding-block var(--d-state) var(--ease-state),
+      background-color var(--d-state) var(--ease-state),
+      border-color var(--d-state) var(--ease-state);
+  }
+  :global(html.js-on) .hdr[data-over] .hdr-mark,
+  :global(html.js-on) .hdr[data-over] .hdr-link,
+  :global(html.js-on) .hdr[data-over] .hdr-phone { color: var(--color-paper); }
+  :global(html.js-on) .hdr[data-over] .hdr-mark-rest { color: rgb(252 252 250 / 0.66); }
+  :global(html.js-on) .hdr[data-over] .hdr-pay { color: rgb(252 252 250 / 0.72); }
+  :global(html.js-on) .hdr[data-over] .hdr-toggle-bars i { background: var(--color-paper); }
+  @media (any-hover: hover) {
+    :global(html.js-on) .hdr[data-over] .hdr-link:hover { border-bottom-color: rgb(252 252 250 / 0.6); }
+    :global(html.js-on) .hdr[data-over] .hdr-phone:hover,
+    :global(html.js-on) .hdr[data-over] .hdr-pay:hover { color: var(--color-brass-light); }
+  }
+  :global(html.js-on) .hdr[data-over] .hdr-link[aria-current="page"] { border-bottom-color: var(--color-brass-light); }
+
+  /* Pills. The one shape borrowed wholesale from the reference, because it is
+     a shape and not a type decision: an outlined capsule for the secondary
+     controls, a filled one for the booking action. */
+  .hdr-lang, .hdr-toggle, .hdr-cta { border-radius: 999px; }
+  .hdr-cta { padding-inline: var(--spacing-s5); }
+  :global(html.js-on) .hdr[data-over] .hdr-lang,
+  :global(html.js-on) .hdr[data-over] .hdr-toggle { border-color: rgb(252 252 250 / 0.34); color: var(--color-paper); }
+  @media (any-hover: hover) {
+    :global(html.js-on) .hdr[data-over] .hdr-lang:hover,
+    :global(html.js-on) .hdr[data-over] .hdr-toggle:hover { border-color: var(--color-paper); }
+  }
+  :global(html.js-on) .hdr[data-over] .hdr-cta {
+    background: transparent;
+    color: var(--color-paper);
+    border: 1px solid rgb(252 252 250 / 0.34);
+  }
+  @media (any-hover: hover) {
+    :global(html.js-on) .hdr[data-over] .hdr-cta:hover { background: var(--color-paper); color: var(--color-navy-deep); border-color: var(--color-paper); }
+  }
 </style>

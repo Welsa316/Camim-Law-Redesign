@@ -9,12 +9,43 @@
 
 /* ------------------------------------------------------------------ header */
 const header = document.querySelector<HTMLElement>("[data-header]");
+
+/**
+ * Set while the header is drawn over a dark opening frame. Kept in a variable
+ * rather than read back off the element, because the element's attribute is
+ * exactly what gets toggled.
+ */
+const startsOverHero = header?.hasAttribute("data-over") ?? false;
+const hero = document.querySelector<HTMLElement>("[data-hero]");
+
+/** Re-evaluate the header's ground. Safe to call at any time. */
+let syncHeader = () => {};
+
 if (header) {
   let ticking = false;
-  const update = () => {
+  let menuOpen = false;
+
+  syncHeader = () => {
     header.toggleAttribute("data-scrolled", window.scrollY > 24);
+    if (!startsOverHero) return;
+    // The drawer's own ground is paper, so the bar has to be paper too while
+    // it is open, whatever the frame behind it is doing.
+    if (menuOpen) {
+      header.removeAttribute("data-over");
+      return;
+    }
+    // Measured from the frame's own box rather than from a scroll offset, so
+    // it stays correct through the frame's negative top margin and through
+    // any later change to its height.
+    const past = hero ? hero.getBoundingClientRect().bottom <= header.offsetHeight + 4 : false;
+    header.toggleAttribute("data-over", !past);
+  };
+
+  const update = () => {
+    syncHeader();
     ticking = false;
   };
+
   addEventListener(
     "scroll",
     () => {
@@ -24,7 +55,16 @@ if (header) {
     },
     { passive: true },
   );
+  addEventListener("resize", update, { passive: true });
   update();
+
+  // The drawer script below flips this through the exported setter.
+  Object.assign(globalThis as Record<string, unknown>, {
+    __setHeaderMenuOpen: (open: boolean) => {
+      menuOpen = open;
+      syncHeader();
+    },
+  });
 }
 
 /* ------------------------------------------------------------------ drawer */
@@ -43,6 +83,8 @@ if (toggle && menu) {
     toggle.setAttribute("aria-expanded", String(open));
     document.body.style.overflow = open ? "hidden" : "";
     if (menuLabel) menuLabel.textContent = open ? labels.close : labels.open;
+    (globalThis as Record<string, unknown>).__setHeaderMenuOpen instanceof Function &&
+      ((globalThis as Record<string, unknown>).__setHeaderMenuOpen as (o: boolean) => void)(open);
   };
 
   toggle.addEventListener("click", () => setOpen(menu.hidden));
@@ -60,7 +102,7 @@ if (toggle && menu) {
   });
 
   // A resize past the desktop breakpoint must not strand an open drawer.
-  matchMedia("(min-width: 1024px)").addEventListener("change", (e) => {
+  matchMedia("(min-width: 1160px)").addEventListener("change", (e) => {
     if (e.matches && !menu.hidden) setOpen(false);
   });
 }

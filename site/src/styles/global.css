@@ -158,7 +158,10 @@
   --section-y: clamp(96px, 6.5vw + 72px, 160px);
   --gutter: 20px;
   /* Sticky header height. Used by the opening frame and by scroll-padding. */
-  --header-h: 66px;
+  /* Measured, not estimated: a 44px control plus s4 padding top and bottom
+     plus the 1px rule. Anything offset against this token is wrong the moment
+     it disagrees with the rendered bar, and verify/header.py asserts it at every width. */
+  --header-h: 77px;
   /* The fixed call bar covers the last strip of the viewport below 1024px.
      One number, so the bar and anything sized against the viewport agree. */
   --mbar-h: 76px;
@@ -177,7 +180,10 @@
 }
 
 @media (min-width: 768px)  { :root { --gutter: 32px; } }
-@media (min-width: 1024px) { :root { --gutter: 48px; --header-h: 82px; --mbar-h: 0px; } }
+@media (min-width: 1024px) { :root { --gutter: 48px; --mbar-h: 0px; } }
+/* The bar grows at the width where the booking button joins it: a 48px button
+   rather than a 44px control. Same breakpoint as SiteHeader's full bar. */
+@media (min-width: 1160px) { :root { --header-h: 81px; } }
 @media (min-width: 1440px) { :root { --gutter: 64px; } }
 
 /* ============================================================================

@@ -62,6 +62,15 @@ export const ORG = {
     },
     "camimlaw.com; live profile reads 2026-09-09",
   ),
+  /**
+   * Their own words, and the strongest thing they can say in a hero: a
+   * Louisiana admission is not a limit on an immigration practice, it is the
+   * reason the practice is nationwide.
+   */
+  statesServed: v(
+    50,
+    "camimlaw.com: 'Nuestras oficinas están ubicadas en Orlando, sin embargo, atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero'",
+  ),
   practiceScope: v(
     "United States immigration law only",
     "camimlaw.com: 'practican exclusivamente la ley de inmigración en los Estados Unidos'",

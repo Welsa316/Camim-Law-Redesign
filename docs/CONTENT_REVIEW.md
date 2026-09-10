@@ -47,6 +47,37 @@ Only asylum ships today, because it is the only service the current site publish
 
 **Why it matters:** Rule 4-7.13(b)(4) forbids advertising areas the firm does not practise.
 
+### 1.2a The two figures in the opening frame
+
+The frame carries two numbers, both taken from existing sources rather than
+supplied by us:
+
+| Figure | Label | Source |
+|---|---|---|
+| 5.0 | 59 reseñas en Google | Google Business Profile, read 2026-09-09 |
+| 50 | estados que atendemos | camimlaw.com: "atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero" |
+
+There is no success rate and no case count, and there will not be one. A past
+results claim has to be objectively verifiable before it can be advertised
+here, and neither of those numbers exists in any record we can check.
+
+**Two things to decide.**
+
+The rating is now the most prominent thing on the home page after the firm's
+own name. It was previously one sentence near the bottom of the page, and it is
+rendered in exactly one place now rather than two. Prominence is the whole
+question: it is a real figure and it names its source, but it is a
+client-satisfaction claim sitting in the first screen. Confirm he wants it
+there.
+
+It also cannot be linked yet, which is the mitigation that makes a rating
+plainly checkable. `ORG.mapsUrl` is still unverified, so there is nothing to
+link to. Supplying the Google Business Profile URL turns the figure into a
+one-click verification and is worth doing before launch.
+
+**Where:** `ORG.googleRating` and `ORG.statesServed` in `site/src/lib/org.ts`.
+Removing either fact from the frame is deleting one list item.
+
 ### 1.2b Every legal statement on the asylum page, and where it came from
 
 The asylum page is the only page on this site that states immigration law, and

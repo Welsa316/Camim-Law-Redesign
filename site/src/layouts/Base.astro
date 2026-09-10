@@ -15,9 +15,11 @@ interface Props {
   schema?: string;
   ogImage?: string;
   noindex?: boolean;
+  /** The page opens on a dark full-bleed frame, so the header sits over it. */
+  overHero?: boolean;
 }
 
-const { lang, title, description, path, alternates, schema, ogImage = "/img/og-default.jpg", noindex = false } = Astro.props;
+const { lang, title, description, path, alternates, schema, ogImage = "/img/og-default.jpg", noindex = false, overHero = false } = Astro.props;
 const _ = t(lang);
 const canonical = abs(path);
 const alts = hreflang(alternates);
@@ -66,6 +68,10 @@ const alts = hreflang(alternates);
       // which is the failure mode we want.
       (function () {
         try {
+          // Anything that only stays correct because a script keeps it correct
+          // is gated on this. The overlay header is the case in point: nothing
+          // can turn it off on scroll if scripting never runs.
+          document.documentElement.classList.add("js-on");
           if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
             document.documentElement.classList.add("js-reveal");
           }
@@ -76,7 +82,7 @@ const alts = hreflang(alternates);
 
   <body>
     <a class="skip-link" href="#main">{_("a11y.skip")}</a>
-    <SiteHeader lang={lang} alternates={alternates} />
+    <SiteHeader lang={lang} alternates={alternates} overHero={overHero} />
     <main id="main">
       <slot />
     </main>

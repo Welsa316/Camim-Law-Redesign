@@ -222,6 +222,17 @@ export const ATTORNEY = {
     "camimlaw.com (LCO07573-Edit.jpg)",
   ),
   /**
+   * The newer photograph, from the sister site's home slideshow
+   * (camulaw.com, Slideshow2-desktop.jpg), cropped to the right half so it is
+   * him alone at the café table; the other person in the frame is entirely
+   * outside the crop. Used on the about page on the client's instruction of
+   * 2026-09-10.
+   */
+  recent: v(
+    { src: "/img/juan-campos-cafe.jpg", width: 1100, height: 1527 },
+    "camulaw.com home slideshow (Slideshow2-desktop.jpg), cropped; sister-site asset approved by the client",
+  ),
+  /**
    * A frame from one of his own Spanish explainer videos, cropped to remove
    * the other firm's watermark. Real, and the only environmental image of him
    * available.

@@ -15,7 +15,7 @@ const es = lang === "es";
 const admissions = show(ATTORNEY.admissions) ?? [];
 const education = show(ATTORNEY.education) ?? [];
 const memberships = show(ATTORNEY.memberships) ?? [];
-const portrait = ATTORNEY.portrait.value; // camimlaw.com's own studio portrait
+const portrait = ATTORNEY.recent.value; // the newer café photograph from the sister site, cropped to him
 const path = langPath(lang, "juan-campos");
 const alternates = { es: "/juan-campos/", en: "/en/juan-campos/" };
 
@@ -117,7 +117,7 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
   .ahead-figure { margin: 0; }
   .ahead-figure img {
     width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
-    object-position: 50% 22%; border-radius: var(--radius-md);
+    object-position: 50% 30%; border-radius: var(--radius-md);
     background: var(--color-paper-2);
   }
   @media (max-width: 899px) {

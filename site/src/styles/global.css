@@ -673,3 +673,17 @@ a { color: inherit; }
 .crumbs a { color: inherit; text-decoration: none; }
 .crumbs a:hover { color: var(--color-ink); }
 .crumbs [aria-current] { color: var(--color-ink); }
+
+/* Switching language is a navigation to another document. Without this the
+   browser paints the new document from nothing, which reads as a flash even
+   when its first paint is the navy frame. A cross-document view transition
+   crossfades the old document into the new one, and the header, which is the
+   same bar on both, holds still through it. Browsers without the feature just
+   navigate. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.32s; animation-timing-function: var(--ease-state, ease); }
+.hdr { view-transition-name: site-header; }
+.mbar { view-transition-name: phone-bar; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

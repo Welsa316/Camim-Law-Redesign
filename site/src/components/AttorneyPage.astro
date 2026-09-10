@@ -2,204 +2,113 @@
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
-import { ORG, ATTORNEY, MEDIA, show } from "../lib/org";
-import { graph, orgSchema, attorneySchema, breadcrumbSchema, abs } from "../lib/seo";
+import { ORG, ATTORNEY, show } from "../lib/org";
+import { graph, orgSchema, attorneySchema, breadcrumbSchema } from "../lib/seo";
 
+/* camimlaw.com/about, then Campos Muños Law's biography of him (camulaw.com,
+   team.members.juan.bio) minus the one paragraph that places his practice in
+   Louisiana (see docs/sources/omissions.json), then record values. */
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
 const es = lang === "es";
-const path = langPath(lang, "juan-campos");
-const alternates = { es: "/juan-campos/", en: "/en/juan-campos/" };
 const admissions = show(ATTORNEY.admissions) ?? [];
 const education = show(ATTORNEY.education) ?? [];
 const memberships = show(ATTORNEY.memberships) ?? [];
-const prior = show(ATTORNEY.priorRoles) ?? [];
-const portrait = ATTORNEY.seated.value;
-const atWork = show(ATTORNEY.atWork);
-const media = MEDIA.filter((m) => m.verified);
+const portrait = ATTORNEY.portrait.value; // camimlaw.com's own studio portrait
+const path = langPath(lang, "juan-campos");
+const alternates = { es: "/juan-campos/", en: "/en/juan-campos/" };
 
-const copy = es
+const camim = es
   ? {
-      title: "Juan Campos, Abogado de Inmigración en Orlando",
-      description:
-        "Juan Campos es abogado de inmigración con oficina en Orlando. Nacido en Venezuela, ex profesor de derecho, admitido en Louisiana y miembro de AILA.",
-      h1: "Juan Campos",
-      role: "Abogado de inmigración",
-      body: [
-        "Nací en Coro, Venezuela. Antes de emigrar fui profesor de derecho y abogado penalista, y llevaba años trabajando en los tribunales de mi país.",
-        "Empezar de nuevo en otro idioma y en otro sistema legal es algo que hice yo mismo. Es la razón por la que entiendo lo que le pasa a alguien que llega a mi oficina sin saber si puede quedarse.",
-        "Hice una maestría en Derecho Comparado en la Universidad de Florida. Ahí encontré el derecho migratorio, y decidí reconstruir mi carrera entera alrededor de esa materia.",
-        "Trabajé como abogado de planta en Caridades Católicas de la Arquidiócesis de Nueva Orleans, representando a personas inmigrantes en algunos de los procesos más delicados del sistema.",
-        "Hoy dedico mi práctica por completo al derecho de inmigración. También publico explicaciones en español cada semana, porque la mayoría de los errores que veo se cometen antes de que alguien hable con un abogado.",
+      h: "Soy un abogado de inmigración con sede en Orlando",
+      p: [
+        "Como abogado de inmigración con experiencia, me dedico a brindar servicios legales excepcionales a personas y familias necesitadas. Ya sea que esté buscando ayuda con visas, tarjetas verdes u otros asuntos de inmigración, tengo el conocimiento y la experiencia para guiarlo a través del complejo proceso.",
+        "Mi equipo y yo entendemos la importancia de su viaje de inmigración y el impacto que puede tener en su vida. Estamos aquí para apoyarlo en cada paso del camino, ofreciéndole soluciones personalizadas adaptadas a sus circunstancias únicas. Con un profundo conocimiento de las leyes y regulaciones de inmigración, me comprometo a lograr el mejor resultado posible para nuestros clientes. Me esfuerzo por brindar representación legal profesional, eficiente y compasiva, asegurando que sus derechos estén protegidos y que su voz sea escuchada.",
       ],
-      jurisdictionTitle: "Por qué una oficina en Orlando con licencia de Louisiana",
-      jurisdictionBody:
-        "El derecho de inmigración es federal. Un abogado admitido en cualquier estado puede representar a personas ante USCIS, ante las cortes de inmigración y ante los consulados de Estados Unidos, sin importar dónde viva el cliente. Estoy admitido en Louisiana, no en Florida, y desde la oficina de Orlando represento a personas en Florida, en otros estados y fuera del país. No llevo asuntos que requieran licencia de Florida, porque no llevo ningún asunto que no sea de inmigración.",
-      credentialsTitle: "Credenciales",
-      mediaTitle: "En los medios",
-      contactTitle: "Hablemos de su caso",
     }
-  : {
-      title: "Juan Campos, Immigration Attorney in Orlando",
-      description:
-        "Juan Campos is an immigration attorney with an Orlando office. Born in Venezuela, a former law professor, admitted in Louisiana and a member of AILA.",
-      h1: "Juan Campos",
-      role: "Immigration attorney",
-      body: [
-        "I was born in Coro, Venezuela. Before I emigrated I was a law professor and a criminal defence lawyer, and I had spent years in my country's courts.",
-        "Starting again in another language and another legal system is something I did myself. It is why I understand what is happening to someone who walks into my office not knowing whether they can stay.",
-        "I took a master's in comparative law at the University of Florida. That is where I found immigration law, and I decided to rebuild my whole career around it.",
-        "I served as a staff attorney at Catholic Charities of the Archdiocese of New Orleans, representing immigrants in some of the most sensitive proceedings in the system.",
-        "Today my practice is entirely immigration law. I also publish explanations in Spanish every week, because most of the mistakes I see are made before anyone speaks to a lawyer.",
-      ],
-      jurisdictionTitle: "Why an Orlando office with a Louisiana licence",
-      jurisdictionBody:
-        "Immigration law is federal. A lawyer admitted in any state may represent people before USCIS, the immigration courts and U.S. consulates, wherever the client lives. I am admitted in Louisiana, not in Florida, and from the Orlando office I represent people in Florida, in other states and outside the country. I do not take matters that would require a Florida licence, because I do not take any matter that is not immigration.",
-      credentialsTitle: "Credentials",
-      mediaTitle: "In the media",
-      contactTitle: "Let us talk about your case",
-    };
-
-const crumbs = [
-  { name: es ? "Inicio" : "Home", url: langPath(lang) },
-  { name: copy.h1, url: path },
-];
-const schema = graph([
-  orgSchema(),
-  attorneySchema(lang),
-  breadcrumbSchema(crumbs),
-  {
-    "@type": "ProfilePage",
-    "@id": `${abs(path)}#page`,
-    mainEntity: { "@id": `${Astro.url.origin}/#juan-campos` },
-    name: copy.title,
-    description: copy.description,
-  },
-]);
+  : null;
+const bio = (es
+  ? [
+      "El derecho migratorio no es solo la profesión de Juan Campos-Gutiérrez — es algo personal. Nacido en Venezuela, aporta más de dos décadas de experiencia legal a su práctica, junto con una comprensión de primera mano de lo que significa empezar de nuevo en un país distinto.",
+      "Fue durante sus estudios de posgrado en los Estados Unidos, mientras cursaba una Maestría en Derecho Comparado (LL.M.) en la Universidad de Florida, que Juan encontró el trabajo para el cual estaba destinado. El derecho de inmigración y nacionalidad resonó en él de una manera que nada más lo había hecho, y tomó la decisión de reconstruir su carrera en torno a esa vocación.",
+      "Antes de fundar su propia práctica, Juan se desempeñó como Abogado de Caridades Católicas en New Orleans, donde representó a la población inmigrante principalmente de Centroamérica — defendiendo sus derechos en algunos de los procesos más delicados y complejos del sistema migratorio.",
+      "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana y es miembro de la American Immigration Lawyers Association (AILA). Ofrece servicios legales en todas las áreas del derecho de inmigración y nacionalidad, y mantiene una presencia activa en redes sociales, donde comparte orientación e información para mantener informadas a las comunidades inmigrantes.",
+      "A lo largo de su carrera, Juan ha representado con éxito a cientos de clientes a nivel administrativo, compareciendo ante las Cortes de Inmigración, el Servicio de Ciudadanía e Inmigración de los Estados Unidos (USCIS) y el Departamento de Estado — representando clientes en distintas jurisdicciones a nivel nacional.",
+      "Juan conoce a fondo el proceso migratorio, y aporta una pasión genuina a cada caso que asume. Su práctica abarca la mayoría de las áreas del derecho de inmigración, pero en el fondo, se trata de las personas: construir relaciones reales con sus clientes y acompañar a inmigrantes, minorías y personas en situación de desventaja. Proteger los derechos de los inmigrantes se ha convertido en algo más que una profesión para Juan — se ha convertido en su misión. Como inmigrante él mismo, comprende de primera mano las preocupaciones de sus clientes, y se esfuerza por explicar las complejidades del derecho migratorio de una manera sencilla, clara y fácil de entender.",
+    ]
+  : [
+      "Immigration law isn't just Juan's profession — it's personal. Born in Venezuela, he brings more than two decades of legal experience to his practice, along with a firsthand understanding of what it means to start over in a new country.",
+      "It was during his graduate studies in the United States, while earning a Master of Comparative Law (LL.M.) from the University of Florida, that Juan found the work he was meant to do. Immigration and nationality law resonated with him in a way nothing else had, and he made the decision to rebuild his career around it.",
+      "Before opening his own practice, Juan served as a Staff Attorney with Catholic Charities Archdiocese of New Orleans, where he represented unaccompanied children — defending their rights in some of the most sensitive and complex proceedings in the immigration system.",
+      "Juan is admitted to practice law before the Louisiana Supreme Court and is a member of the American Immigration Lawyers Association (AILA). He provides legal services across the full scope of Immigration and Nationality Law, and is active on social media, where he shares guidance and updates to help immigrant communities stay informed.",
+      "Over the course of his career, Juan has successfully represented hundreds of clients at the administrative level, appearing before the Immigration Courts, U.S. Citizenship and Immigration Services, and the U.S. Department of State — representing clients across jurisdictions nationwide.",
+      "Juan is intimately familiar with the immigration process, and he brings genuine passion to every case he takes on. His practice spans most areas of immigration law, but at its core, it's about people: building real relationships with his clients and standing beside immigrants, minorities, and those facing disadvantage. Protecting immigrants' rights has become more than a profession for Juan — it's become his mission. As an immigrant himself, he understands his clients' concerns firsthand, and works to explain the complexities of immigration law in a way that's simple, clear, and easy to understand.",
+    ]);
+const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.attorney"), url: path }];
+const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs)]);
+const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value} — ${ORG.name.value}`;
 ---
-<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
-  <section class="ahead" data-surface="paper">
-    <div class="wrap-wide ahead-inner">
-      <div class="ahead-text">
-        <p class="eyebrow">{copy.role}</p>
-        <h1 class="h1" data-split-lines="hero">{copy.h1}, {ATTORNEY.credentialSuffix.value}</h1>
-        <p class="lead">
-          {es
-            ? "Practico solo derecho de inmigración. Le explico su caso en español hasta que lo entienda."
-            : "I practise immigration law only. I explain your case in your language until it makes sense."}
-        </p>
-        <p class="apparatus ahead-meta">
-          {admissions.join(" · ")} &middot; {memberships.join(" · ")} &middot; {es ? "Español e inglés" : "Spanish and English"}
-        </p>
-      </div>
-      <figure class="ahead-figure" data-reveal="portrait">
-        <img src={portrait.src} width={portrait.width} height={portrait.height}
-             alt={es
-               ? "Retrato de Juan Campos, abogado de inmigración, con saco de lino claro y corbatín."
-               : "Portrait of Juan Campos, immigration attorney, in a light linen jacket and bow tie."}
-             fetchpriority="high" decoding="async" />
-      </figure>
+<Base lang={lang} title={title} description={es ? camim!.h : bio[0]} path={path} alternates={alternates} schema={schema}>
+  <nav class="crumbs wrap">
+    <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
+  </nav>
+
+  <section class="ahead wrap" data-surface="paper">
+   <div class="ahead-inner">
+    <div class="ahead-text">
+      <p class="eyebrow">{_("nav.attorney")}</p>
+      <h1 class="h1" data-split-lines="hero">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</h1>
+      {camim && <p class="lead">{camim.h}</p>}
     </div>
+    <figure class="ahead-figure" data-reveal="portrait">
+      <img src={portrait.src} width={portrait.width} height={portrait.height} alt={`${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}`} loading="eager" decoding="async" />
+    </figure>
+   </div>
   </section>
 
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{es ? "En sus palabras" : "In his words"}</p></div>
-      <div class="words">
-        <div class="prose">{copy.body.slice(0, 3).map((p) => <p>{p}</p>)}</div>
-        {atWork && (
-          <figure class="words-fig" data-reveal="media">
-            <img src={atWork.src} width={atWork.width} height={atWork.height}
-                 loading="lazy" decoding="async"
-                 alt={es
-                   ? "Juan Campos en su escritorio, explicando un tema de inmigración a cámara."
-                   : "Juan Campos at his desk, explaining an immigration topic to camera."} />
-            <figcaption class="apparatus">
-              {es
-                ? "Publica explicaciones en español cada semana."
-                : "He publishes explanations in Spanish every week."}
-            </figcaption>
-          </figure>
-        )}
-        <div class="prose">{copy.body.slice(3).map((p) => <p>{p}</p>)}</div>
-      </div>
-    </div>
-  </Section>
-
-  <!-- The jurisdiction question, answered rather than avoided. It is also the
-       reason he can serve clients in other states. -->
-  <Section surface="navy">
-    <div class="editorial">
-      <div><p class="eyebrow">{es ? "Jurisdicción" : "Jurisdiction"}</p></div>
-      <div class="prose">
-        <h2 class="h2" data-split-lines>{copy.jurisdictionTitle}</h2>
-        <p>{copy.jurisdictionBody}</p>
-      </div>
-    </div>
-  </Section>
-
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{copy.credentialsTitle}</p></div>
-      <dl class="creds">
-        <div class="meta-item">
-          <dt class="meta-term">{es ? "Admisión" : "Admission"}</dt>
-          <dd>{admissions.join(", ")}<br /><span class="notice">{es ? "No admitido en Florida." : "Not admitted in Florida."}</span></dd>
-        </div>
-        <div class="meta-item">
-          <dt class="meta-term">{es ? "Estudios" : "Education"}</dt>
-          <dd><ul>{education.map((e) => <li>{e.degree[lang]}, {e.school}, <span class="apparatus">{e.year}</span></li>)}</ul></dd>
-        </div>
-        <div class="meta-item">
-          <dt class="meta-term">{es ? "Membresías" : "Memberships"}</dt>
-          <dd>{memberships.join(", ")}</dd>
-        </div>
-        <div class="meta-item">
-          <dt class="meta-term">{es ? "Antes" : "Previously"}</dt>
-          <dd><ul>{prior.map((r) => <li>{r.role[lang]} <span class="apparatus">{r.years[lang]}</span></li>)}</ul></dd>
-        </div>
-        <div class="meta-item">
-          <dt class="meta-term">{_("label.languages")}</dt>
-          <dd>{es ? "Español e inglés" : "Spanish and English"}</dd>
-        </div>
-      </dl>
-    </div>
-  </Section>
-
-  {media.length > 0 && (
-    <Section surface="paper-2">
+  {camim && (
+    <Section surface="paper">
       <div class="editorial">
-        <div><p class="eyebrow">{copy.mediaTitle}</p></div>
-        <ul class="media" data-stagger>
-          {media.map((m) => (
-            <li data-reveal="media">
-              <img src={m.still} width={m.width} height={m.height} loading="lazy" decoding="async"
-                   alt={es ? `Juan Campos entrevistado en ${m.outlet}.` : `Juan Campos interviewed on ${m.outlet}.`} />
-              <p class="apparatus">{m.outlet}{m.station ? ` · ${m.station}` : ""} · {m.programme}</p>
-              <p>{m.chyron[lang]}</p>
-            </li>
-          ))}
-        </ul>
+        <div></div>
+        <div class="prose">{camim.p.map((t) => <p>{t}</p>)}</div>
       </div>
     </Section>
   )}
 
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div></div>
+      <div class="prose">{bio.map((t) => <p>{t}</p>)}</div>
+    </div>
+  </Section>
+
   <Section surface="paper">
     <div class="editorial">
-      <div><p class="eyebrow">{_("label.nextStep")}</p></div>
-      <div class="acta">
-        <h2 class="h2" data-split-lines>{copy.contactTitle}</h2>
-        <div class="acta-actions">
-          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
-          <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
-        </div>
+      <div></div>
+      <ul class="creds">
+        {admissions.map((a) => <li>{a}</li>)}
+        {education.map((e) => <li>{e.degree[lang]}, {e.school}, <span class="apparatus">{e.year}</span></li>)}
+        {memberships.map((m) => <li>{m}</li>)}
+      </ul>
+    </div>
+  </Section>
+
+  <Section surface="paper-2">
+    <div class="editorial">
+      <div><p class="eyebrow">{_("home.questions")}</p></div>
+      <div>
+        <p class="lead">{_("contact.subtitle")}</p>
+        <p><a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a></p>
       </div>
     </div>
   </Section>
 </Base>
 
 <style>
+  .creds { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--spacing-s3); font-size: var(--text-lead); }
+  .creds li { padding-block: var(--spacing-s3); border-bottom: 1px solid var(--color-line); }
+
   .ahead { padding-block: var(--spacing-s7) var(--spacing-s8); }
   .ahead-inner { display: grid; gap: var(--spacing-s7); align-items: center; }
   @media (min-width: 900px) { .ahead-inner { grid-template-columns: minmax(0,1fr) minmax(0,0.72fr); gap: var(--spacing-s9); align-items: center; } }
@@ -208,14 +117,14 @@ const schema = graph([
   .ahead-figure { margin: 0; }
   .ahead-figure img {
     width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
-    object-position: 50% 16%; border-radius: var(--radius-md);
+    object-position: 50% 22%; border-radius: var(--radius-md);
     background: var(--color-paper-2);
   }
   @media (max-width: 899px) {
     .ahead-inner { grid-template-areas: "fig" "text"; }
     .ahead-figure { grid-area: fig; }
     .ahead-text { grid-area: text; }
-    .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 14%; }
+    .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 18%; }
   }
   .words { display: grid; gap: var(--spacing-s7); }
   .words-fig { margin: 0; display: grid; gap: var(--spacing-s3); max-width: var(--container-m-read); }

@@ -110,19 +110,17 @@ export function breadcrumbSchema(items: { name: string; url: string }[]) {
   };
 }
 
-export function serviceSchema(name: string, url: string, lang: Lang) {
+export function serviceSchema(name: string, url: string, lang: Lang, description?: string) {
   return {
     "@type": "Service",
+    "@id": `${abs(url)}#service`,
     name,
-    serviceType: lang === "es" ? "Derecho de inmigración" : "Immigration law",
-    provider: { "@id": `${SITE_URL}/#firm` },
+    ...(description ? { description } : {}),
     url: abs(url),
-    areaServed: [
-      { "@type": "City", name: "Orlando" },
-      { "@type": "State", name: "Florida" },
-      { "@type": "Country", name: "United States" },
-    ],
-    availableLanguage: ["es", "en"],
+    inLanguage: lang,
+    provider: { "@id": `${SITE_URL}/#organization` },
+    areaServed: { "@type": "Country", name: "United States" },
+    serviceType: name,
   };
 }
 

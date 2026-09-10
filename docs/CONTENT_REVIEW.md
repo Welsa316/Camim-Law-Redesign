@@ -6,6 +6,133 @@ Nothing marked here is currently asserted on the site as fact. Unverified values
 
 ---
 
+## 0. The copy rule, and how it is enforced
+
+**Nothing on this site was written for it.** On the client's instruction of
+2026-09-10, every visible string is one of:
+
+1. word-for-word from camimlaw.com (its home, about, services, contact and
+   asylum pages, captured in `docs/sources/camimlaw.com.json` and `.blocks.json`);
+2. word-for-word from Campos Muños Law's site (camulaw.com), its ES/EN
+   dictionaries and service pages (`docs/sources/camulaw.com.*.json`), or the
+   firm's own source documents and video transcripts
+   (`docs/sources/camulaw-source-documents/`);
+3. a value from a checked record in `site/src/lib/org.ts` (a name, number,
+   address, date, admission, degree, form number).
+
+`site/verify/copy-provenance.py` renders every route of the build in both
+languages, extracts every text node, alt, title, aria-label, page title and
+meta description, and fails unless each one is a whole sourced line, a whole
+record value, a sourced fragment of twelve or more characters, or a compound
+of whole sourced parts (a label beside a phone number; a headline the reveal
+has split into lines). It writes the result to `docs/COPY_PROVENANCE.md`.
+Run it after any change to copy. A failing gate is a string somebody wrote.
+
+**What was removed to get there.** The FAQ, detained-relative and Orlando
+pages; the situation finder, the commitments, the consultation steps, the
+first-person attorney narrative, every disclaimer, every meta description
+and alt text that had no source. Sixteen practice areas written here were
+replaced by Campos Muños Law's fourteen, on the instruction that this firm's
+services are the same.
+
+**Omitted, not rewritten.** Campos Muños Law's pages name that firm, its city
+and its state, and address the reader as that firm. Those blocks are dropped
+whole; nothing is edited to say "Campos Immigration Law" instead, because that
+would be a new claim about this firm. Every omission:
+
+| Service | Lang | Block | Text | Why |
+|---|---|---|---|---|
+| greenCard | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| greenCard | es | paragraph | En Campos Muños Law ayudamos a cada cliente a entender qué opciones reales tiene, a identificar posibles riesg… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| greenCard | es | paragraph | Contáctenos si desea iniciar o revisar su proceso de green card.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| greenCard | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| greenCard | en | paragraph | At Campos Muños Law, we help each client understand their real options, identify potential risks from the star… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| greenCard | en | paragraph | Contact us if you would like to begin or review your green card process.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| peticionesFamiliares | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| peticionesFamiliares | es | paragraph | En Campos Muños Law ayudamos a cada familia a identificar el tipo de petición que corresponde a su situación y… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| peticionesFamiliares | es | paragraph | Contáctenos si desea conocer qué tipo de petición familiar corresponde a su caso y dar el siguiente paso con l… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| peticionesFamiliares | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| peticionesFamiliares | en | paragraph | At Campos Muños Law we help each family identify the type of petition that fits their circumstances and prepar… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| peticionesFamiliares | en | paragraph | Contact us if you would like to find out which family petition applies to your case and take the next step wit… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ciudadania | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ciudadania | es | paragraph | En Campos Muños Law ayudamos a cada cliente a evaluar si realmente está listo para dar este paso, a identifica… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ciudadania | es | paragraph | Contáctenos si desea evaluar su elegibilidad o iniciar su proceso de ciudadanía.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ciudadania | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ciudadania | en | paragraph | At Campos Muños Law, we help each client assess whether they are truly ready to take this step, identify possi… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ciudadania | en | paragraph | Contact us if you would like to review your eligibility or begin your citizenship process.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| defensaDeportacion | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| defensaDeportacion | es | paragraph | En Campos Muños Law representamos a cada cliente con preparación, análisis estratégico y verdadero compromiso.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| defensaDeportacion | es | paragraph | Contáctenos si tiene una audiencia en la corte de inmigración y desea evaluar sus opciones de defensa.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| defensaDeportacion | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| defensaDeportacion | en | paragraph | At Campos Muños Law, we represent each client with preparation, strategic analysis, and genuine commitment. Ou… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| defensaDeportacion | en | paragraph | Contact us if you have a hearing in immigration court and would like to review your defense options.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visasJovenes | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visasJovenes | es | paragraph | En Campos Muños Law atendemos los casos de Visa Especial para Jóvenes con cuidado y responsabilidad, acompañan… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visasJovenes | es | paragraph | Contáctenos si desea evaluar si un menor a su cargo podría calificar para la Visa Especial para Jóvenes.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visasJovenes | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visasJovenes | en | paragraph | At Campos Muños Law, we handle Special Immigrant Juvenile cases with care and responsibility, standing beside … | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visasJovenes | en | paragraph | Contact us if you would like to find out whether a minor in your care may qualify for Special Immigrant Juveni… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| asilo | es | h3 | Póngase en contacto con nuestros abogados si está solicitando la ciudadanía estadounidense y la naturalización… | a citizenship line on the asylum page; a paste error on the source site |
+| asilo | es | p | Con la ayuda de nuestro exitoso equipo legal, los solicitantes de asilo pueden solicitarlo rápida y correctame… | 'exitoso equipo legal': a quality claim about a team, and a Rule 4-7.13 concern |
+| asilo | en | paragraph | Our firm can also help applicants with work authorization issues, permanent residence applications, and family… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| vawa | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| vawa | es | paragraph | En Campos Muños Law tratamos estos casos con empatía, respeto y experiencia. Le ayudamos a construir una petic… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| vawa | es | paragraph | Si algo de esto le resulta familiar, no está solo. Contáctenos, con total confidencialidad, para evaluar su ca… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| vawa | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| vawa | en | paragraph | At Campos Muños Law we handle these cases with empathy, respect, and experience. We help you build a strong pe… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| vawa | en | paragraph | If any of this sounds familiar, you are not alone. Contact us, in full confidence, to review your case.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| daca | es | paragraph | Nuestro equipo de abogados de inmigración está formado por profesionales de distintos orígenes y áreas de espe… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| tramiteConsular | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| tramiteConsular | es | paragraph | En Campos Muños Law le acompañamos en cada etapa del trámite consular para ayudarle a evitar errores. Nuestra … | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| tramiteConsular | es | paragraph | Contáctenos o envíenos un mensaje si desea que nuestra firma le guíe en su trámite consular.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| tramiteConsular | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| tramiteConsular | en | paragraph | At Campos Muños Law, we accompany you at every stage of consular processing to help you avoid errors. Our firm… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| tramiteConsular | en | paragraph | Contact us or send us a message if you would like our firm to guide you through your consular process.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ead | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ead | es | paragraph | En Campos Muños Law revisamos si usted tiene un caso pendiente que lo haga elegible, le explicamos sus opcione… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ead | es | paragraph | Contáctenos si desea revisar su elegibilidad para un permiso de trabajo.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ead | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ead | en | paragraph | At Campos Muños Law, we review whether you have a pending case that makes you eligible, explain your real opti… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| ead | en | paragraph | Contact us if you would like to review your eligibility for a work permit.… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visaU | es | heading | ¿Cómo le ayuda nuestra firma?… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visaU | es | paragraph | En nuestra firma contamos con experiencia acompañando a las víctimas de delitos desde el inicio, para determin… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visaU | es | paragraph | Contáctenos si desea evaluar su caso de visa U y conocer las opciones disponibles para usted. En Campos Muños … | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visaU | en | heading | How Our Firm Helps… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visaU | en | paragraph | Our firm has experience guiding crime victims from the very beginning to determine whether they meet the requi… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+| visaU | en | paragraph | Contact us if you would like to review your U visa case and learn about the options available to you. At Campo… | names the sister firm, its city or state, or addresses the reader as the sister firm |
+
+**Florida, not Louisiana.** Immigration law is federal and the imported
+descriptions describe federal processes. The one place state law enters is
+Special Immigrant Juvenile Status, which depends on a state-court order; the
+imported text says "corte estatal" generically and names no Louisiana court.
+The client should still read that page against Florida dependency-court
+practice before launch.
+
+**Statements on camimlaw.com itself that the firm should look at.** They are
+reproduced verbatim because that is the rule, and each is the firm's own
+published claim, but a Florida Bar reviewer would ask about them:
+
+- "abogados atentos y dedicados" and "Nuestros abogados tienen diferentes
+  antecedentes" (home): the records show one attorney.
+- "Mi equipo y yo" (about): same question.
+- "me comprometo a lograr el mejor resultado posible para nuestros clientes"
+  (about): a statement about outcomes. Rule 4-7.13 and 4-7.14 reach promises
+  and predictions of results.
+
+**English.** camimlaw.com is Spanish with a few English fragments, so the
+English site is built from Campos Muños Law's English: the fourteen service
+pages, the biography, the consultation and payment pages, the labels. The
+English home page carries only "Why Us?" and its paragraph, because the other
+home sections exist only in camimlaw.com's Spanish. That asymmetry is the
+source material, not an oversight.
+
+**WhatsApp.** The phone bar's second button opens WhatsApp to the office
+number, on the client's instruction. Whether that number is registered on
+WhatsApp has not been checked here; if it is not, the button opens to nothing.
+`ORG.whatsapp` in `org.ts`.
+
+---
+
 ## 1. Blocks launch
 
 ### 1.1 Bar admission and jurisdiction

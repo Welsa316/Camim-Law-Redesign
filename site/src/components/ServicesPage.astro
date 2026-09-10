@@ -1,97 +1,46 @@
 ---
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
-import SituationFinder from "./SituationFinder.astro";
-import ServiceRows from "./ServiceRows.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
-import { liveGroups, liveMatters } from "../lib/services";
+import { ORG } from "../lib/org";
+import { SERVICES } from "../lib/services";
 import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
-const es = lang === "es";
-const groups = liveGroups();
-const all = [...liveMatters()].sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang));
-const path = langPath(lang, es ? "servicios" : "services");
-const alternates = { es: "/servicios/", en: "/en/services/" };
-
-const copy = es
-  ? {
-      title: "Servicios de Inmigración en Orlando | Campos Immigration Law",
-      description:
-        "Los casos de inmigración que lleva Campos Immigration Law desde Orlando, agrupados por situación y con el número de formulario de cada uno.",
-      h1: "Casos que llevamos",
-      lead: "Inmigración es lo único que hacemos. Abajo están los casos agrupados por la situación en la que se encuentra la persona, no por el número de visa.",
-      indexTitle: "Todos los servicios, de la A a la Z",
-      scopeTitle: "Lo que no hacemos",
-      scopeBody:
-        "No llevamos casos penales, de familia, de accidentes ni de negocios. Si su asunto necesita ese tipo de abogado, se lo decimos en la consulta.",
-    }
-  : {
-      title: "Immigration Services in Orlando | Campos Immigration Law",
-      description:
-        "The immigration matters Campos Immigration Law handles from Orlando, grouped by situation, each with its form number.",
-      h1: "Matters we handle",
-      lead: "Immigration law is all we do. Below, matters are grouped by the situation a person is actually in, not by visa number.",
-      indexTitle: "Every service, A to Z",
-      scopeTitle: "What we do not do",
-      scopeBody:
-        "We do not take criminal, family, personal injury or business matters. If your situation needs that kind of lawyer, we will say so at the consultation.",
-    };
-
-const crumbs = [
-  { name: es ? "Inicio" : "Home", url: langPath(lang) },
-  { name: _("nav.services"), url: path },
-];
+const path = langPath(lang, "servicios");
+const alternates = { es: "/servicios/", en: "/en/servicios/" };
+const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.services"), url: path }];
 const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 ---
-<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+<Base lang={lang} title={`${_("nav.services")} — ${ORG.name.value}`} description={_("nav.services")} path={path} alternates={alternates} schema={schema}>
   <section class="head wrap" data-surface="paper">
-    <p class="eyebrow">{_("nav.services")}</p>
-    <h1 class="h1" data-split-lines="hero">{copy.h1}</h1>
-    <p class="lead">{copy.lead}</p>
+    <h1 class="h1" data-split-lines="hero">{_("nav.services")}</h1>
   </section>
 
-  <Section surface="paper-2">
-    <SituationFinder lang={lang} />
-  </Section>
-
   <Section surface="paper">
-    {groups.map((g) => <ServiceRows lang={lang} group={g} />)}
-  </Section>
-
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div><p class="eyebrow">{es ? "Índice" : "Index"}</p></div>
-      <div>
-        <h2 class="h2" data-split-lines>{copy.indexTitle}</h2>
-        <ul class="az">
-          {all.map((m) => (
-            <li>
-              <a href={langPath(lang, m.slug[lang])}>
-                {m.name[lang]}
-                {m.form && <span class="row-form">{m.form}</span>}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  </Section>
-
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{es ? "Alcance" : "Scope"}</p></div>
-      <div class="prose">
-        <h2 class="h2" data-split-lines>{copy.scopeTitle}</h2>
-        <p>{copy.scopeBody}</p>
-      </div>
-    </div>
+    <ul class="svc rows">
+      {SERVICES.map((m) => (
+        <li class="row-item">
+          <a class="row-link svc-link" href={langPath(lang, m.slug)}>
+            <span class="row-title svc-title">{m.name[lang]}</span>
+            <span class="svc-line">{m.line[lang]}</span>
+            <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
   </Section>
 </Base>
 
 <style>
+  .svc { list-style: none; margin: 0; padding: 0; max-width: var(--container-m-lead, 72ch); }
+  .svc-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: var(--spacing-s4); row-gap: 4px; align-items: start; }
+  .svc-title { grid-column: 1; }
+  .svc-line { grid-column: 1; color: var(--color-ink-2); font-size: var(--text-base); line-height: 1.5; }
+  .svc-link .row-arrow { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+
   .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
   .az { list-style: none; display: grid; gap: var(--spacing-s3); margin-top: var(--spacing-s5); }
   @media (min-width: 700px) { .az { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacing-s8); } }

@@ -1,0 +1,362 @@
+{
+ "home": [
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "¿Quiénes somos?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos. Nuestros abogados tienen diferentes antecedentes y áreas específicas de especialización, y pueden analizar su caso desde múltiples ángulos."
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "¿Por qué elegirnos?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Porque nos aseguraremos de que comprenda lo que está sucediendo con su caso, nos esforzaremos por tratarlo como familia y siempre estaremos disponibles para responder sus preguntas e inquietudes. Haremos todo lo posible para mantenerlo informado sobre el panorama cambiante de la ley de inmigración y cómo afecta su caso."
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "¿Qué hacemos?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Representamos a inmigrantes en todas las facetas de su caso. Queremos brindar soluciones a procesos y procedimientos que pueden ser desalentadores para que los inmigrantes naveguen por su cuenta."
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "@juancamposlaw"
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "Áreas en las que prestamos servicios"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Nuestras oficinas están ubicadas en Orlando, sin embargo, atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero."
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Ubicación"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Horario"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Lunes — Viernes 9:00 am — 7:00 pm"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Contactanos"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "juan@camimlaw.com +1(407) 418-9193"
+  }
+ ],
+ "about": [
+  {
+   "type": "heading",
+   "tag": "h2",
+   "text": "Soy un abogado de inmigración con sede en Orlando"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Como abogado de inmigración con experiencia, me dedico a brindar servicios legales excepcionales a personas y familias necesitadas. Ya sea que esté buscando ayuda con visas, tarjetas verdes u otros asuntos de inmigración, tengo el conocimiento y la experiencia para guiarlo a través del complejo proceso."
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Mi equipo y yo entendemos la importancia de su viaje de inmigración y el impacto que puede tener en su vida. Estamos aquí para apoyarlo en cada paso del camino, ofreciéndole soluciones personalizadas adaptadas a sus circunstancias únicas. Con un profundo conocimiento de las leyes y regulaciones de inmigración, me comprometo a lograr el mejor resultado posible para nuestros clientes. Me esfuerzo por brindar representación legal profesional, eficiente y compasiva, asegurando que sus derechos estén protegidos y que su voz sea escuchada."
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Ubicación"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Horario"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Lunes — Viernes 9:00 am — 7:00 pm"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Contactanos"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "juan@camimlaw.com +1(407) 418-9193"
+  }
+ ],
+ "services": [
+  {
+   "type": "heading",
+   "tag": "h2",
+   "text": "Services"
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "Asilo"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Hire an Experienced Immigration Lawyer"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Get the Best Immigration Solutions"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "“As an experienced immigration lawyer based in Orlando, I understand the importance of your unique story. It is my passion to help you navigate the complex legal landscape and ensure that your journey continues in the best possible way. Trust Campos Immigration Law to provide you with expert guidance and personalized solutions that will evolve with your needs. Your success is our priority.”"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "— Quote source"
+  },
+  {
+   "type": "heading",
+   "tag": "h2",
+   "text": "Book a professional consultation"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Ubicación"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Horario"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Lunes — Viernes 9:00 am — 7:00 pm"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Contactanos"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "juan@camimlaw.com +1(407) 418-9193"
+  }
+ ],
+ "asilo": [
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "El asilo se puede otorgar a personas que ya se encuentran en los Estados Unidos y no pueden o no quieren regresar a su país de origen debido a la persecución o un temor fundado de persecución por motivos de raza, religión, nacionalidad, pertenencia a un grupo social en particular u opinión política. Si se le concede asilo, se le permitirá vivir y trabajar en los Estados Unidos. También podrá solicitar el estatus de residente permanente un año después de que se le otorgue el asilo. Puede incluir a su cónyuge y a cualquier hijo soltero menor de 21 años en su propia solicitud de asilo si su cónyuge o hijos están en los Estados Unidos."
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "¿Estatus de asilo o estatus de refugiado?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "¿Estatus de asilo o estatus de refugiado? La condición de asilado y la condición de refugiado están estrechamente relacionadas. Sólo se diferencian en el lugar en el que la persona solicita el estatus. El asilo se solicita en los Estados Unidos, el estatus de refugiado se solicita fuera de los Estados Unidos. Sin embargo, todas las personas a las que se les concede asilo deben cumplir con la definición de refugiado. Si no reúne los requisitos para el asilo, pero teme ser torturado al regresar a su país de origen, puede solicitar que se le considere en virtud de la Convención contra la Tortura. El Congreso ha restringido las solicitudes de asilo que se presentan más de un año después de su llegada a los EE. UU., excepto si hay cambios o circunstancias extraordinarias."
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "El proceso de asilo"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Hay dos maneras en que una persona puede solicitar asilo. Sin embargo, en ambos procesos, las personas deben demostrar un \"temor fundado\" de persecución en su país de origen, como se mencionó anteriormente."
+  },
+  {
+   "type": "item",
+   "tag": "li",
+   "text": "Proceso de asilo afirmativo"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Una persona puede presentar una solicitud a través del proceso de asilo afirmativo si ingresó a los Estados Unidos con una visa o como un niño no acompañado está físicamente presente en los Estados Unidos, independientemente de cómo ingresó al país dentro de un año de su llegada. Las personas también pueden solicitar asilo en un puerto de entrada. En el proceso de asilo afirmativo, un oficial de asilo de USCIS determina si se le otorgará asilo a la persona en los Estados Unidos. Al solicitante de asilo se le concede asilo o se le remite a un juez de inmigración. En el caso de que se remita, el solicitante de asilo tendrá otra oportunidad de demostrar su elegibilidad ante un juez de inmigración."
+  },
+  {
+   "type": "item",
+   "tag": "li",
+   "text": "Proceso de asilo defensivo"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Una persona puede solicitar a través del proceso de asilo defensivo como defensa contra la deportación después de haber sido detenida por el Servicio de Inmigración y Control de Aduanas de los Estados Unidos (ICE) o la Oficina de Aduanas y Protección Fronteriza (CBP) o en cualquier puerto de entrada sin una visa válida. A través del proceso de asilo defensivo, las personas buscan asilo en un tribunal de inmigración donde un juez decide si se le concederá o no el asilo al solicitante."
+  },
+  {
+   "type": "heading",
+   "tag": "h2",
+   "text": "Asilo preguntas frecuentes"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "¿Puede un refugiado o asilado regresar a su país de origen?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "No se aconseja que los solicitantes de asilo o asilados regresen a su país de origen. Un refugiado o asilado es una persona que se acoge a la protección de los Estados Unidos, que teme regresar a su país de origen con el temor de una futura persecución o daño en esa nación. ​ Una persona con una solicitud de asilo pendiente puede solicitar un documento de viaje solo para viajes breves y de emergencia al extranjero. Sin aprobación previa, una solicitud de asilo abierta será considerada abandonada por USCIS."
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "¿Cuánto dura el proceso de solicitud de asilo en Estados Unidos?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Varía según la jurisdicción. USCIS tiene once oficinas de asilo en todo el país y cada oficina tiene su propia carga de casos única. La oficina de asilo programa sus entrevistas en base a un protocolo establecido por USCIS. ​"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "En algunas jurisdicciones, los solicitantes han estado esperando durante muchos años, mientras que otros solicitantes son llamados a una entrevista en el plazo de un año."
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "¿Pueden trabajar en EE.UU. los solicitantes de asilo?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Esto está cambiando actualmente en la ley y puede ser posible dependiendo del tipo de caso. La respuesta corta es que después de un cierto número de días, con una solicitud pendiente debidamente presentada, un solicitante puede solicitar un documento de autorización de empleo. El permiso de trabajo puede aprobarse por dos años y puede utilizarse únicamente para buscar empleo. También hay que tener en cuenta que la tarjeta de autorización de trabajo no puede utilizarse para viajar o volver a entrar en EE.UU."
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Asegúrese de hablar con un abogado antes de cualquier plan de viaje durante un caso de asilo pendiente o sobre cómo solicitar la autorización de trabajo."
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "¿Qué ocurre si la oficina de asilo no concede el asilo tras la entrevista?"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Depende de la situación migratoria del solicitante. Si el solicitante tiene un estatus de inmigración válido en el momento en que se toma la decisión, se le permitiría permanecer en EE.UU. bajo ese estatus. Por el contrario, si el solicitante no tiene un estatus de inmigración válido, el caso se remite al tribunal de inmigración, donde el solicitante tendrá una nueva oportunidad de presentar su solicitud de asilo ante un juez de inmigración."
+  },
+  {
+   "type": "heading",
+   "tag": "h3",
+   "text": "Póngase en contacto con nuestros abogados si está solicitando la ciudadanía estadounidense y la naturalización."
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Con la ayuda de nuestro exitoso equipo legal, los solicitantes de asilo pueden solicitarlo rápida y correctamente. Nuestra firma también puede ayudar a los solicitantes con cuestiones de autorización de empleo, la presentación de la residencia permanente, y ayudar a los miembros de la familia vienen a los Estados Unidos."
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Ubicación"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Horario"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Lunes — Viernes 9:00 am — 7:00 pm"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Contactanos"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "juan@camimlaw.com +1(407) 418-9193"
+  }
+ ],
+ "contact": [
+  {
+   "type": "heading",
+   "tag": "h2",
+   "text": "Contact Us"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Let people know what to reach out about and what to expect after contacting you. Don’t forget to choose a storage option for submissions."
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "email@example.com (555) 555-5555"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "123 Demo Street New York, NY 12345"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Ubicación"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Horario"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "Lunes — Viernes 9:00 am — 7:00 pm"
+  },
+  {
+   "type": "heading",
+   "tag": "h4",
+   "text": "Contactanos"
+  },
+  {
+   "type": "paragraph",
+   "tag": "p",
+   "text": "juan@camimlaw.com +1(407) 418-9193"
+  }
+ ]
+}

@@ -1,127 +1,81 @@
 ---
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
-import SituationFinder from "./SituationFinder.astro";
 import AccordionGallery from "./AccordionGallery.astro";
 import type { GalleryItem } from "./AccordionGallery.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
-import { ORG, ATTORNEY, MEDIA, COURT, show, mapEmbedUrl } from "../lib/org";
-import { liveGroups, mattersInGroup } from "../lib/services";
+import { ORG, ATTORNEY, MEDIA, show, mapEmbedUrl } from "../lib/org";
+import { featured } from "../lib/services";
 import { graph, orgSchema, attorneySchema } from "../lib/seo";
 
+/*
+  Every visible string on this page is copied from camimlaw.com, from Campos
+  Muños Law's site and dictionaries, or is a value from a checked record. The
+  comment beside each names the source. Nothing was written for this page.
+  verify/copy-provenance.py fails the build otherwise.
+*/
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
 const es = lang === "es";
-const groups = liveGroups();
 const media = MEDIA.filter((m) => m.verified);
 const rating = show(ORG.googleRating);
-const consultation = show(ORG.consultation);
 const heroImg = ATTORNEY.hero.value;
 
-/* The accordion carries the practice groups. Each panel is a group: its
-   ordinal, its name, its one line, and the matters inside it as links. Only
-   groups with at least one matter the build is allowed to show are present,
-   through liveGroups() and mattersInGroup(), so the compliance gate on
-   services.ts applies here exactly as it does on the services page. */
-const serviceItems: GalleryItem[] = groups.map((g, i) => ({
+const src = es
+  ? {
+      // camimlaw.com home, "¿Qué hacemos?"
+      display: "Representamos a inmigrantes",   // camimlaw.com home, "¿Qué hacemos?", fragment
+      // camimlaw.com home, "¿Quiénes somos?", first sentence
+      lead: "Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos.",
+      // camulaw.com home.reviewsTitle, fragment
+      statReviews: "reseñas de cinco estrellas",
+      // camimlaw.com home, "Áreas en las que prestamos servicios", fragment
+      statStates: "estados de Estados Unidos",
+      // camulaw.com team.members.juan.bio, fragment
+      admitted: "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana",
+      sections: [
+        { h: "¿Quiénes somos?", p: "Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos. Nuestros abogados tienen diferentes antecedentes y áreas específicas de especialización, y pueden analizar su caso desde múltiples ángulos." },
+        { h: "¿Por qué elegirnos?", p: "Porque nos aseguraremos de que comprenda lo que está sucediendo con su caso, nos esforzaremos por tratarlo como familia y siempre estaremos disponibles para responder sus preguntas e inquietudes. Haremos todo lo posible para mantenerlo informado sobre el panorama cambiante de la ley de inmigración y cómo afecta su caso." },
+        { h: "¿Qué hacemos?", p: "Representamos a inmigrantes en todas las facetas de su caso. Queremos brindar soluciones a procesos y procedimientos que pueden ser desalentadores para que los inmigrantes naveguen por su cuenta." },
+      ],
+      // camimlaw.com home, "Áreas en las que prestamos servicios"
+      where: "Nuestras oficinas están ubicadas en Orlando, sin embargo, atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero.",
+      title: "Campos Immigration Law",                        // camimlaw.com <title>
+      description: "Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos.",
+    }
+  : {
+      display: "Hire an Experienced Immigration Lawyer",     // camimlaw.com services page
+      lead: "We are here to help you. Virtual consultation available.", // camulaw contact.subtitle + home.virtualAvailable
+      statReviews: "Five-Star Review",                       // camulaw home.reviewsTitle, fragment
+      statStates: "states and abroad",                       // camulaw home.dondeEstamosText, fragment
+      admitted: "Juan is admitted to practice law before the Louisiana Supreme Court", // camulaw bio, fragment
+      sections: [
+        { h: "Why Us?", p: "Because we will make sure you understand what is happening with your case, we will strive to treat you like family, and we will always be available to answer your questions and concerns. We will do everything possible to keep you informed about changes in immigration laws and how they may affect your case." }, // camulaw home.porQueNosotros(+Text)
+      ],
+      where: "",
+      title: "Campos Immigration Law",
+      description: "We are here to help you. Virtual consultation available.",
+    };
+
+const serviceItems: GalleryItem[] = featured().map((s, i) => ({
   ordinal: String(i + 1).padStart(2, "0"),
-  label: g.name[lang],
-  meta: g.line[lang],
-  link: `${langPath(lang, es ? "servicios" : "services")}#${g.id}`,
-  links: mattersInGroup(g.id).map((m) => ({
-    label: m.name[lang],
-    href: langPath(lang, m.slug[lang]),
-    note: m.form,
-  })),
+  label: s.name[lang],
+  meta: s.line[lang],
+  link: langPath(lang, s.slug),
 }));
 
-const copy = {
-  es: {
-    title: "Abogado de Inmigración en Orlando, FL | Campos Immigration Law",
-    description:
-      "Juan Campos, abogado dedicado exclusivamente a la ley de inmigración, con oficina en Orlando. Asilo y ley de inmigración, explicados en español. (407) 418-9193.",
-    display: "Inmigración es lo único que hacemos.",
-    lead: "Juan Campos es abogado de inmigración. Le explicamos su caso en español, hasta que lo entienda, y usted siempre sabe qué sigue.",
-    scopeEyebrow: "Lo que hacemos",
-    scopeTitle: "Casos que llevamos",
-    statement: "Usted no está hablando con un notario. Está hablando con un abogado.",
-    statementMeta: "Juan Campos, Esq. · Admitido para ejercer en Louisiana Supreme Court · Miembro de AILA",
-    commitmentsEyebrow: "Cómo trabajamos",
-    commitments: [
-      { t: "No aceptamos un caso que no podamos llevar.", d: "Si su asunto necesita otro tipo de abogado, se lo decimos en la consulta en vez de aceptarlo." },
-      { t: "Le explicamos su caso hasta que lo entienda.", d: "En español, sin términos que no le hayamos explicado antes, y las veces que haga falta." },
-      { t: "Usted siempre sabrá qué sigue y cuándo.", d: "Qué se presentó, qué falta, qué esperamos del gobierno y en qué plazo aproximado." },
-    ],
-    mediaEyebrow: "En los medios",
-    officeEyebrow: "La oficina",
-    officeTitle: "Dónde estamos",
-    officeBody:
-      "La oficina está en Orlando. Como la inmigración es una materia federal, representamos también a personas que viven en otros estados y fuera del país.",
-    courtNote: `La Corte de Inmigración de Orlando queda en ${COURT.address}.`,
-    consultEyebrow: "La consulta",
-    consultTitle: "Cómo funciona una consulta",
-    consultSteps: [
-      { t: "Nos escribe o nos llama", d: "Nos dice su nombre, cómo contactarle y de qué se trata. Todavía no hacen falta detalles." },
-      { t: "Revisamos si podemos ayudarle", d: "Confirmamos que no haya conflicto de interés y que su caso sea de los que llevamos." },
-      { t: "Hablamos de su caso", d: "Repasamos fechas, entradas y salidas, documentos y opciones reales. Sale sabiendo qué sigue." },
-    ],
-  },
-  en: {
-    title: "Orlando Immigration Lawyer | Campos Immigration Law",
-    description:
-      "Juan Campos practises United States immigration law exclusively, from an Orlando office, for clients in Florida and other states. Asylum and immigration law, explained in Spanish. (407) 418-9193.",
-    display: "Immigration law is all we do.",
-    lead: "Juan Campos is an immigration attorney. We explain your case in your language, until it makes sense, and you always know what happens next.",
-    scopeEyebrow: "What we do",
-    scopeTitle: "Matters we handle",
-    statement: "You are not talking to a notario. You are talking to a lawyer.",
-    statementMeta: "Juan Campos, Esq. · Admitted to the Louisiana Supreme Court · Member of AILA",
-    commitmentsEyebrow: "How we work",
-    commitments: [
-      { t: "We do not take a case we cannot carry.", d: "If your matter needs a different kind of lawyer, we say so at the consultation instead of taking it on." },
-      { t: "We explain your case until it makes sense.", d: "In your language, with no term we have not defined first, as many times as it takes." },
-      { t: "You will always know what happens next.", d: "What was filed, what is missing, what we expect from the government, and roughly when." },
-    ],
-    mediaEyebrow: "In the media",
-    officeEyebrow: "The office",
-    officeTitle: "Where we are",
-    officeBody:
-      "The office is in Orlando. Because immigration is federal law, we also represent people who live in other states and outside the country.",
-    courtNote: `The Orlando Immigration Court is at ${COURT.address}.`,
-    consultEyebrow: "The consultation",
-    consultTitle: "How a consultation works",
-    consultSteps: [
-      { t: "You write or call", d: "Your name, how to reach you, and roughly what it is about. No details needed yet." },
-      { t: "We check whether we can help", d: "We confirm there is no conflict of interest and that your matter is one we handle." },
-      { t: "We go through your case", d: "Dates, entries and departures, documents and real options. You leave knowing what happens next." },
-    ],
-  },
-}[lang];
+const altFor: Record<string, string> = {
+  telemundo: _("press.alt.telemundo"),
+  univision: _("press.alt.univision"),
+  tvv: _("press.alt.tvv"),
+};
 
 const alternates = { es: "/", en: "/en/" };
-const schema = graph([
-  orgSchema(),
-  attorneySchema(lang),
-  { "@type": "WebPage", "@id": `${Astro.url.origin}${es ? "/" : "/en/"}#page`, name: copy.title, description: copy.description },
-]);
+const schema = graph([orgSchema(), attorneySchema(lang)]);
 ---
-<Base lang={lang} title={copy.title} description={copy.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema} overHero>
+<Base lang={lang} title={src.title} description={src.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema} overHero>
 
-  <!--
-    01 / Opening frame.
-
-    Four corners around a centred subject: the figures and the sentence across
-    the top, the statement and the action across the bottom, and him holding
-    the middle. The header is drawn over the frame rather than above it, so the
-    photograph starts at the top of the page and the navigation sits on it
-    under a hairline.
-
-    Both figures are real and both are checkable. There is no success rate and
-    no case count here, because we do not have those numbers and, in this
-    state, a past-results claim has to be objectively verifiable before it can
-    be advertised at all.
-  -->
   <section class="opener" data-surface="navy-deep" data-hero>
     <picture>
       <source media="(min-aspect-ratio: 1/1)" srcset={heroImg.wide.src} width={heroImg.wide.width} height={heroImg.wide.height} />
@@ -130,9 +84,7 @@ const schema = graph([
         src={heroImg.tall.src}
         width={heroImg.tall.width}
         height={heroImg.tall.height}
-        alt={es
-          ? "Juan Campos, abogado de inmigración, sentado con las piernas cruzadas en una silla de madera en la recepción de la oficina."
-          : "Juan Campos, immigration attorney, seated with his legs crossed in a wooden chair in the office reception."}
+        alt={`${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}`}
         fetchpriority="high"
         decoding="async"
         data-scrub-portrait-img
@@ -146,117 +98,68 @@ const schema = graph([
           {rating && (
             <li>
               <span class="stat-fig">{rating.value.toFixed(1)}</span>
-              <span class="stat-label">
-                {es ? `${rating.count} reseñas en Google` : `${rating.count} Google reviews`}
-              </span>
+              <span class="stat-label">{src.statReviews}</span>
             </li>
           )}
           <li>
             <span class="stat-fig">{ORG.statesServed.value}</span>
-            <span class="stat-label">{es ? "estados que atendemos" : "states we serve"}</span>
+            <span class="stat-label">{src.statStates}</span>
           </li>
         </ul>
-        <p class="opener-lead" data-reveal="text">{copy.lead}</p>
+        <p class="opener-lead" data-reveal="text">{src.lead}</p>
       </div>
 
       <div class="opener-bottom">
-        <h1 class="hero-type opener-display" data-split-lines="hero">{copy.display}</h1>
+        <h1 class="hero-type opener-display" data-split-lines="hero">{src.display}</h1>
         <div class="opener-side">
-          <a class="opener-pill" href={langPath(lang, es ? "consulta" : "consultation")} data-reveal="control">
+          <a class="opener-pill" href={langPath(lang, "consulta")} data-reveal="control">
             {_("cta.book")}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span>
           </a>
           <div class="opener-rule" aria-hidden="true"></div>
-          <p class="opener-meta apparatus" data-reveal="text">
-            {es
-              ? "Admitido en Louisiana · Práctica exclusiva de inmigración"
-              : "Admitted in Louisiana · Immigration practice only"}
-          </p>
+          <p class="opener-meta apparatus" data-reveal="text">{src.admitted}</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 02 / Situation finder -->
+  <!-- camimlaw.com's own three sections, in their order and their words -->
   <Section surface="paper-2">
-    <SituationFinder lang={lang} />
+    <div class="who">
+      {src.sections.map((s) => (
+        <div class="editorial who-row">
+          <div><h2 class="eyebrow who-h">{s.h}</h2></div>
+          <p class="lead who-p">{s.p}</p>
+        </div>
+      ))}
+    </div>
   </Section>
 
-  <!-- 03 / Practice groups -->
   <Section surface="paper">
     <div class="editorial">
-      <div>
-        <p class="eyebrow">{copy.scopeEyebrow}</p>
-      </div>
-      <div>
-        <h2 class="h2" data-split-lines>{copy.scopeTitle}</h2>
-      </div>
+      <div><p class="eyebrow">{_("nav.services")}</p></div>
+      <div></div>
     </div>
     <div class="scope-acc">
       <AccordionGallery items={serviceItems} id="servicios-acordeon" defaultIndex={0} height={460} expandRatio={0.5} tilt={2} />
     </div>
     <p class="scope-more">
-      <a class="link-arrow" href={langPath(lang, es ? "servicios" : "services")}>
+      <a class="link-arrow" href={langPath(lang, "servicios")}>
         {_("nav.allServices")} <span aria-hidden="true">&rarr;</span>
       </a>
     </p>
   </Section>
 
-  <!--
-    A single statement given a whole band. One line, display scale, on the
-    institutional ground. It is the page's one rhetorical moment and it says
-    something true and checkable rather than something performative.
-  -->
-  <section class="statement" data-surface="navy-deep">
-    {/*
-      A dark, near-abstract detail of flag fabric, heavily overlaid. It is a
-      material and a texture, not a patriotic hero image: no waving flag, no
-      seal, nothing implying a government connection. It carries the heritage
-      palette and gives the page its one full-bleed moment.
-    */}
-    <img class="statement-bg" src="/img/flag-texture.jpg" width="1600" height="926"
-         alt="" aria-hidden="true" loading="lazy" decoding="async" />
-    <div class="wrap-wide statement-inner">
-      <p class="hero-type statement-line" data-split-lines>{copy.statement}</p>
-      <p class="apparatus statement-meta">{copy.statementMeta}</p>
-    </div>
-  </section>
-
-  <!-- 06 / Commitments, as type. Not cards. -->
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{copy.commitmentsEyebrow}</p></div>
-      <ol class="commit" data-stagger>
-        {copy.commitments.map((c, i) => (
-          <li data-reveal="text">
-            <span class="commit-n apparatus">{String(i + 1).padStart(2, "0")}</span>
-            <div>
-              <p class="h2 commit-t">{c.t}</p>
-              <p class="commit-d">{c.d}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </Section>
-
   {media.length > 0 && (
     <Section surface="paper-2" wide>
       <div class="editorial gal-head">
-        <div><p class="eyebrow">{copy.mediaEyebrow}</p></div>
+        <div><p class="eyebrow">{_("press.heading")}</p></div>
       </div>
-      <ul class="press" data-stagger>
+      <ul class="press" data-stagger aria-label={_("press.aria")}>
         {media.map((m) => (
           <li class="press-item" data-reveal="text">
             <figure class="press-fig">
               <div class="press-still">
-                <img
-                  src={m.still}
-                  width={m.width}
-                  height={m.height}
-                  alt={es ? `Juan Campos entrevistado en ${m.outlet}.` : `Juan Campos interviewed on ${m.outlet}.`}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src={m.still} width={m.width} height={m.height} alt={altFor[m.id] ?? m.outlet} loading="lazy" decoding="async" />
               </div>
               <figcaption class="press-cap">
                 <span class="press-outlet">{m.outlet}</span>
@@ -270,56 +173,32 @@ const schema = graph([
     </Section>
   )}
 
-  <!-- 06 / Consultation, as a numbered column -->
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{copy.consultEyebrow}</p></div>
-      <div>
-        <h2 class="h2" data-split-lines>{copy.consultTitle}</h2>
-        <ol class="steps consult-steps">
-          {copy.consultSteps.map((s) => (
-            <li>
-              <div>
-                <p class="h4">{s.t}</p>
-                <p class="consult-d">{s.d}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-        {consultation ? (
-          <p class="consult-price prose">{consultation.price}</p>
-        ) : null}
-        <p class="consult-cta">
-          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
-        </p>
-      </div>
+  <!-- camulaw.com home.popupTitle, as the page's one statement -->
+  <section class="statement" data-surface="navy-deep">
+    <img class="statement-bg" src="/img/flag-texture.jpg" width="1600" height="926" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    <div class="wrap-wide statement-inner">
+      <p class="hero-type statement-line" data-split-lines>{_("home.questions")}</p>
+      <p class="statement-cta">
+        <a class="opener-pill" href={langPath(lang, "consulta")}>{_("cta.book")}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
+        <span class="apparatus statement-meta">{_("contact.confidential")}</span>
+      </p>
     </div>
-  </Section>
+  </section>
 
-  <!-- 07 / Office -->
   <Section surface="paper-2">
     <div class="editorial">
-      <div><p class="eyebrow">{copy.officeEyebrow}</p></div>
+      <div><p class="eyebrow">{_("home.where")}</p></div>
       <div class="office">
-        <h2 class="h2" data-split-lines>{copy.officeTitle}</h2>
-        <p class="lead">{copy.officeBody}</p>
+        {src.where && <p class="lead">{src.where}</p>}
         <address class="office-addr">
           <span>{ORG.address.value.street}</span>
           <span>{ORG.address.value.locality}, {ORG.address.value.region} {ORG.address.value.postalCode}</span>
           <a class="apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
         </address>
-        <p class="notice">{copy.courtNote}</p>
       </div>
     </div>
     <div class="map wrap-wide">
-      <iframe
-        class="map-frame"
-        src={mapEmbedUrl()}
-        title={es ? "Mapa de la oficina de Campos Immigration Law en Orlando" : "Map of the Campos Immigration Law office in Orlando"}
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-        allowfullscreen
-      ></iframe>
+      <iframe class="map-frame" src={mapEmbedUrl()} title={_("home.where")} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     </div>
   </Section>
 </Base>
@@ -363,8 +242,8 @@ const schema = graph([
       radial-gradient(34% 30% at 50% 24%, rgb(176 138 74 / 0.12) 0%, rgb(176 138 74 / 0) 100%),
       /* the four corners, where the type is; each is a local scrim that stops
          well short of the centre column, where he is */
-      radial-gradient(46% 40% at 0% 18%, rgb(11 31 51 / 0.72) 0%, rgb(11 31 51 / 0) 66%),
-      radial-gradient(60% 46% at 100% 18%, rgb(11 31 51 / 0.94) 0%, rgb(11 31 51 / 0.78) 36%, rgb(11 31 51 / 0.36) 60%, rgb(11 31 51 / 0) 80%),
+      radial-gradient(52% 42% at 0% 18%, rgb(11 31 51 / 0.82) 0%, rgb(11 31 51 / 0.46) 40%, rgb(11 31 51 / 0) 70%),
+      radial-gradient(62% 50% at 100% 20%, rgb(11 31 51 / 0.94) 0%, rgb(11 31 51 / 0.80) 38%, rgb(11 31 51 / 0.46) 62%, rgb(11 31 51 / 0) 84%),
       radial-gradient(110% 80% at 6% 100%, rgb(11 31 51 / 0.86) 0%, rgb(11 31 51 / 0) 60%),
       radial-gradient(60% 50% at 100% 100%, rgb(11 31 51 / 0.60) 0%, rgb(11 31 51 / 0) 66%),
       linear-gradient(180deg,
@@ -420,7 +299,7 @@ const schema = graph([
     font-size: var(--text-eyebrow);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #c9d4df;
+    color: #dbe3ea;
   }
 
   .opener-lead { color: #e6ecf2; max-width: 34ch; font-size: var(--text-base); margin: 0; }
@@ -509,7 +388,10 @@ const schema = graph([
     .opener-lead { justify-self: end; text-align: right; }
     .opener-bottom { grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr); gap: var(--spacing-s9); }
     .opener-side { justify-items: end; text-align: right; }
-    .opener-display { font-size: clamp(2.4rem, 5.6vw, 7rem); line-height: 1.02; max-width: min(12ch, 32vw); }
+    /* 4.8vw, not 5.6: the first line is the thirteen-letter "Representamos",
+       and at 5.6vw its tail reached his shoulder at 1440. The frame's left
+       third is the column; the word has to fit it. */
+    .opener-display { font-size: clamp(2.4rem, 4.8vw, 6rem); line-height: 1.02; max-width: min(13ch, 32vw); }
   }
 
   /* Landscape phones. The frame is shorter than the type wants to be, so the
@@ -563,17 +445,13 @@ const schema = graph([
   }
   @media (max-width: 767px) { .map-frame { aspect-ratio: 4 / 3; } }
 
-  /* --- sections --- */
-  .scope-more { margin-top: var(--spacing-s6); }
 
-
+  /* --- statement band --- */
   .statement { position: relative; padding-block: var(--spacing-s11); overflow: hidden; isolation: isolate; }
   .statement-bg {
     position: absolute; inset: 0; z-index: -2;
     width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%;
   }
-  /* The overlay is what keeps this a texture rather than a picture, and it is
-     what makes the type contrast measurable rather than hopeful. */
   .statement::after {
     content: ""; position: absolute; inset: 0; z-index: -1;
     background: linear-gradient(180deg, rgb(11 31 51 / 0.955), rgb(11 31 51 / 0.975));
@@ -582,18 +460,22 @@ const schema = graph([
   .statement-line { margin: 0; max-width: 18ch; color: var(--color-paper); }
   .statement-meta { margin-top: var(--spacing-s6); color: #a8b6c6; }
 
-  .commit { list-style: none; display: grid; gap: var(--spacing-s9); counter-reset: c; }
-  .commit > li { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: var(--spacing-s4); }
-  .commit-n { color: var(--surface-accent-ink); padding-top: 0.55em; }
-  .commit-t { margin: 0 0 var(--spacing-s3); max-width: 20ch; }
-  .commit-d { color: var(--surface-ink-2); max-width: var(--container-m-short); }
+  /* --- camimlaw's three sections --- */
+  .who { display: grid; gap: var(--spacing-s7); }
+  .who-h { margin: 0; }
+  .who-p { margin: 0; max-width: var(--container-m-lead); }
+  .statement-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-s4); margin-top: var(--spacing-s6); }
+  .statement-meta { color: #b6c3d1; }
+
+  /* --- sections --- */
+
+
+  /* The overlay is what keeps this a texture rather than a picture, and it is
+     what makes the type contrast measurable rather than hopeful. */
+
 
   .gal-head { margin-bottom: var(--spacing-s7); }
 
-  .consult-steps { margin-top: var(--spacing-s5); max-width: var(--container-m-read); }
-  .consult-d { color: var(--surface-ink-2); }
-  .consult-price { margin-top: var(--spacing-s5); }
-  .consult-cta { margin-top: var(--spacing-s6); }
 
   .office { display: grid; gap: var(--spacing-s5); }
   .office-addr { display: grid; gap: var(--spacing-s1); font-style: normal; font-size: var(--text-lead); }

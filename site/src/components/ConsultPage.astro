@@ -3,189 +3,84 @@ import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, show, mapEmbedUrl } from "../lib/org";
-import { liveGroups } from "../lib/services";
+import { SERVICES } from "../lib/services";
 import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
 
+/* camulaw.com's consultation page strings and form labels; record values. */
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
-const es = lang === "es";
-const path = langPath(lang, es ? "consulta" : "consultation");
-const alternates = { es: "/consulta/", en: "/en/consultation/" };
-const consultation = show(ORG.consultation);
 const whatsapp = show(ORG.whatsapp);
-const groups = liveGroups();
-
-const copy = es
-  ? {
-      title: "Agendar una Consulta | Campos Immigration Law, Orlando",
-      description:
-        "Cómo funciona una consulta con Campos Immigration Law en Orlando: qué traer, qué pasa después y cómo contactarnos. Atendemos en español. (407) 418-9193.",
-      h1: "Agendar una consulta",
-      lead: "Una consulta es una conversación sobre su caso concreto: qué opciones tiene, qué riesgos hay y qué sigue. No es una venta.",
-      costTitle: "Qué cuesta",
-      costPending:
-        "Confirmaremos el costo de la consulta antes de agendarla, y le diremos si las tarifas del gobierno van aparte. Nunca le cobraremos algo que no le hayamos dicho primero.",
-      bringTitle: "Qué traer",
-      bring: [
-        "Su pasaporte o identificación, y los de su familia si el caso los incluye.",
-        "Cualquier documento que le haya enviado el gobierno, aunque no lo entienda. Traiga el sobre completo.",
-        "Fechas: cuándo entró al país, cuántas veces, cuándo salió si salió.",
-        "Si tiene corte, la fecha y el papel donde aparece.",
-        "Copia de cualquier solicitud que ya haya presentado, usted o alguien más por usted.",
-      ],
-      afterTitle: "Qué pasa después de escribirnos",
-      after: [
-        { t: "Recibimos su mensaje", d: "Le respondemos dentro del horario de oficina para acordar una hora." },
-        { t: "Revisamos si podemos ayudarle", d: "Verificamos que no haya conflicto de interés y que su asunto sea de inmigración." },
-        { t: "Hablamos de su caso", d: "Repasamos su historia, sus documentos y sus opciones reales. Sale sabiendo qué sigue." },
-      ],
-      formTitle: "Escríbanos",
-      otherTitle: "Otras formas de contacto",
-    }
-  : {
-      title: "Book a Consultation | Campos Immigration Law, Orlando",
-      description:
-        "How a consultation with Campos Immigration Law in Orlando works: what to bring, what happens next and how to reach us. Spanish and English. (407) 418-9193.",
-      h1: "Book a consultation",
-      lead: "A consultation is a conversation about your actual case: what options you have, what the risks are, and what happens next. It is not a sales call.",
-      costTitle: "What it costs",
-      costPending:
-        "We will confirm the cost of the consultation before we book it, and tell you whether government filing fees are separate. We will never charge you something we have not told you about first.",
-      bringTitle: "What to bring",
-      bring: [
-        "Your passport or identification, and your family's if the case involves them.",
-        "Any document the government has sent you, even if you do not understand it. Bring the whole envelope.",
-        "Dates: when you entered the country, how many times, when you left if you left.",
-        "If you have a court date, the date and the paper it appears on.",
-        "A copy of any application already filed, by you or by someone on your behalf.",
-      ],
-      afterTitle: "What happens after you write",
-      after: [
-        { t: "We receive your message", d: "We reply during office hours to agree a time." },
-        { t: "We check whether we can help", d: "We confirm there is no conflict of interest and that your matter is an immigration one." },
-        { t: "We go through your case", d: "Your account, your documents, your real options. You leave knowing what happens next." },
-      ],
-      formTitle: "Write to us",
-      otherTitle: "Other ways to reach us",
-    };
-
-const crumbs = [
-  { name: es ? "Inicio" : "Home", url: langPath(lang) },
-  { name: _("nav.consultation"), url: path },
-];
+const path = langPath(lang, "consulta");
+const alternates = { es: "/consulta/", en: "/en/consulta/" };
+const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.consultation"), url: path }];
 const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 ---
-<Base lang={lang} title={copy.title} description={copy.description} path={path} alternates={alternates} schema={schema}>
+<Base lang={lang} title={`${_("contact.title")} — ${ORG.name.value}`} description={_("contact.subtitle")} path={path} alternates={alternates} schema={schema}>
   <section class="head wrap" data-surface="paper">
-    <p class="eyebrow">{_("nav.consultation")}</p>
-    <h1 class="h1" data-split-lines="hero">{copy.h1}</h1>
-    <p class="lead">{copy.lead}</p>
+    <p class="eyebrow">{_("contact.confidential")}</p>
+    <h1 class="h1" data-split-lines="hero">{_("contact.title")}</h1>
+    <p class="lead">{_("contact.subtitle")}</p>
+    <p class="apparatus">{_("contact.virtual")}</p>
   </section>
 
-  <!-- Money in a sentence, not in a pricing card. -->
   <Section surface="paper-2">
     <div class="editorial">
-      <div><p class="eyebrow">{copy.costTitle}</p></div>
-      <div class="prose">
-        <p>{consultation ? consultation.price : copy.costPending}</p>
-      </div>
-    </div>
-  </Section>
-
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{copy.afterTitle}</p></div>
-      <ol class="steps">
-        {copy.after.map((s) => (
-          <li><div><p class="h4">{s.t}</p><p class="dim">{s.d}</p></div></li>
-        ))}
-      </ol>
-    </div>
-  </Section>
-
-  <Section surface="paper" id="form">
-    <div class="editorial">
-      <div><p class="eyebrow">{copy.formTitle}</p></div>
-      <div class="formwrap">
-        <p class="notice form-caution">{_("disclaimer.form")}</p>
-
-        <p class="form-status" data-form-status tabindex="-1" role="status" aria-live="polite"></p>
-
+      <div><p class="eyebrow">{_("form.type")}</p></div>
+      <div>
         <form
           class="form"
-          data-contact-form
-          action="/api/contact/"
           method="post"
+          action="/api/contact"
+          data-contact-form
+          data-phone={ORG.phone.value}
+          data-phone-display={ORG.phoneDisplay.value}
           data-sending-label={_("form.sending")}
           data-success-message={_("form.success")}
           data-failure-message={_("form.failure")}
-          data-phone={ORG.phone.value}
-          data-phone-display={ORG.phoneDisplay.value}
+          data-ratelimit-message={_("form.rateLimit")}
         >
-          <div class="form-grid">
-            <p class="field">
-              <label for="firstName">{_("form.firstName")} <span class="req">({_("form.required")})</span></label>
-              <input id="firstName" name="firstName" type="text" autocomplete="given-name" required
-                     data-validate data-err-required={_("form.errorRequired")} />
-              <span class="field-err" data-field-error aria-live="polite"></span>
-            </p>
-            <p class="field">
+          <div class="grid-2">
+            <div class="field">
+              <label for="firstName">{_("form.firstName")}</label>
+              <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+            </div>
+            <div class="field">
               <label for="lastName">{_("form.lastName")}</label>
               <input id="lastName" name="lastName" type="text" autocomplete="family-name" />
-            </p>
-            <p class="field">
-              <label for="phone">{_("form.phone")} <span class="req">({_("form.required")})</span></label>
-              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required
-                     data-validate data-err-required={_("form.errorRequired")} data-err-phone={_("form.errorPhone")} />
-              <span class="field-err" data-field-error aria-live="polite"></span>
-            </p>
-            <p class="field">
+            </div>
+            <div class="field">
+              <label for="phone">{_("form.phone")}</label>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+            </div>
+            <div class="field">
               <label for="email">{_("form.email")}</label>
-              <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
-                     data-validate data-err-email={_("form.errorEmail")} />
-              <span class="field-err" data-field-error aria-live="polite"></span>
-            </p>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" />
+            </div>
           </div>
-
-          <p class="field">
-            <label for="topic">{_("form.topic")} <span class="req">({_("form.required")})</span></label>
-            <select id="topic" name="topic" required data-validate data-err-required={_("form.errorRequired")}>
-              <option value="">{_("form.topicPlaceholder")}</option>
-              {groups.map((g) => <option value={g.id}>{g.situation[lang]}</option>)}
-              <option value="otro">{es ? "Otro / no estoy seguro" : "Something else / not sure"}</option>
+          <div class="field">
+            <label for="topic">{_("form.type")}</label>
+            <select id="topic" name="topic" required>
+              <option value="">{_("form.selectType")}</option>
+              {SERVICES.map((s) => <option value={s.slug}>{s.name[lang]}</option>)}
+              <option value="otro">{_("form.notSure")}</option>
             </select>
-            <span class="field-err" data-field-error aria-live="polite"></span>
-          </p>
-
+          </div>
           <fieldset class="field field--radio">
-            <legend>{_("form.language")}</legend>
-            <label><input type="radio" name="preferredLanguage" value="es" checked /> Español</label>
-            <label><input type="radio" name="preferredLanguage" value="en" /> English</label>
+            <legend>{_("lang.es")} / {_("lang.en")}</legend>
+            <label><input type="radio" name="preferredLanguage" value="es" checked /> {_("lang.es")}</label>
+            <label><input type="radio" name="preferredLanguage" value="en" /> {_("lang.en")}</label>
           </fieldset>
-
           <button class="btn btn-primary" type="submit">{_("form.send")}</button>
-          <noscript>
-            <p class="notice">
-              {es ? "Si el formulario no funciona, llámenos al " : "If the form does not work, call us at "}
-              <a href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>.
-            </p>
-          </noscript>
+          <p class="form-status" data-form-status aria-live="polite"></p>
         </form>
       </div>
     </div>
   </Section>
 
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div><p class="eyebrow">{copy.bringTitle}</p></div>
-      <ul class="bring">{copy.bring.map((b) => <li>{b}</li>)}</ul>
-    </div>
-  </Section>
-
   <Section surface="paper">
     <div class="editorial">
-      <div><p class="eyebrow">{copy.otherTitle}</p></div>
+      <div><p class="eyebrow">{_("contact.contact")}</p></div>
       <div class="ways">
         <p><a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a></p>
         {whatsapp && <p><a class="btn btn-secondary" href={whatsapp} rel="noopener">WhatsApp</a></p>}
@@ -193,18 +88,10 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
           <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
           <span>{ORG.address.value.street}</span>
           <span>{ORG.address.value.locality}, {ORG.address.value.region} {ORG.address.value.postalCode}</span>
-          <span class="apparatus">
-            {es ? "Lunes a viernes" : "Monday to Friday"} · {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}
-          </span>
+          <span class="apparatus">{_("contact.monFri")} · {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</span>
         </address>
-        <iframe
-          class="ways-map"
-          src={mapEmbedUrl()}
-          title={es ? "Mapa de la oficina de Campos Immigration Law en Orlando" : "Map of the Campos Immigration Law office in Orlando"}
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          allowfullscreen
-        ></iframe>
+        <iframe class="ways-map" src={mapEmbedUrl()} title={_("home.where")} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        <p><a class="link-arrow" href={langPath(lang, "pagos")}>{_("contact.paymentQ")} <span aria-hidden="true">&rarr;</span></a></p>
       </div>
     </div>
   </Section>

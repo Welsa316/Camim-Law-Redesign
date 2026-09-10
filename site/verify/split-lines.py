@@ -13,12 +13,13 @@ at its end state, so a mask cannot pass by hiding an unrevealed line.
 
     python3 verify/split-lines.py [base-url]
 """
-import asyncio, sys
+import asyncio, sys, pathlib
 from playwright.async_api import async_playwright
 
 BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:4321"
-ROUTES = ["/", "/servicios/", "/asilo-orlando/", "/juan-campos/", "/consulta/", "/detenido/", "/preguntas/", "/orlando/", "/pagos/",
-          "/en/", "/en/services/", "/en/juan-campos/", "/en/consultation/", "/en/faq/"]
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+# every route in the build, so a renamed page cannot fall out of the check
+ROUTES = sorted("/" + str(f.relative_to(ROOT / "dist/client")).replace("index.html", "") for f in (ROOT / "dist/client").rglob("index.html"))
 TOL = 0.75  # px; sub-pixel rounding
 
 JS = """() => {

@@ -1,57 +1,35 @@
 ---
 import { t, langPath, type Lang } from "../i18n/ui";
-import { ORG, ATTORNEY, show } from "../lib/org";
-import { liveGroups, mattersInGroup } from "../lib/services";
+import { ORG, ATTORNEY } from "../lib/org";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
 const a = ORG.address.value;
-const groups = liveGroups();
-const admissions = show(ATTORNEY.admissions) ?? [];
-const mapsQuery = encodeURIComponent(`${a.street}, ${a.locality}, ${a.region} ${a.postalCode}`);
 ---
 <footer class="ftr" data-surface="navy-deep">
-  <div class="wrap-wide ftr-inner">
-    <div class="ftr-cols">
+  <div class="ftr-inner wrap-wide">
+    {/* camimlaw.com's own footer: Ubicación, Horario, Contactanos, and the values. */}
+    <div class="ftr-grid">
       <div class="ftr-col">
-        <p class="eyebrow">{_("nav.services")}</p>
-        <ul class="ftr-list">
-          {groups.map((g) => (
-            <li>
-              <a href={`${langPath(lang, lang === "es" ? "servicios" : "services")}#${g.id}`}>{g.name[lang]}</a>
-            </li>
-          ))}
-          {groups.flatMap((g) => mattersInGroup(g.id)).map((m) => (
-            <li><a href={langPath(lang, m.slug[lang])}>{m.name[lang]}</a></li>
-          ))}
-        </ul>
-      </div>
-
-      <div class="ftr-col">
-        <p class="eyebrow">{lang === "es" ? "El bufete" : "The firm"}</p>
-        <ul class="ftr-list">
-          <li><a href={langPath(lang, "juan-campos")}>{_("nav.attorney")}</a></li>
-          <li><a href={langPath(lang, lang === "es" ? "consulta" : "consultation")}>{_("nav.consultation")}</a></li>
-          <li><a href={langPath(lang, lang === "es" ? "preguntas" : "faq")}>{_("nav.faq")}</a></li>
-          <li><a href={langPath(lang, lang === "es" ? "detenido" : "detained")}>{_("nav.detained")}</a></li>
-          <li><a href={langPath(lang, "orlando")}>{_("nav.orlando")}</a></li>
-          <li><a href={langPath(lang, lang === "es" ? "pagos" : "payment")}>{_("nav.payment")}</a></li>
-        </ul>
-      </div>
-
-      <div class="ftr-col">
-        <p class="eyebrow">{lang === "es" ? "Contacto" : "Contact"}</p>
-        <address class="ftr-address">
-          <a href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} rel="noopener">
-            {a.street}<br />{a.locality}, {a.region} {a.postalCode}
-          </a>
-          <a class="ftr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
-          <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
+        <p class="ftr-h apparatus">{_("contact.address")}</p>
+        <address class="ftr-addr">
+          <span>{a.street}</span>
+          <span>{a.locality}, {a.region} {a.postalCode}</span>
         </address>
-        <p class="ftr-hours apparatus">
-          {lang === "es" ? "Lunes a viernes" : "Monday to Friday"} · {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}
-        </p>
+      </div>
+      <div class="ftr-col">
+        <p class="ftr-h apparatus">{_("contact.hours")}</p>
+        <p>{_("contact.monFri")}</p>
+        <p class="apparatus">{ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</p>
+      </div>
+      <div class="ftr-col">
+        <p class="ftr-h apparatus">{_("contact.contact")}</p>
+        <a class="ftr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+        <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
+      </div>
+      <div class="ftr-col">
+        <p class="ftr-h apparatus">{_("contact.connect")}</p>
         <ul class="ftr-social">
           <li><a href={ORG.social.value.instagram} rel="noopener">Instagram</a></li>
           <li><a href={ORG.social.value.facebook} rel="noopener">Facebook</a></li>
@@ -60,34 +38,30 @@ const mapsQuery = encodeURIComponent(`${a.street}, ${a.locality}, ${a.region} ${
         </ul>
       </div>
     </div>
-
-    <hr class="rule ftr-rule" />
-
-    <!-- Rule 4-7.12(a): the responsible lawyer and a bona fide office location
-         must appear. Rule 4-7.21(d) and the 4-7.11 comment: the jurisdictional
-         limitation is stated because the attorney is admitted in Louisiana. -->
     <div class="ftr-legal">
-      <p class="ftr-firm">
-        {ORG.name.value} &middot; {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}
-      </p>
+      <p class="ftr-firm">{ORG.name.value} &middot; {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</p>
+      {/* camulaw.com, team.members.juan.bio: the admission sentence. Rule 4-7.21(d). */}
       <p class="ftr-note">
         {lang === "es"
-          ? `Oficina en ${a.locality}, ${a.region}. Admitido para ejercer en ${admissions.join(", ")}. No admitido en Florida. La inmigración es una práctica federal, así que representamos a clientes ante USCIS, las cortes de inmigración (EOIR) y los consulados de Estados Unidos desde nuestra oficina de Orlando, incluyendo a personas que viven en otros estados.`
-          : `Office in ${a.locality}, ${a.region}. Admitted to practise in ${admissions.join(", ")}. Not admitted in Florida. Immigration is a federal practice, so we represent clients before USCIS, the immigration courts (EOIR) and U.S. consulates from our Orlando office, including people who live in other states.`}
-      </p>
-      <p class="ftr-note ftr-note--strong">{_("footer.notNotarios")}</p>
-      <p class="ftr-note">
-        {lang === "es"
-          ? "Este sitio es publicidad de servicios legales. La información aquí es general y no es asesoría legal; visitarlo o escribirnos no crea una relación abogado-cliente."
-          : "This website is attorney advertising. The information here is general and is not legal advice; visiting the site or writing to us does not create an attorney-client relationship."}
-      </p>
-      <p class="ftr-meta apparatus">
+          ? "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana y es miembro de la American Immigration Lawyers Association (AILA)."
+          : "Juan is admitted to practice law before the Louisiana Supreme Court and is a member of the American Immigration Lawyers Association (AILA)."}
       </p>
     </div>
   </div>
 </footer>
 
 <style>
+  .ftr-grid { display: grid; gap: var(--spacing-s6); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .ftr-col { display: grid; gap: var(--spacing-s2); align-content: start; }
+  .ftr-col p { margin: 0; }
+  .ftr-h { color: var(--surface-ink-2); }
+  .ftr-addr { display: grid; gap: 2px; font-style: normal; }
+  .ftr-col a { color: var(--surface-ink); text-decoration: none; }
+  .ftr-social { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--spacing-s3) var(--spacing-s4); }
+  .ftr-legal { margin-top: var(--spacing-s8); padding-top: var(--spacing-s5); border-top: 1px solid rgb(252 252 250 / 0.14); display: grid; gap: var(--spacing-s2); }
+  .ftr-firm { margin: 0; font-family: var(--font-serif); font-size: var(--text-h4); }
+  .ftr-note { margin: 0; color: var(--surface-ink-2); max-width: 70ch; font-size: var(--text-sm); }
+
   .ftr { margin-top: var(--section-y); padding-block: var(--spacing-s10) var(--spacing-s8); }
   .ftr-inner { display: grid; gap: var(--spacing-s8); }
   .ftr-cols { display: grid; gap: var(--spacing-s8); }

@@ -78,7 +78,14 @@ export const ORG = {
 
   /* ---- pending ---- */
   mapsUrl: pending<string | null>(null),
-  whatsapp: pending<string | null>(null),
+  /**
+   * The office line, as a WhatsApp link. Set on the client's instruction of
+   * 2026-09-10 to put WhatsApp in the phone bar. The number is the verified
+   * office number; whether that number is registered on WhatsApp has not
+   * been checked here. If it is not, the button opens WhatsApp to nothing:
+   * confirm before launch (CONTENT_REVIEW.md).
+   */
+  whatsapp: v("https://wa.me/14074189193", "client instruction 2026-09-10; number is the verified office line"),
   consultation: pending<{ price: string; minutes: number; creditedBack: boolean } | null>(null),
   /**
    * 5401 S. Kirkman Rd is the Regions Bank Building, which hosts Execu-Suites

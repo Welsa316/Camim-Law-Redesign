@@ -59,7 +59,6 @@ export default defineConfig({
     "/services": "/servicios/",
     "/about": "/juan-campos/",
     "/contact": "/consulta/",
-    "/asilo": "/asilo-orlando/",
     "/appointments": "/consulta/",
     "/cart": "/",
     "/checkout": "/",

@@ -2,170 +2,82 @@
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
-import { ORG, ATTORNEY, COURT, show } from "../lib/org";
-import { groupById, matterById, isDraft, liveMatters, type Matter } from "../lib/services";
-import { graph, orgSchema, attorneySchema, breadcrumbSchema, serviceSchema, faqSchema } from "../lib/seo";
+import { ORG, ATTORNEY } from "../lib/org";
+import { serviceBySlug, type Service } from "../lib/services";
+import { graph, orgSchema, attorneySchema, breadcrumbSchema, serviceSchema } from "../lib/seo";
 
-interface Props { lang: Lang; matter: Matter }
-const { lang, matter } = Astro.props;
+/* Every string here is a sourced block from services.ts, a dictionary label,
+   or a record value. See services.ts for provenance and the omission log. */
+interface Props { lang: Lang; service: Service }
+const { lang, service } = Astro.props;
 const _ = t(lang);
 const es = lang === "es";
-const group = groupById(matter.group)!;
-const path = langPath(lang, matter.slug[lang]);
-const servicesPath = langPath(lang, es ? "servicios" : "services");
-// Related links use the same renderable set as the navigation, so a review
-// build cross-links its drafts and a production build never links to one.
-const renderableIds = new Set(liveMatters().map((m) => m.id));
-const related = matter.related
-  .map(matterById)
-  .filter((m): m is Matter => !!m && renderableIds.has(m.id));
-const admissions = show(ATTORNEY.admissions) ?? [];
-const updated = "2026-09-09";
-const draft = isDraft(matter);
-
-const alternates = { es: langPath("es", matter.slug.es), en: langPath("en", matter.slug.en) };
+const path = langPath(lang, service.slug);
+const related = service.related.map(serviceBySlug).filter((s): s is Service => !!s);
+const admitted = es
+  ? "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana" // camulaw bio, fragment
+  : "Juan is admitted to practice law before the Louisiana Supreme Court";
+const alternates = { es: langPath("es", service.slug), en: langPath("en", service.slug) };
 const crumbs = [
-  { name: es ? "Inicio" : "Home", url: langPath(lang) },
-  { name: _("nav.services"), url: servicesPath },
-  { name: matter.name[lang], url: path },
+  { name: _("nav.home"), url: langPath(lang) },
+  { name: _("nav.services"), url: langPath(lang, "servicios") },
+  { name: service.name[lang], url: path },
 ];
-const schema = graph([
-  orgSchema(),
-  attorneySchema(lang),
-  breadcrumbSchema(crumbs),
-  serviceSchema(matter.name[lang], path, lang),
-  ...(matter.faqs.length
-    ? [faqSchema(matter.faqs.map((f) => ({ q: f.q[lang], a: f.a[lang] })))]
-    : []),
-]);
+const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs), serviceSchema(service.name[lang], path, lang, service.line[lang])]);
 ---
-<Base lang={lang} title={matter.title[lang]} description={matter.description[lang]} path={path} alternates={alternates} schema={schema} noindex={draft}>
+<Base lang={lang} title={`${service.name[lang]} — ${ORG.name.value}`} description={service.line[lang]} path={path} alternates={alternates} schema={schema}>
 
-  {draft && (
-    <div class="reviewbar">
-      <p>
-        <strong>Borrador para revisión.</strong>{" "}
-        Esta página está redactada pero el bufete todavía no ha confirmado que
-        lleva este tipo de caso. No se publica ni se indexa hasta esa
-        confirmación. Evidencia: {matter.evidence}
-      </p>
-    </div>
-  )}
-
-  <nav class="crumbs wrap" aria-label={_("a11y.breadcrumb")}>
+  <nav class="crumbs wrap">
     <ol>
       {crumbs.map((c, i) => (
-        <li>
-          {i < crumbs.length - 1
-            ? <a href={c.url}>{c.name}</a>
-            : <span aria-current="page">{c.name}</span>}
-        </li>
+        <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>
       ))}
     </ol>
   </nav>
 
-  <!-- The opening block is a self-contained direct answer naming the firm, the
-       city and the phone number, so an extracted chunk carries the brand. -->
   <section class="mhead wrap" data-surface="paper">
-    <p class="eyebrow">{group.name[lang]}</p>
-    <h1 class="h1 mhead-title">
-      {matter.name[lang]}
-      {matter.form && <span class="mhead-form">{matter.form}</span>}
-    </h1>
-    <p class="lead mhead-summary">{matter.summary[lang]}</p>
+    <p class="eyebrow">{_("nav.services")}</p>
+    <h1 class="h1 mhead-title">{service.name[lang]}</h1>
+    <p class="lead mhead-summary">{service.line[lang]}</p>
     <div class="mhead-actions">
-      <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+      <a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
       <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
     </div>
-    <p class="apparatus mhead-by">
-      {show(ORG.copyReviewedByAttorney) ? `${_("label.reviewedBy")} ` : ""}{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value} &middot;
-      {es ? "Admitido en" : "Admitted in"} {admissions.join(", ")} &middot;
-      {_("label.updated")} <time datetime={updated}>{updated}</time>
-    </p>
+    <p class="apparatus mhead-by">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value} &middot; {admitted}</p>
   </section>
 
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("label.whoFor")}</p></div>
-      <ul class="who" data-stagger>
-        {matter.whoFor[lang].map((w) => <li data-reveal="text">{w}</li>)}
-      </ul>
-    </div>
-  </Section>
-
   <Section surface="paper">
     <div class="editorial">
-      <div><p class="eyebrow">{_("label.whatItIs")}</p></div>
-      <div class="prose"><p>{matter.what[lang]}</p></div>
-    </div>
-  </Section>
-
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("label.howItWorks")}</p></div>
-      <ol class="steps mstep">
-        {matter.steps[lang].map((s) => <li><p>{s}</p></li>)}
-      </ol>
-    </div>
-  </Section>
-
-  <Section surface="navy">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("label.howWeHelp")}</p></div>
-      <div>
-        <ul class="help" data-stagger>
-          {matter.weHelp[lang].map((h) => <li data-reveal="text">{h}</li>)}
-        </ul>
-        <p class="help-cta">
-          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
-        </p>
+      <div></div>
+      <div class="prose blocks">
+        {service.blocks[lang].map((b) =>
+          b.type === "heading" ? <h2 class="h2" data-split-lines>{b.text}</h2>
+          : b.type === "subheading" ? <h3 class="h3">{b.text}</h3>
+          : b.type === "list" ? <ul>{b.items.map((i) => <li>{i}</li>)}</ul>
+          : <p>{b.text}</p>
+        )}
       </div>
     </div>
   </Section>
 
-  {matter.faqs.length > 0 && (
-    <Section surface="paper">
-      <div class="editorial">
-        <div><p class="eyebrow">{_("label.questions")}</p></div>
-        <div class="faqs">
-          {matter.faqs.map((f, i) => (
-            <details class="qa">
-              <summary>{f.q[lang]}</summary>
-              {/* The fragment id is on the CONTENT, never on the summary: a
-                  summary is always visible, so an id there scrolls without
-                  ever opening the answer. */}
-              <div class="qa-body prose" id={`q${i + 1}`}>
-                <p>{f.a[lang]}</p>
-              </div>
-            </details>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )}
-
   <Section surface="paper-2">
     <div class="editorial">
-      <div><p class="eyebrow">{_("label.nextStep")}</p></div>
+      <div><p class="eyebrow">{_("home.questions")}</p></div>
       <div class="next">
-        <p class="lead">
-          {es
-            ? "Si algo de esta página se parece a su situación, hablemos antes de que presente nada."
-            : "If anything on this page sounds like your situation, let us talk before you file anything."}
-        </p>
+        <p class="lead">{_("contact.subtitle")}</p>
         <div class="mhead-actions">
-          <a class="btn btn-primary" href={langPath(lang, es ? "consulta" : "consultation")}>{_("cta.book")}</a>
+          <a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
           <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
         </div>
-
         {related.length > 0 && (
           <div class="rel">
-            <p class="eyebrow">{_("label.related")}</p>
+            <p class="eyebrow">{_("services.related")}</p>
+            <p class="dim">{_("services.relatedSub")}</p>
             <ul class="rows">
               {related.map((r) => (
                 <li class="row-item">
-                  <a class="row-link" href={langPath(lang, r.slug[lang])}>
-                    <span class="row-title">{r.name[lang]}{r.form && <span class="row-form">{r.form}</span>}</span>
+                  <a class="row-link" href={langPath(lang, r.slug)}>
+                    <span class="row-title">{r.name[lang]}</span>
                     <span class="row-arrow" aria-hidden="true">&rarr;</span>
                   </a>
                 </li>
@@ -173,15 +85,16 @@ const schema = graph([
             </ul>
           </div>
         )}
-
-        <p class="notice next-note">{_("disclaimer.general")}</p>
-        <p class="notice">{es ? `La Corte de Inmigración de Orlando queda en ${COURT.address}.` : `The Orlando Immigration Court is at ${COURT.address}.`}</p>
       </div>
     </div>
   </Section>
 </Base>
 
 <style>
+  .blocks h2 { margin-top: var(--spacing-s7); }
+  .blocks h2:first-child { margin-top: 0; }
+  .blocks h3 { margin-top: var(--spacing-s5); }
+
   /* Only ever visible in a review build. Deliberately loud. */
   .reviewbar {
     background: #3a2a12; color: #fdf6e8;
@@ -191,12 +104,6 @@ const schema = graph([
   .reviewbar p { max-width: var(--container-content); margin-inline: auto; }
   .reviewbar strong { color: #ffd79a; }
 
-  .crumbs { padding-block: var(--spacing-s5) 0; }
-  .crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--spacing-s2);
-               font-family: var(--font-mono); font-size: var(--text-eyebrow);
-               letter-spacing: 0.06em; color: var(--color-ink-2); }
-  .crumbs li + li::before { content: "/"; margin-right: var(--spacing-s2); color: var(--color-line-strong); }
-  .crumbs a { color: inherit; text-decoration: none; }
   @media (any-hover: hover) { .crumbs a:hover { color: var(--color-accent-ink); } }
 
   .mhead { padding-block: var(--spacing-s6) var(--spacing-s9); display: grid; gap: var(--spacing-s5); }

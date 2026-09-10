@@ -1,7 +1,7 @@
 ---
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG } from "../lib/org";
-import { liveGroups, mattersInGroup } from "../lib/services";
+import { SERVICES } from "../lib/services";
 import type { Alternates } from "../lib/seo";
 
 interface Props { lang: Lang; alternates: Alternates; overHero?: boolean }
@@ -9,23 +9,21 @@ const { lang, alternates, overHero = false } = Astro.props;
 const _ = t(lang);
 const other: Lang = lang === "es" ? "en" : "es";
 const otherHref = other === "es" ? alternates.es : alternates.en;
-const groups = liveGroups();
 
 const nav = [
-  { href: langPath(lang, lang === "es" ? "servicios" : "services"), label: _("nav.services"), hasPanel: true },
+  { href: langPath(lang, "servicios"), label: _("nav.services") },
   { href: langPath(lang, "juan-campos"), label: _("nav.attorney") },
-  { href: langPath(lang, lang === "es" ? "consulta" : "consultation"), label: _("nav.consultation") },
-  { href: langPath(lang, lang === "es" ? "preguntas" : "faq"), label: _("nav.faq") },
+  { href: langPath(lang, "consulta"), label: _("nav.consultation") },
 ];
 ---
 <header class="hdr" data-header data-over={overHero ? "" : undefined}>
   <div class="hdr-inner wrap-wide">
     <a class="hdr-mark" href={langPath(lang)}>
-      <span class="hdr-mark-name">Campos</span>
+      <span class="hdr-mark-name">Campos</span>{" "}
       <span class="hdr-mark-rest">Immigration Law</span>
     </a>
 
-    <nav class="hdr-nav" aria-label={_("a11y.mainNav")}>
+    <nav class="hdr-nav">
       {nav.map((item) => (
         <a class="hdr-link" href={item.href} aria-current={Astro.url.pathname === item.href ? "page" : undefined}>
           {item.label}
@@ -35,16 +33,15 @@ const nav = [
 
     <div class="hdr-actions">
       <a class="hdr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
-      <a class="hdr-pay" href={langPath(lang, lang === "es" ? "pagos" : "payment")}>{_("nav.payment")}</a>
-      <a class="hdr-lang" href={otherHref} lang={other} hreflang={other} aria-label={_("a11y.langSwitch")}>
+      <a class="hdr-pay" href={langPath(lang, "pagos")}>{_("nav.payment")}</a>
+      <a class="hdr-lang" href={otherHref} lang={other} hreflang={other} aria-label={other === "en" ? _("lang.en") : _("lang.es")}>
         <span aria-hidden="true">{lang === "es" ? "EN" : "ES"}</span>
-        <span class="sr-only">{other === "en" ? "View this page in English" : "Ver esta página en español"}</span>
       </a>
-      <a class="btn btn-primary hdr-cta" href={langPath(lang, lang === "es" ? "consulta" : "consultation")}>
+      <a class="btn btn-primary hdr-cta" href={langPath(lang, "consulta")}>
         {_("cta.book")}
       </a>
       <button class="hdr-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu">
-        <span class="sr-only" data-menu-label>{_("nav.openMenu")}</span>
+        <span class="sr-only" data-menu-label>{_("a11y.menu")}</span>
         <span class="hdr-toggle-bars" aria-hidden="true"><i></i><i></i></span>
       </button>
     </div>
@@ -52,34 +49,24 @@ const nav = [
 
   <!-- Mobile drawer: ruled rows, always labelled, never a grid of icons. -->
   <div class="drawer" id="site-menu" data-menu hidden>
-    <nav class="drawer-inner wrap" aria-label={_("a11y.mainNav")}>
+    <nav class="drawer-inner wrap">
       <ul class="drawer-list">
-        {groups.map((g) => (
-          <li class="drawer-group">
-            <p class="drawer-group-name">{g.name[lang]}</p>
-            <ul>
-              {mattersInGroup(g.id).map((m) => (
-                <li>
-                  <a class="drawer-link" href={langPath(lang, m.slug[lang])}>
-                    {m.name[lang]}
-                    {m.form && <span class="row-form">{m.form}</span>}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        <li class="drawer-group">
+          <p class="drawer-group-name">{_("nav.services")}</p>
+          <ul>
+            {SERVICES.map((m) => (
+              <li><a class="drawer-link" href={langPath(lang, m.slug)}>{m.name[lang]}</a></li>
+            ))}
+          </ul>
+        </li>
         {nav.map((item) => (
           <li><a class="drawer-link drawer-link--big" href={item.href}>{item.label}</a></li>
         ))}
-        <li><a class="drawer-link drawer-link--big" href={langPath(lang, lang === "es" ? "detenido" : "detained")}>{_("nav.detained")}</a></li>
-        <li><a class="drawer-link drawer-link--big" href={langPath(lang, lang === "es" ? "pagos" : "payment")}>{_("nav.payment")}</a></li>
+        <li><a class="drawer-link drawer-link--big" href={langPath(lang, "pagos")}>{_("nav.payment")}</a></li>
       </ul>
       <div class="drawer-actions">
         <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
-        <a class="btn btn-secondary" href={otherHref} lang={other} hreflang={other}>
-          {other === "en" ? "English" : "Español"}
-        </a>
+        <a class="btn btn-secondary" href={otherHref} lang={other} hreflang={other}>{other === "en" ? _("lang.en") : _("lang.es")}</a>
       </div>
     </nav>
   </div>

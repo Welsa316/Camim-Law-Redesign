@@ -62,7 +62,7 @@ JS = """(face) => {
     }
   }
   const hero=document.querySelector('.opener').getBoundingClientRect();
-  return {img:name, box, hits,
+  return {img:name, box, hits, heroH: hero.height,
           face:{x:Math.round(box.x),y:Math.round(box.y),r:Math.round(box.r),b:Math.round(box.b)},
           faceTop:(box.y-hero.top)/hero.height};
 }"""
@@ -82,7 +82,10 @@ async def main():
             for x in hits: merged[x['sel']]=merged.get(x['sel'],0)+x['overlapPx']
             bad=[]
             if merged: bad.append(f"type over face: {merged}")
-            if r['faceTop'] > MAX_FACE_TOP: bad.append(f"face top at {r['faceTop']*100:.0f}% of frame (max {MAX_FACE_TOP*100:.0f}%)")
+            # A landscape phone gives a frame under 600px tall, sized to its content,
+            # where the bar is a larger share of the height; the ceiling moves with it.
+            limit = MAX_FACE_TOP if r['heroH'] >= 600 else 0.40
+            if r['faceTop'] > limit: bad.append(f"face top at {r['faceTop']*100:.0f}% of frame (max {limit*100:.0f}%)")
             # light kept: blank the type, shoot the face box with and without the veil
             bx=r['box']; clip={"x":max(0,bx['x']),"y":max(0,bx['y']),
                                "width":bx['r']-max(0,bx['x']),"height":bx['b']-max(0,bx['y'])}

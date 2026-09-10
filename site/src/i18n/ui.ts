@@ -1,10 +1,8 @@
 /**
- * Every chrome string, in both languages.
- *
- * Navigation, buttons, form labels, errors and the 404 get the same care as
- * body copy. The research found an otherwise excellent trilingual firm site
- * rendering "Home" as "Hogar", and a local competitor shipping
- * "DEFENSA DE DESPEDIDA" for removal defence. Those are chrome-string failures.
+ * Interface strings. Every value is copied from camimlaw.com or from Campos
+ * Muños Law's ES/EN dictionaries (docs/sources/camulaw.com.site-data.json);
+ * the comment beside each names the source key. Nothing here was written for
+ * this site. verify/copy-provenance.py checks every rendered string.
  */
 
 export const LANGS = ["es", "en"] as const;
@@ -13,151 +11,126 @@ export const DEFAULT_LANG: Lang = "es";
 
 export const ui = {
   es: {
-    "nav.services": "Servicios",
-    "nav.attorney": "El abogado",
-    "nav.consultation": "Consulta",
-    "nav.faq": "Preguntas",
-    "nav.detained": "¿Detuvieron a un familiar?",
-    "nav.payment": "Pagar",
-    "nav.orlando": "Orlando",
-    "nav.menu": "Menú",
-    "nav.closeMenu": "Cerrar menú",
-    "nav.openMenu": "Abrir menú",
-    "nav.allServices": "Ver todos los servicios",
-
-    "cta.book": "Agendar consulta",
-    "cta.call": "Llamar",
-    "cta.callNow": "Llamar ahora",
-    "cta.write": "Escribir",
-    "cta.seeServices": "Ver servicios",
-    "cta.readMore": "Seguir leyendo",
-    "cta.meetAttorney": "Conocer al abogado",
-
-    "a11y.skip": "Saltar al contenido principal",
-    "a11y.langSwitch": "Cambiar idioma",
-    "a11y.currentLang": "Idioma actual: español",
-    "a11y.breadcrumb": "Ruta de navegación",
-    "a11y.mainNav": "Navegación principal",
-    "a11y.footerNav": "Navegación del pie de página",
-
-    "label.phone": "Teléfono",
-    "label.email": "Correo",
-    "label.address": "Dirección",
-    "label.hours": "Horario",
-    "label.languages": "Idiomas",
-    "label.form": "Formulario",
-    "label.updated": "Última actualización",
-    "label.reviewedBy": "Escrito y revisado por",
-    "label.whoFor": "Para quién es",
-    "label.whatItIs": "Qué es",
-    "label.howItWorks": "Cómo funciona",
-    "label.howWeHelp": "En qué ayudamos",
-    "label.questions": "Preguntas frecuentes",
-    "label.related": "Servicios relacionados",
-    "label.nextStep": "Siguiente paso",
-
-    "home.eyebrow": "Abogado de inmigración · Orlando, Florida",
-    "footer.notNotarios": "Somos un bufete de abogados. No somos notarios ni consultores de inmigración.",
-
-    "form.firstName": "Nombre",
-    "form.lastName": "Apellido",
-    "form.phone": "Teléfono",
-    "form.email": "Correo electrónico",
-    "form.language": "¿En qué idioma prefiere que le contactemos?",
-    "form.topic": "¿Sobre qué tema nos escribe?",
-    "form.topicPlaceholder": "Elija una opción",
-    "form.send": "Enviar",
-    "form.sending": "Enviando…",
-    "form.required": "obligatorio",
-    "form.errorRequired": "Este campo es obligatorio.",
-    "form.errorEmail": "Escriba un correo electrónico válido.",
-    "form.errorPhone": "Escriba un número de teléfono válido.",
-    "form.success": "Recibimos su mensaje. Le contactaremos pronto.",
-    "form.failure": "No pudimos enviar el formulario. Llámenos al",
-
-    "notFound.title": "No encontramos esa página",
-    "notFound.body": "Es posible que el enlace haya cambiado. Estas son las páginas que la mayoría de las personas busca.",
-
-    "disclaimer.general":
-      "Esta página ofrece información general sobre la ley de inmigración. No es asesoría legal para su caso y leerla no crea una relación abogado-cliente. La ley cambia; hable con un abogado sobre su situación.",
-    "disclaimer.form":
-      "Enviar este formulario no crea una relación abogado-cliente. Comparta solo su nombre, sus datos de contacto y el tema general. No incluya todavía detalles de su historial migratorio.",
+    "nav.home": "Inicio", // camulaw nav.home
+    "nav.services": "Servicios", // camulaw nav.servicios
+    "nav.attorney": "Acerca de", // camulaw nav.acercaDe
+    "nav.consultation": "Consulta", // camulaw nav.consulta
+    "nav.payment": "Pago", // camulaw nav.pago
+    "nav.allServices": "Ver todos los servicios", // camulaw nav.verTodosServicios
+    "cta.book": "Consulta aquí", // camulaw home.consultaBtn
+    "cta.call": "Llámenos", // camulaw mobileContact.cta
+    "cta.contact": "Contáctenos", // camulaw home.contactenosBtn
+    "cta.whatsapp": "Escríbanos por WhatsApp", // camulaw mobileContact.whatsappLabel
+    "a11y.skip": "Saltar al contenido principal", // camulaw a11y.skipToContent
+    "a11y.menu": "Menú", // camulaw a11y.menu
+    "a11y.closeMenu": "Cerrar menú", // camulaw a11y.closeMenu
+    "a11y.close": "Cerrar", // camulaw a11y.close
+    "a11y.viewServices": "Ver servicios", // camulaw a11y.toggleServices
+    "lang.es": "Español", // camulaw language switch
+    "lang.en": "English", // camulaw language switch
+    "form.firstName": "Nombre", // camulaw contact.firstName
+    "form.lastName": "Apellido", // camulaw contact.lastName
+    "form.email": "Correo electrónico", // camulaw contact.email
+    "form.phone": "Teléfono", // camulaw contact.phone
+    "form.message": "Mensaje", // camulaw contact.message
+    "form.send": "Enviar", // camulaw contact.submit
+    "form.sending": "Enviando...", // camulaw contact.sending
+    "form.success": "¡Gracias por enviar su formulario! Nos comunicaremos con usted pronto.", // camulaw contact.successMessage
+    "form.failure": "No se pudo enviar el formulario. Por favor, inténtelo de nuevo.", // camulaw contact.errorMessage
+    "form.rateLimit": "Demasiadas solicitudes. Por favor espere un momento e inténtelo de nuevo.", // camulaw contact.rateLimitError
+    "form.type": "Tipo de consulta", // camulaw consultationForm.consultationType
+    "form.selectType": "Seleccione un tipo de consulta", // camulaw consultationForm.selectConsultation
+    "form.notSure": "No estoy seguro / Otro", // camulaw consultationForm.notSure
+    "contact.title": "Agende Su Consulta Ahora", // camulaw contact.title
+    "contact.subtitle": "Estamos aquí para ayudarle", // camulaw contact.subtitle
+    "contact.confidential": "Consultas confidenciales", // camulaw contact.subtitleAlt
+    "contact.virtual": "Consulta virtual disponible", // camulaw home.virtualAvailable
+    "contact.address": "Ubicación", // camimlaw footer
+    "contact.hours": "Horario", // camimlaw footer
+    "contact.contact": "Contactanos", // camimlaw footer
+    "contact.monFri": "Lunes — Viernes", // camimlaw footer
+    "contact.connect": "Conéctese", // camulaw contact.conectese
+    "contact.paymentQ": "¿Desea realizar un pago?", // camulaw contact.paymentBtn
+    "home.where": "Dónde Encontrarnos", // camulaw home.dondeEstamos
+    "home.questions": "¿Tiene preguntas sobre su situación legal?", // camulaw home.popupTitle
+    "press.heading": "Destacado en:", // camulaw home.pressHeading
+    "press.aria": "Apariciones de Juan Campos en televisión", // camulaw home.pressAria
+    "press.alt.telemundo": "Juan Campos entrevistado en Telemundo — segmento \"Hoy en Inmigración\"", // camulaw home.pressAltTelemundo
+    "press.alt.univision": "Juan Campos entrevistado en Univision sobre trámites de ciudadanía", // camulaw home.pressAltUnivision
+    "press.alt.tvv": "Juan Campos entrevistado en TVV en el programa \"La Última\"", // camulaw home.pressAltTvv
+    "services.related": "Servicios Relacionados", // camulaw serviceDetail.relatedTitle
+    "services.relatedSub": "También le pueden interesar los siguientes servicios:", // camulaw serviceDetail.relatedSubtitle
+    "payment.title": "Hacer un pago", // camimlaw nav
+    "payment.subtitle": "Cómo pagar por nuestros servicios", // camulaw payment.subtitle
+    "payment.body": "Por favor contacte a nuestra oficina para coordinar el pago de los servicios que le ofrecemos.", // camulaw payment.contactMessage
+    "notFound.title": "Página no encontrada", // camulaw notFound.title
+    "notFound.body": "La página que buscaba no existe o fue movida. Permítanos guiarle al lugar correcto.", // camulaw notFound.body
+    "notFound.home": "Ir al inicio", // camulaw notFound.homeBtn
+    "notFound.services": "Ver servicios", // camulaw notFound.servicesBtn
+    "readMore": "Leer más", // camulaw readMore
   },
-
   en: {
+    "nav.home": "Home",
     "nav.services": "Services",
-    "nav.attorney": "The attorney",
+    "nav.attorney": "About us",
     "nav.consultation": "Consultation",
-    "nav.faq": "Questions",
-    "nav.detained": "A relative was detained",
-    "nav.payment": "Pay",
-    "nav.orlando": "Orlando",
-    "nav.menu": "Menu",
-    "nav.closeMenu": "Close menu",
-    "nav.openMenu": "Open menu",
-    "nav.allServices": "See all services",
-
-    "cta.book": "Book a consultation",
-    "cta.call": "Call",
-    "cta.callNow": "Call now",
-    "cta.write": "Write",
-    "cta.seeServices": "See services",
-    "cta.readMore": "Keep reading",
-    "cta.meetAttorney": "Meet the attorney",
-
+    "nav.payment": "Payment",
+    "nav.allServices": "View all services",
+    "cta.book": "Consultation here",
+    "cta.call": "Call us",
+    "cta.contact": "Contact Us",
+    "cta.whatsapp": "Message us on WhatsApp",
     "a11y.skip": "Skip to main content",
-    "a11y.langSwitch": "Change language",
-    "a11y.currentLang": "Current language: English",
-    "a11y.breadcrumb": "Breadcrumb",
-    "a11y.mainNav": "Main navigation",
-    "a11y.footerNav": "Footer navigation",
-
-    "label.phone": "Phone",
-    "label.email": "Email",
-    "label.address": "Address",
-    "label.hours": "Hours",
-    "label.languages": "Languages",
-    "label.form": "Form",
-    "label.updated": "Last updated",
-    "label.reviewedBy": "Written and reviewed by",
-    "label.whoFor": "Who this is for",
-    "label.whatItIs": "What it is",
-    "label.howItWorks": "How it works",
-    "label.howWeHelp": "How we help",
-    "label.questions": "Common questions",
-    "label.related": "Related services",
-    "label.nextStep": "Next step",
-
-    "home.eyebrow": "Immigration attorney · Orlando, Florida",
-    "footer.notNotarios": "We are a law firm. We are not notarios or immigration consultants.",
-
-    "form.firstName": "First name",
-    "form.lastName": "Last name",
-    "form.phone": "Phone",
+    "a11y.menu": "Menu",
+    "a11y.closeMenu": "Close menu",
+    "a11y.close": "Close",
+    "a11y.viewServices": "View services",
+    "lang.es": "Español",
+    "lang.en": "English",
+    "form.firstName": "First Name",
+    "form.lastName": "Last Name",
     "form.email": "Email",
-    "form.language": "Which language should we use to contact you?",
-    "form.topic": "What is this about?",
-    "form.topicPlaceholder": "Choose one",
+    "form.phone": "Phone",
+    "form.message": "Message",
     "form.send": "Send",
-    "form.sending": "Sending…",
-    "form.required": "required",
-    "form.errorRequired": "This field is required.",
-    "form.errorEmail": "Enter a valid email address.",
-    "form.errorPhone": "Enter a valid phone number.",
-    "form.success": "We received your message. We will be in touch soon.",
-    "form.failure": "We could not send the form. Please call us at",
-
-    "notFound.title": "We could not find that page",
-    "notFound.body": "The link may have changed. These are the pages most people are looking for.",
-
-    "disclaimer.general":
-      "This page gives general information about immigration law. It is not legal advice about your case, and reading it does not create an attorney-client relationship. The law changes; talk to a lawyer about your own situation.",
-    "disclaimer.form":
-      "Sending this form does not create an attorney-client relationship. Please share only your name, your contact details and the general topic. Do not include details of your immigration history yet.",
+    "form.sending": "Sending...",
+    "form.success": "Thank you for submitting your form! We will contact you soon.",
+    "form.failure": "Failed to submit the form. Please try again.",
+    "form.rateLimit": "Too many requests. Please wait a moment and try again.",
+    "form.type": "Type of consultation",
+    "form.selectType": "Select a consultation type",
+    "form.notSure": "Not sure / Other",
+    "contact.title": "Schedule Your Consultation Now",
+    "contact.subtitle": "We are here to help you",
+    "contact.confidential": "Confidential consultations",
+    "contact.virtual": "Virtual consultation available",
+    "contact.address": "Address",
+    "contact.hours": "Hours",
+    "contact.contact": "Contact Us",
+    "contact.monFri": "Monday - Friday",
+    "contact.connect": "Connect",
+    "contact.paymentQ": "Want to make a payment?",
+    "home.where": "Where to Find Us",
+    "home.questions": "Do you have questions about your legal situation?",
+    "press.heading": "Featured on:",
+    "press.aria": "Juan Campos TV appearances",
+    "press.alt.telemundo": "Juan Campos interviewed on Telemundo — \"Hoy en Inmigración\" segment",
+    "press.alt.univision": "Juan Campos interviewed on Univision about citizenship procedures",
+    "press.alt.tvv": "Juan Campos interviewed on TVV on the show \"La Última\"",
+    "services.related": "Related Services",
+    "services.relatedSub": "You may also be interested in the following services:",
+    "payment.title": "Want to make a payment?",
+    "payment.subtitle": "How to pay for our services",
+    "payment.body": "Please contact our office to arrange payment for the services we are offering.",
+    "notFound.title": "Page not found",
+    "notFound.body": "The page you were looking for doesn't exist or has moved. Let us guide you back.",
+    "notFound.home": "Go home",
+    "notFound.services": "See services",
+    "readMore": "Read More",
   },
 } as const;
 
-export type UIKey = keyof (typeof ui)["es"];
+export type UIKey = keyof typeof ui.es;
 
 export function t(lang: Lang) {
   return (key: UIKey): string => ui[lang][key] ?? ui[DEFAULT_LANG][key];

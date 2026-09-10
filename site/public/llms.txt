@@ -1,39 +1,29 @@
 # Campos Immigration Law
 
-> Immigration law firm in Orlando, Florida. United States immigration law only.
-> Spanish and English. Attorney Juan Campos, Esq.
+> Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos.
 
-Contact
-- Address: 5401 S. Kirkman Rd., Suite 324, Orlando, FL 32819
-- Phone: +1 (407) 418-9193
-- Email: juan@camimlaw.com
-- Hours: Monday to Friday, 08:00-17:00
-- Languages: Spanish, English
+5401 S. Kirkman Rd., Suite 324, Orlando, FL 32819 · (407) 418-9193 · juan@camimlaw.com
 
-Attorney
-- Name: Juan Campos, Esq. (Juan Manuel Campos Gutierrez)
-- Admitted: Louisiana Supreme Court, 2020. Not admitted in Florida.
-- Immigration is federal practice, so clients are represented before USCIS,
-  the immigration courts (EOIR) and U.S. consulates from the Orlando office,
-  including clients living in other states.
-- Education: LL.M. in Comparative Law, University of Florida Levin College of
-  Law, 2019. Law degree, Universidad Yacambu, Venezuela, 2006.
-- Member: American Immigration Lawyers Association (AILA)
-- Born in Coro, Venezuela.
+## Servicios
 
-Pages (Spanish is the primary language; each links to its English twin)
-- / — Home. https://www.camimlaw.com/en/
-- /servicios/ — All services. https://www.camimlaw.com/en/services/
-- /asilo-orlando/ — Asylum, I-589. https://www.camimlaw.com/en/asylum-lawyer-orlando/
-- /juan-campos/ — The attorney. https://www.camimlaw.com/en/juan-campos/
-- /consulta/ — Consultations. https://www.camimlaw.com/en/consultation/
-- /detenido/ — A relative was detained. https://www.camimlaw.com/en/detained/
-- /preguntas/ — Common questions. https://www.camimlaw.com/en/faq/
-- /orlando/ — Orlando Immigration Court and local information. https://www.camimlaw.com/en/orlando/
-- /pagos/ — Payment. https://www.camimlaw.com/en/payment/
+- [Green Card](https://www.camimlaw.com/green-card/): Asesoramos y representamos a nuestros clientes en procesos para obtener la residencia permanente legal a través de familia, empleo u otras opciones disponibles. — [Green Card](https://www.camimlaw.com/en/green-card/): We advise and represent our clients in processes to obtain lawful permanent residence through family, employment, or other available options.
+- [Peticiones Familiares](https://www.camimlaw.com/peticiones-familiares/): Las peticiones familiares permiten a ciudadanos y residentes permanentes solicitar a ciertos familiares para obtener estatus legal y residencia permanente en EE. UU. — [Family Petitions](https://www.camimlaw.com/en/peticiones-familiares/): Family petitions allow citizens and permanent residents to petition certain family members to obtain legal status and permanent residence in the U.S.
+- [Ciudadanía](https://www.camimlaw.com/ciudadania/): Le ayudamos a obtener la ciudadanía estadounidense guiándolo en cada paso del proceso, desde la solicitud hasta la entrevista y el examen de naturalización. — [Citizenship](https://www.camimlaw.com/en/ciudadania/): We help you obtain U.S. citizenship by guiding you through every step of the process, from the application to the interview and naturalization exam.
+- [Defensa Contra la Deportación](https://www.camimlaw.com/defensa-contra-la-deportacion/): Representamos a personas que enfrentan procedimientos de deportación ante los tribunales de inmigración. Nuestros abogados preparan defensas sólidas para proteger su derecho a permanecer en los Estados Unidos. — [Deportation Defense](https://www.camimlaw.com/en/defensa-contra-la-deportacion/): We represent individuals facing deportation proceedings in immigration court. Our attorneys prepare strong defenses to protect your right to remain in the United States.
+- [Visas Especial para Jóvenes](https://www.camimlaw.com/visas-especial-para-jovenes/): La Visa Especial para Jóvenes (SIJS) brinda protección migratoria a jóvenes menores de 21 años que han sido abandonados, maltratados o descuidados, y permite solicitar la residencia permanente en EE. UU. — [Special Immigrant Juvenile Visas](https://www.camimlaw.com/en/visas-especial-para-jovenes/): The Special Immigrant Juvenile Status (SIJS) provides immigration protection to minors under 21 who have been abandoned, abused, or neglected, and allows them to apply for permanent residence in the U.S.
+- [Visas de Prometido(a)](https://www.camimlaw.com/visas-de-prometido/): Le guiamos en el proceso de la visa de prometido(a) para reunirse con su pareja ciudadana estadounidense y casarse legalmente en EE. UU. — [Fiancé Visas](https://www.camimlaw.com/en/visas-de-prometido/): We guide you through the fiancé visa process to reunite with your U.S. citizen partner and legally marry in the U.S.
+- [Asilo](https://www.camimlaw.com/asilo/): Brindamos apoyo legal a personas que buscan protección en los Estados Unidos debido a persecución o peligro en su país de origen, manejando su caso con confidencialidad y cuidado. — [Asylum](https://www.camimlaw.com/en/asilo/): We provide legal support to individuals seeking protection in the United States due to persecution or danger in their home country, handling their case with confidentiality and care.
+- [VAWA](https://www.camimlaw.com/vawa/): Ayudamos a víctimas de abuso por parte de un ciudadano o residente permanente a solicitar estatus legal de forma confidencial e independiente del agresor. — [VAWA](https://www.camimlaw.com/en/vawa/): We help victims of abuse by a U.S. citizen or permanent resident apply for legal status confidentially and independently from the abuser.
+- [DACA](https://www.camimlaw.com/daca/): Ayudamos a jóvenes elegibles a solicitar o renovar DACA, brindándoles protección contra la deportación y autorización de empleo. — [DACA](https://www.camimlaw.com/en/daca/): We help eligible young people apply for or renew DACA, providing them with deportation protection and employment authorization.
+- [Trámite Consular](https://www.camimlaw.com/tramite-consular/): Le asistimos en el proceso consular para obtener su visa desde su país de origen, asegurándonos de que su solicitud cumpla con todos los requisitos legales. — [Consular Processing](https://www.camimlaw.com/en/tramite-consular/): We assist you in the consular process to obtain your visa from your home country, ensuring your application meets all legal requirements.
+- [Permiso de Trabajo (EAD)](https://www.camimlaw.com/ead/): El permiso de trabajo permite a ciertos inmigrantes trabajar legalmente en Estados Unidos mientras su caso migratorio está en proceso o bajo una categoría elegible. Le ayudamos a solicitarlo correctamente para que pueda trabajar sin preocupaciones. — [Employment Authorization (EAD)](https://www.camimlaw.com/en/ead/): The employment authorization document allows certain immigrants to work legally in the United States while their immigration case is in process or under an eligible category. We help you apply correctly so you can work without worry.
+- [Estatus de Protección Temporal](https://www.camimlaw.com/estatus-de-proteccion-temporal/): Asistimos a personas elegibles para solicitar o renovar el Estatus de Protección Temporal, permitiéndoles vivir y trabajar legalmente en EE. UU. — [Temporary Protected Status](https://www.camimlaw.com/en/estatus-de-proteccion-temporal/): We assist eligible individuals in applying for or renewing Temporary Protected Status, allowing them to live and work legally in the U.S.
+- [Visa U](https://www.camimlaw.com/visa-u/): Brindamos representación legal a víctimas de ciertos delitos que han cooperado con las autoridades y buscan protección y estatus legal en los Estados Unidos. — [U Visa](https://www.camimlaw.com/en/visa-u/): We provide legal representation to victims of certain crimes who have cooperated with authorities and seek protection and legal status in the United States.
+- [Visa T](https://www.camimlaw.com/visa-t/): La Visa T está diseñada para víctimas de tráfico humano. Brindamos representación legal confidencial para ayudarle a obtener estatus legal y protección en los Estados Unidos. — [T Visa](https://www.camimlaw.com/en/visa-t/): The T Visa is designed for victims of human trafficking. We provide confidential legal representation to help you obtain legal status and protection in the United States.
 
-Notes
-- Not a notario, notary or immigration consultant. This is a law firm.
-- Content on this site is general information, not legal advice, and does not
-  create an attorney-client relationship.
-- The Orlando Immigration Court is at 3535 Lawton Road, Suite 200, Orlando, FL 32803.
+## Páginas
+
+- [Acerca de](https://www.camimlaw.com/juan-campos/) — [About us](https://www.camimlaw.com/en/juan-campos/)
+- [Consulta](https://www.camimlaw.com/consulta/) — [Consultation](https://www.camimlaw.com/en/consulta/)
+- [Pago](https://www.camimlaw.com/pagos/) — [Payment](https://www.camimlaw.com/en/pagos/)
+- [Servicios](https://www.camimlaw.com/servicios/) — [Services](https://www.camimlaw.com/en/servicios/)

@@ -65,7 +65,12 @@ if (roots.length) {
           const text = panel.querySelector<HTMLElement>("[data-ag-text]");
 
           panel.toggleAttribute("data-active", isActive);
-          panel.querySelector("a")?.setAttribute("aria-current", isActive ? "true" : "false");
+          // Image panels are single anchors, so "current" describes the open
+          // one. A text panel holds several real links, and marking its
+          // heading link current would misdescribe it.
+          if (!("text" in panel.dataset)) {
+            panel.querySelector("a")?.setAttribute("aria-current", isActive ? "true" : "false");
+          }
 
           tl!.to(
             panel,
@@ -123,33 +128,33 @@ if (roots.length) {
       };
 
       panels.forEach((panel, i) => {
-        const link = panel.querySelector("a");
-        if (!link) return;
+        // Bound on the panel, not on its first anchor: a text panel holds a
+        // heading link and a list of sub-links, and focus landing on any of
+        // them must open the panel. focusin bubbles; focus does not.
         if (hoverTrigger) panel.addEventListener("pointerenter", () => setActive(i));
-        link.addEventListener("focus", () => setActive(i));
-        link.addEventListener("click", (e) => {
-          // A collapsed panel's first tap opens it rather than navigating,
-          // which is what a touch user expects and what the original does.
+        panel.addEventListener("focusin", () => setActive(i));
+
+        panel.addEventListener("click", (e) => {
+          const a = (e.target as HTMLElement).closest("a");
           if (i !== active && !stacked()) {
+            // A collapsed panel's first tap opens it rather than navigating,
+            // which is what a touch user expects and what the original does.
             e.preventDefault();
             setActive(i);
-          } else if (link.getAttribute("href")?.startsWith("#")) {
-            e.preventDefault();
+            return;
           }
+          if (a?.getAttribute("href")?.startsWith("#")) e.preventDefault();
         });
-        link.addEventListener("keydown", (e) => {
+
+        panel.addEventListener("keydown", (e) => {
           const k = (e as KeyboardEvent).key;
-          if (k === "ArrowRight" || k === "ArrowDown") {
+          const go = (n: number) => {
             e.preventDefault();
-            const n = (i + 1) % count;
             setActive(n);
-            panels[n].querySelector("a")?.focus();
-          } else if (k === "ArrowLeft" || k === "ArrowUp") {
-            e.preventDefault();
-            const n = (i - 1 + count) % count;
-            setActive(n);
-            panels[n].querySelector("a")?.focus();
-          }
+            panels[n].querySelector<HTMLElement>("a")?.focus();
+          };
+          if (k === "ArrowRight" || k === "ArrowDown") go((i + 1) % count);
+          else if (k === "ArrowLeft" || k === "ArrowUp") go((i - 1 + count) % count);
         });
       });
 

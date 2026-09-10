@@ -21,21 +21,39 @@
  *     label is available to assistive technology and to search.
  */
 
+export interface GalleryLink {
+  label: string;
+  href: string;
+  /** A small trailing note, e.g. a form number. */
+  note?: string;
+}
+
 export interface GalleryItem {
-  image: string;
   label: string;
   meta?: string;
-  alt: string;
-  width: number;
-  height: number;
+  /** Primary destination for the panel. */
   link?: string;
+  /** "01", "02"... Shown large on a text panel and in its collapsed tab. */
+  ordinal?: string;
+  /** Sub-links listed inside an open text panel. */
+  links?: GalleryLink[];
   /**
-   * Focal point, as an `object-position` value. Required, not optional: a
+   * Imagery is optional. Without it the panel is typographic: a ground, an
+   * ordinal, the label, the line and the sub-links, with a vertical tab that
+   * names the panel while it is collapsed. That variant exists because the
+   * only per-service photography available was stock, and it was rejected.
+   */
+  image?: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+  /**
+   * Focal point, as an `object-position` value. Required with an image: a
    * fixed-width media box centred in a narrow panel crops a tall portrait
    * straight through the head, and a face cut off at the eyeline is the one
    * framing error a reader always notices.
    */
-  focus: string;
+  focus?: string;
 }
 
 interface Props {
@@ -90,34 +108,75 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
   data-stagger={stagger}
   data-trigger={trigger}
   data-grayscale={String(grayscale)}
+  data-count={items.length}
   style={`--ag-gap:${gap}px; --ag-radius:${radius}px; --ag-height:${height}px;`}
 >
   {items.map((item, i) => (
-    <li class="ag-item" data-ag-panel data-index={i} data-active={i === active ? "" : undefined}>
-      <a class="ag-link" href={item.link ?? `#${id}`} aria-current={i === active ? "true" : undefined}>
-        <span class="ag-frame">
-          <span class="ag-media" data-ag-media>
-            <img
-              src={item.image}
-              width={item.width}
-              height={item.height}
-              alt={item.alt}
-              style={`object-position:${item.focus};`}
-              loading={i === active ? "eager" : "lazy"}
-              decoding="async"
-              draggable="false"
-            />
+    <li
+      class="ag-item"
+      data-ag-panel
+      data-index={i}
+      data-active={i === active ? "" : undefined}
+      data-text={item.image ? undefined : ""}
+    >
+      {item.image ? (
+        <a class="ag-link" href={item.link ?? `#${id}`} aria-current={i === active ? "true" : undefined}>
+          <span class="ag-frame">
+            <span class="ag-media" data-ag-media>
+              <img
+                src={item.image}
+                width={item.width}
+                height={item.height}
+                alt={item.alt ?? ""}
+                style={`object-position:${item.focus ?? "50% 50%"};`}
+                loading={i === active ? "eager" : "lazy"}
+                decoding="async"
+                draggable="false"
+              />
+            </span>
+            <span class="ag-overlay" aria-hidden="true"></span>
           </span>
-          <span class="ag-overlay" aria-hidden="true"></span>
-        </span>
-        <span class="ag-caption">
-          <span class="ag-bar" data-ag-bar aria-hidden="true"></span>
-          <span class="ag-text" data-ag-text>
-            <span class="ag-label">{item.label}</span>
-            {item.meta && <span class="ag-meta apparatus">{item.meta}</span>}
+          <span class="ag-caption">
+            <span class="ag-bar" data-ag-bar aria-hidden="true"></span>
+            <span class="ag-text" data-ag-text>
+              <span class="ag-label">{item.label}</span>
+              {item.meta && <span class="ag-meta apparatus">{item.meta}</span>}
+            </span>
           </span>
-        </span>
-      </a>
+        </a>
+      ) : (
+        <div class="ag-link ag-link--text">
+          {/* Names the panel while it is collapsed. Decorative: the same words
+              are in the caption below, which stays in the accessibility tree
+              whatever its opacity. */}
+          <span class="ag-tab" aria-hidden="true">
+            {item.ordinal && <span class="ag-tab-n">{item.ordinal}</span>}
+            <span class="ag-tab-l">{item.label}</span>
+          </span>
+          <div class="ag-caption ag-caption--text">
+            <span class="ag-bar" data-ag-bar aria-hidden="true"></span>
+            <div class="ag-text" data-ag-text>
+              {item.ordinal && <span class="ag-n apparatus">{item.ordinal}</span>}
+              <h3 class="ag-label ag-label--text">
+                {item.link ? <a class="ag-title-link" href={item.link}>{item.label}</a> : item.label}
+              </h3>
+              {item.meta && <p class="ag-line">{item.meta}</p>}
+              {item.links && item.links.length > 0 && (
+                <ul class="ag-links">
+                  {item.links.map((l) => (
+                    <li>
+                      <a class="ag-sub" href={l.href}>
+                        <span>{l.label}</span>
+                        {l.note && <span class="ag-note apparatus">{l.note}</span>}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </li>
   ))}
 </ul>
@@ -236,6 +295,93 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
     }
     .ag-overlay { background: linear-gradient(180deg, transparent 40%, rgb(11 31 51 / 0.86) 100%); }
     .ag-bar, .ag-text { opacity: 1 !important; transform: none !important; }
+  }
+
+  /* --- text panels ------------------------------------------------------
+     Same box, same motion, no photograph. A light ground on the section's own
+     surface, the ordinal in the accent, the label in the serif. */
+  .ag-link--text {
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+    transition: background-color var(--d-state) var(--ease-state),
+                border-color var(--d-state) var(--ease-state);
+  }
+  .ag-item[data-active] .ag-link--text { background: var(--color-paper); border-color: var(--color-line-strong); }
+
+  /* The collapsed tab: ordinal then name, running up the panel. */
+  .ag-tab {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    display: flex; align-items: flex-end; gap: var(--spacing-s3);
+    padding: var(--spacing-s5) var(--spacing-s4);
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity var(--d-state) var(--ease-state);
+  }
+  .ag-item[data-active] .ag-tab { opacity: 0; }
+  .ag-tab-n {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.12em; color: var(--color-accent-ink);
+  }
+  .ag-tab-l {
+    font-family: var(--font-serif); font-size: var(--text-h4); line-height: 1;
+    letter-spacing: -0.01em; color: var(--color-ink);
+  }
+
+  .ag-caption--text {
+    top: var(--spacing-s5); bottom: auto;
+    left: var(--spacing-s5); right: var(--spacing-s5);
+    pointer-events: auto;              /* the links inside are real links */
+    max-width: 44ch;
+  }
+  .ag-caption--text .ag-bar { background: var(--color-accent-ink); height: 3.2em; }
+  .ag-caption--text .ag-text { gap: var(--spacing-s2); }
+  .ag-n { color: var(--color-accent-ink); }
+  .ag-label--text {
+    margin: 0;
+    font-family: var(--font-serif); font-size: var(--text-h3); line-height: 1.1;
+    letter-spacing: -0.015em; font-weight: 400; color: var(--color-ink);
+    text-shadow: none;
+  }
+  /* Inline-block with vertical padding so the heading link is a 44px target
+     on a phone, where it is tapped, without changing the line box on desktop. */
+  .ag-title-link { display: inline-block; color: inherit; text-decoration: none; padding-block: 10px; margin-block: -10px; }
+  @media (any-hover: hover) { .ag-title-link:hover { color: var(--color-accent-ink); } }
+  .ag-line { margin: 0; color: var(--color-ink-2); font-size: var(--text-base); line-height: 1.5; max-width: 40ch; }
+  .ag-links { list-style: none; margin: var(--spacing-s3) 0 0; padding: 0; display: grid; }
+  .ag-sub {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-s3);
+    min-height: 40px; padding-block: var(--spacing-s2);
+    border-top: 1px solid var(--color-line);
+    color: var(--color-ink); text-decoration: none; font-size: var(--text-base);
+  }
+  .ag-links li:last-child .ag-sub { border-bottom: 1px solid var(--color-line); }
+  @media (any-hover: hover) { .ag-sub:hover { color: var(--color-accent-ink); } }
+  .ag-sub:focus-visible, .ag-title-link:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+  .ag-note { color: var(--color-ink-2); }
+
+  /* A set of one is not an accordion. The production build currently has a
+     single confirmed practice group, so on the live site this is the normal
+     case, not an edge case: the one panel lays out as a plain block at every
+     width, exactly as the stacked phone layout does, and the script never
+     runs for it (it bails below two panels). */
+  .ag[data-count="1"] { display: block; height: auto; perspective: none; }
+  .ag[data-count="1"] .ag-item { transform: none; }
+  .ag[data-count="1"] .ag-link { position: relative; inset: auto; }
+  .ag[data-count="1"] .ag-link--text { max-width: var(--container-m-lead, 60ch); }
+  .ag[data-count="1"] .ag-tab { display: none; }
+  .ag[data-count="1"] .ag-caption--text { position: static; max-width: none; padding: var(--spacing-s5); }
+  .ag[data-count="1"] .ag-caption--text .ag-bar { display: none; }
+  .ag[data-count="1"] .ag-text { opacity: 1; }
+
+  @media (max-width: 767px) {
+    /* Stacked, every text panel is open: the tab is redundant and the
+       caption is static content, not an overlay. */
+    .ag-item[data-text] .ag-link--text { aspect-ratio: auto; position: relative; }
+    .ag-tab { display: none; }
+    .ag-caption--text { position: static; max-width: none; padding: var(--spacing-s5); }
+    .ag-caption--text .ag-bar { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {

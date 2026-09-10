@@ -2,12 +2,11 @@
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import SituationFinder from "./SituationFinder.astro";
-import ServiceRows from "./ServiceRows.astro";
 import AccordionGallery from "./AccordionGallery.astro";
 import type { GalleryItem } from "./AccordionGallery.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
-import { ORG, ATTORNEY, MEDIA, COURT, show } from "../lib/org";
-import { liveGroups } from "../lib/services";
+import { ORG, ATTORNEY, MEDIA, COURT, show, mapEmbedUrl } from "../lib/org";
+import { liveGroups, mattersInGroup } from "../lib/services";
 import { graph, orgSchema, attorneySchema } from "../lib/seo";
 
 interface Props { lang: Lang }
@@ -15,68 +14,37 @@ const { lang } = Astro.props;
 const _ = t(lang);
 const es = lang === "es";
 const groups = liveGroups();
-const admissions = show(ATTORNEY.admissions) ?? [];
 const media = MEDIA.filter((m) => m.verified);
 const rating = show(ORG.googleRating);
 const consultation = show(ORG.consultation);
-const portrait = ATTORNEY.portrait.value;
 const heroImg = ATTORNEY.hero.value;
-const seated = ATTORNEY.seated.value;
-const atWork = show(ATTORNEY.atWork);
 
-/* The gallery uses only real photographs of the attorney and real broadcast
-   stills. There is no filler panel: if an image is not confirmed it is not in
-   the set, and the gallery renders with however many are. */
-const gallery: GalleryItem[] = [
-  {
-    image: seated.src, width: seated.width, height: seated.height,
-    label: "Juan Campos, Esq.",
-    meta: es ? "Abogado de inmigración" : "Immigration attorney",
-    focus: "50% 18%",
-    alt: es
-      ? "Retrato de Juan Campos con saco de lino claro y corbatín."
-      : "Portrait of Juan Campos in a light linen jacket and bow tie.",
-  },
-  ...(atWork
-    ? [{
-        image: atWork.src, width: atWork.width, height: atWork.height,
-        label: es ? "En el escritorio" : "At the desk",
-        meta: es ? "Explicaciones en español cada semana" : "Explanations in Spanish every week",
-        focus: "62% 40%",
-        alt: es
-          ? "Juan Campos en su escritorio, explicando un tema de inmigración a cámara."
-          : "Juan Campos at his desk, explaining an immigration topic to camera.",
-      } as GalleryItem]
-    : []),
-  ...media
-    .filter((m) => m.width >= 1000)
-    .map((m) => ({
-      image: m.still, width: m.width, height: m.height,
-      label: m.outlet,
-      meta: m.station ? `${m.station} · ${m.programme}` : m.programme,
-      focus: "50% 22%",
-      alt: es
-        ? `Juan Campos entrevistado en ${m.outlet}.`
-        : `Juan Campos interviewed on ${m.outlet}.`,
-    } as GalleryItem)),
-];
+/* The accordion carries the practice groups. Each panel is a group: its
+   ordinal, its name, its one line, and the matters inside it as links. Only
+   groups with at least one matter the build is allowed to show are present,
+   through liveGroups() and mattersInGroup(), so the compliance gate on
+   services.ts applies here exactly as it does on the services page. */
+const serviceItems: GalleryItem[] = groups.map((g, i) => ({
+  ordinal: String(i + 1).padStart(2, "0"),
+  label: g.name[lang],
+  meta: g.line[lang],
+  link: `${langPath(lang, es ? "servicios" : "services")}#${g.id}`,
+  links: mattersInGroup(g.id).map((m) => ({
+    label: m.name[lang],
+    href: langPath(lang, m.slug[lang]),
+    note: m.form,
+  })),
+}));
 
 const copy = {
   es: {
     title: "Abogado de Inmigración en Orlando, FL | Campos Immigration Law",
     description:
-      "Juan Campos, abogado dedicado exclusivamente a la ley de inmigración, con oficina en Orlando. Asilo y otros casos migratorios, explicados en español. (407) 418-9193.",
+      "Juan Campos, abogado dedicado exclusivamente a la ley de inmigración, con oficina en Orlando. Asilo y ley de inmigración, explicados en español. (407) 418-9193.",
     display: "Inmigración es lo único que hacemos.",
     lead: "Juan Campos es abogado de inmigración. Le explicamos su caso en español, hasta que lo entienda, y usted siempre sabe qué sigue.",
     scopeEyebrow: "Lo que hacemos",
     scopeTitle: "Casos que llevamos",
-    attorneyEyebrow: "El abogado",
-    attorneyTitle: "Un abogado, con nombre y cara",
-    attorneyBody: [
-      "Nació en Coro, Venezuela. Fue profesor de derecho y abogado penalista antes de emigrar.",
-      "Hizo una maestría en Derecho Comparado en la Universidad de Florida y encontró ahí el trabajo al que se dedica hoy. Trabajó como abogado de planta en Caridades Católicas de la Arquidiócesis de Nueva Orleans, representando a personas inmigrantes en algunos de los procesos más delicados del sistema.",
-      "Hoy dedica su práctica por completo al derecho de inmigración, y publica cada semana explicaciones en español para que la gente entienda sus opciones antes de que sea tarde.",
-    ],
     statement: "Usted no está hablando con un notario. Está hablando con un abogado.",
     statementMeta: "Juan Campos, Esq. · Admitido para ejercer en Louisiana Supreme Court · Miembro de AILA",
     commitmentsEyebrow: "Cómo trabajamos",
@@ -86,8 +54,6 @@ const copy = {
       { t: "Usted siempre sabrá qué sigue y cuándo.", d: "Qué se presentó, qué falta, qué esperamos del gobierno y en qué plazo aproximado." },
     ],
     mediaEyebrow: "En los medios",
-    mediaTitle: "El abogado, y dónde lo han entrevistado",
-    mediaLead: "Todas las fotografías de este sitio son de él. No usamos imágenes de archivo de personas.",
     officeEyebrow: "La oficina",
     officeTitle: "Dónde estamos",
     officeBody:
@@ -104,18 +70,11 @@ const copy = {
   en: {
     title: "Orlando Immigration Lawyer | Campos Immigration Law",
     description:
-      "Juan Campos practises United States immigration law exclusively, from an Orlando office, for clients in Florida and other states. Asylum and other matters. (407) 418-9193.",
+      "Juan Campos practises United States immigration law exclusively, from an Orlando office, for clients in Florida and other states. Asylum and immigration law, explained in Spanish. (407) 418-9193.",
     display: "Immigration law is all we do.",
     lead: "Juan Campos is an immigration attorney. We explain your case in your language, until it makes sense, and you always know what happens next.",
     scopeEyebrow: "What we do",
     scopeTitle: "Matters we handle",
-    attorneyEyebrow: "The attorney",
-    attorneyTitle: "A lawyer with a name and a face",
-    attorneyBody: [
-      "He was born in Coro, Venezuela. He was a law professor and a criminal defence lawyer before he emigrated.",
-      "He took a master's in comparative law at the University of Florida and found there the work he does now. He served as a staff attorney at Catholic Charities of the Archdiocese of New Orleans, representing immigrants in some of the most sensitive proceedings in the system.",
-      "Today his practice is entirely immigration law, and he publishes explanations in Spanish every week so that people understand their options before it is too late.",
-    ],
     statement: "You are not talking to a notario. You are talking to a lawyer.",
     statementMeta: "Juan Campos, Esq. · Admitted to the Louisiana Supreme Court · Member of AILA",
     commitmentsEyebrow: "How we work",
@@ -125,8 +84,6 @@ const copy = {
       { t: "You will always know what happens next.", d: "What was filed, what is missing, what we expect from the government, and roughly when." },
     ],
     mediaEyebrow: "In the media",
-    mediaTitle: "The attorney, and where he has been interviewed",
-    mediaLead: "Every photograph on this site is of him. We use no stock imagery of people.",
     officeEyebrow: "The office",
     officeTitle: "Where we are",
     officeBody:
@@ -174,8 +131,8 @@ const schema = graph([
         width={heroImg.tall.width}
         height={heroImg.tall.height}
         alt={es
-          ? "Juan Campos, abogado de inmigración, sentado en una silla de madera en la recepción de la oficina."
-          : "Juan Campos, immigration attorney, seated in a wooden chair in the office reception."}
+          ? "Juan Campos, abogado de inmigración, sentado con las piernas cruzadas en una silla de madera en la recepción de la oficina."
+          : "Juan Campos, immigration attorney, seated with his legs crossed in a wooden chair in the office reception."}
         fetchpriority="high"
         decoding="async"
         data-scrub-portrait-img
@@ -234,54 +191,14 @@ const schema = graph([
         <h2 class="h2" data-split-lines>{copy.scopeTitle}</h2>
       </div>
     </div>
-    <div class="scope-rows">
-      {groups.map((g, i) => <ServiceRows lang={lang} group={g} index={i + 1} />)}
+    <div class="scope-acc">
+      <AccordionGallery items={serviceItems} id="servicios-acordeon" defaultIndex={0} height={460} expandRatio={0.5} tilt={2} />
     </div>
     <p class="scope-more">
       <a class="link-arrow" href={langPath(lang, es ? "servicios" : "services")}>
         {_("nav.allServices")} <span aria-hidden="true">&rarr;</span>
       </a>
     </p>
-  </Section>
-
-  <!-- 04 / The attorney. The one dark band on the page. -->
-  <Section surface="navy">
-    <div class="editorial">
-      <div>
-        <p class="eyebrow">{copy.attorneyEyebrow}</p>
-      </div>
-      <div class="att">
-        <h2 class="h2" data-split-lines>{copy.attorneyTitle}</h2>
-        <div class="prose att-body">
-          {copy.attorneyBody.map((p) => <p>{p}</p>)}
-        </div>
-
-        <dl class="meta att-meta">
-          <div class="meta-item">
-            <dt class="meta-term">{es ? "Admisión" : "Admission"}</dt>
-            <dd>{admissions.join(", ")}</dd>
-          </div>
-          <div class="meta-item">
-            <dt class="meta-term">{es ? "Estudios" : "Education"}</dt>
-            <dd>{(show(ATTORNEY.education) ?? []).map((e) => `${e.degree[lang]}, ${e.school}`).join(" · ")}</dd>
-          </div>
-          <div class="meta-item">
-            <dt class="meta-term">{es ? "Membresía" : "Membership"}</dt>
-            <dd>{(show(ATTORNEY.memberships) ?? []).join(", ")}</dd>
-          </div>
-          <div class="meta-item">
-            <dt class="meta-term">{_("label.languages")}</dt>
-            <dd>{es ? "Español e inglés" : "Spanish and English"}</dd>
-          </div>
-        </dl>
-
-        <p class="att-cta">
-          <a class="link-arrow" href={langPath(lang, "juan-campos")}>
-            {_("cta.meetAttorney")} <span aria-hidden="true">&rarr;</span>
-          </a>
-        </p>
-      </div>
-    </div>
   </Section>
 
   <!--
@@ -322,16 +239,34 @@ const schema = graph([
     </div>
   </Section>
 
-  {gallery.length > 1 && (
+  {media.length > 0 && (
     <Section surface="paper-2" wide>
       <div class="editorial gal-head">
         <div><p class="eyebrow">{copy.mediaEyebrow}</p></div>
-        <div>
-          <h2 class="h2" data-split-lines>{copy.mediaTitle}</h2>
-          <p class="lead gal-lead">{copy.mediaLead}</p>
-        </div>
       </div>
-      <AccordionGallery items={gallery} id="galeria" defaultIndex={0} height={540} expandRatio={0.5} />
+      <ul class="press" data-stagger>
+        {media.map((m) => (
+          <li class="press-item" data-reveal="text">
+            <figure class="press-fig">
+              <div class="press-still">
+                <img
+                  src={m.still}
+                  width={m.width}
+                  height={m.height}
+                  alt={es ? `Juan Campos entrevistado en ${m.outlet}.` : `Juan Campos interviewed on ${m.outlet}.`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <figcaption class="press-cap">
+                <span class="press-outlet">{m.outlet}</span>
+                <span class="press-prog apparatus">{m.station ? `${m.station} · ${m.programme}` : m.programme}</span>
+                <span class="press-chyron">&ldquo;{m.chyron[lang]}&rdquo;</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
     </Section>
   )}
 
@@ -376,6 +311,16 @@ const schema = graph([
         <p class="notice">{copy.courtNote}</p>
       </div>
     </div>
+    <div class="map wrap-wide">
+      <iframe
+        class="map-frame"
+        src={mapEmbedUrl()}
+        title={es ? "Mapa de la oficina de Campos Immigration Law en Orlando" : "Map of the Campos Immigration Law office in Orlando"}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen
+      ></iframe>
+    </div>
   </Section>
 </Base>
 
@@ -396,36 +341,44 @@ const schema = graph([
   .opener-img {
     position: absolute; inset: 0; z-index: -2;
     width: 100%; height: 100%;
-    object-fit: cover; object-position: 50% 38%;
+    object-fit: cover; object-position: 50% 22%;
     will-change: transform;
+  }
+  @media (min-aspect-ratio: 1/1) {
+    .opener-img { object-position: 50% 0%; }
   }
 
   /* Four layers, each doing one job.
-     1. A warm lift behind his head, so the centre of the frame has some light
-        in it and he is not sitting in a flat wash.
-     2. A vertical wash: heavy where the type is, lightest across the middle
-        band, which is where his face is.
-     3. A horizontal wash: darkens the left and right margins, which is where
-        the corners of type sit, and leaves the centre column alone.
-     4. A bottom-left corner wash under the display line, the largest block of
-        type and the one over the busiest part of the frame.
-     The values were set by measuring the composited pixels under each block of
-     glyphs and raising each layer until the worst pixel cleared its threshold. */
+     1. A warm lift behind his head.
+     2. A vertical wash: heavy under the bar and under the statement, light
+        across the figure. The top of the wide frame is already dark in the
+        asset, so the top stop can be gentler than it used to be.
+     3. A horizontal wash on the margins, where the type corners sit and
+        where the generated room is; the centre column is the photograph and
+        is left alone.
+     4. A bottom-left corner wash under the display line. */
   .opener-veil {
     position: absolute; inset: 0; z-index: -1;
     background:
-      radial-gradient(58% 42% at 50% 34%, rgb(176 138 74 / 0.16) 0%, rgb(176 138 74 / 0) 100%),
-      radial-gradient(120% 85% at 8% 100%, rgb(11 31 51 / 0.82) 0%, rgb(11 31 51 / 0) 62%),
+      radial-gradient(34% 30% at 50% 24%, rgb(176 138 74 / 0.12) 0%, rgb(176 138 74 / 0) 100%),
+      /* the four corners, where the type is; each is a local scrim that stops
+         well short of the centre column, where he is */
+      radial-gradient(46% 40% at 0% 18%, rgb(11 31 51 / 0.72) 0%, rgb(11 31 51 / 0) 66%),
+      radial-gradient(60% 46% at 100% 18%, rgb(11 31 51 / 0.94) 0%, rgb(11 31 51 / 0.78) 36%, rgb(11 31 51 / 0.36) 60%, rgb(11 31 51 / 0) 80%),
+      radial-gradient(110% 80% at 6% 100%, rgb(11 31 51 / 0.86) 0%, rgb(11 31 51 / 0) 60%),
+      radial-gradient(60% 50% at 100% 100%, rgb(11 31 51 / 0.60) 0%, rgb(11 31 51 / 0) 66%),
       linear-gradient(180deg,
-        rgb(11 31 51 / 0.86) 0%,
-        rgb(11 31 51 / 0.58) 14%,
-        rgb(11 31 51 / 0.30) 36%,
-        rgb(11 31 51 / 0.62) 62%,
-        rgb(11 31 51 / 0.93) 82%,
-        rgb(11 31 51 / 0.97) 100%),
+        rgb(11 31 51 / 0.62) 0%,
+        rgb(11 31 51 / 0.28) 9%,
+        rgb(11 31 51 / 0.05) 16%,
+        rgb(11 31 51 / 0.05) 60%,
+        rgb(11 31 51 / 0.40) 74%,
+        rgb(11 31 51 / 0.88) 88%,
+        rgb(11 31 51 / 0.96) 100%),
       linear-gradient(90deg,
-        rgb(11 31 51 / 0.72) 0%, rgb(11 31 51 / 0.22) 34%,
-        rgb(11 31 51 / 0.18) 60%, rgb(11 31 51 / 0.62) 100%);
+        rgb(11 31 51 / 0.66) 0%, rgb(11 31 51 / 0.32) 20%,
+        rgb(11 31 51 / 0.00) 38%, rgb(11 31 51 / 0.00) 62%,
+        rgb(11 31 51 / 0.40) 80%, rgb(11 31 51 / 0.70) 100%);
   }
 
   .opener-frame {
@@ -470,7 +423,7 @@ const schema = graph([
     color: #c9d4df;
   }
 
-  .opener-lead { color: #dde4eb; max-width: 40ch; font-size: var(--text-base); margin: 0; }
+  .opener-lead { color: #e6ecf2; max-width: 34ch; font-size: var(--text-base); margin: 0; }
 
   /* --- bottom row: statement left, action right --- */
   .opener-bottom { grid-row: 3; display: grid; gap: var(--spacing-s5); align-items: end; }
@@ -510,7 +463,6 @@ const schema = graph([
     .opener-frame { grid-template-rows: 1fr auto auto; padding-block: var(--spacing-s6); }
     .opener-top { grid-row: 2; gap: var(--spacing-s4); }
     .opener-bottom { grid-row: 3; gap: var(--spacing-s4); }
-    .opener-img { object-position: 50% 26%; }
     .opener-lead { display: none; }
 
     /* The scrim is anchored to the first row of type, not to a percentage of
@@ -583,14 +535,37 @@ const schema = graph([
     .opener-rule { display: none; }
   }
 
+  /* --- services accordion + press strip --- */
+  .scope-acc { margin-top: var(--spacing-s7); }
+  .press {
+    list-style: none; margin: var(--spacing-s7) 0 0; padding: 0;
+    display: grid; gap: var(--spacing-s6);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+  .press-fig { margin: 0; display: grid; gap: var(--spacing-s3); }
+  .press-still {
+    aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-sm);
+    background: var(--color-navy-deep);
+  }
+  .press-still img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
+  .press-cap { display: grid; gap: 4px; }
+  .press-outlet { font-family: var(--font-serif); font-size: var(--text-h4); line-height: 1.1; color: var(--surface-ink); }
+  .press-prog { color: var(--surface-ink-2); }
+  .press-chyron { color: var(--surface-ink-2); font-size: var(--text-sm); line-height: 1.45; max-width: 36ch; }
+
+  /* --- map --- */
+  .map { margin-top: var(--spacing-s7); }
+  .map-frame {
+    display: block; width: 100%; aspect-ratio: 16 / 7; min-height: 320px;
+    border: 1px solid var(--color-line); border-radius: var(--radius-sm);
+    background: var(--color-paper-2);
+    filter: saturate(0.85);
+  }
+  @media (max-width: 767px) { .map-frame { aspect-ratio: 4 / 3; } }
+
   /* --- sections --- */
-  .scope-rows { margin-top: var(--spacing-s7); }
   .scope-more { margin-top: var(--spacing-s6); }
 
-  .att { display: grid; gap: var(--spacing-s5); }
-  .att-body { max-width: var(--container-m-read); }
-  .att-meta { margin-top: var(--spacing-s3); gap: var(--spacing-s3); }
-  .att-meta dd { margin: 0; }
 
   .statement { position: relative; padding-block: var(--spacing-s11); overflow: hidden; isolation: isolate; }
   .statement-bg {
@@ -614,7 +589,6 @@ const schema = graph([
   .commit-d { color: var(--surface-ink-2); max-width: var(--container-m-short); }
 
   .gal-head { margin-bottom: var(--spacing-s7); }
-  .gal-lead { margin-top: var(--spacing-s4); }
 
   .consult-steps { margin-top: var(--spacing-s5); max-width: var(--container-m-read); }
   .consult-d { color: var(--surface-ink-2); }

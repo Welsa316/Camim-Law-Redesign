@@ -55,7 +55,7 @@ async def main():
                          ("844x390 landscape",844,390)]:
             c=await b.new_context(viewport={"width":w,"height":h},device_scale_factor=1)
             pg=await c.new_page()
-            await pg.goto("http://127.0.0.1:4321/", wait_until="networkidle")
+            await pg.goto("http://localhost:4321/", wait_until="networkidle")
             await pg.wait_for_timeout(2500)
             blocks=await pg.evaluate(RECTS)
             await pg.add_style_tag(content=BLANK)

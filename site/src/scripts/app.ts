@@ -20,6 +20,8 @@ const hero = document.querySelector<HTMLElement>("[data-hero]");
 
 /** Re-evaluate the header's ground. Safe to call at any time. */
 let syncHeader = () => {};
+/** Tell the header the drawer's state. Assigned inside the header block. */
+let setHeaderMenuOpen = (_open: boolean) => {};
 
 if (header) {
   let ticking = false;
@@ -58,13 +60,10 @@ if (header) {
   addEventListener("resize", update, { passive: true });
   update();
 
-  // The drawer script below flips this through the exported setter.
-  Object.assign(globalThis as Record<string, unknown>, {
-    __setHeaderMenuOpen: (open: boolean) => {
-      menuOpen = open;
-      syncHeader();
-    },
-  });
+  setHeaderMenuOpen = (open: boolean) => {
+    menuOpen = open;
+    syncHeader();
+  };
 }
 
 /* ------------------------------------------------------------------ drawer */
@@ -83,8 +82,7 @@ if (toggle && menu) {
     toggle.setAttribute("aria-expanded", String(open));
     document.body.style.overflow = open ? "hidden" : "";
     if (menuLabel) menuLabel.textContent = open ? labels.close : labels.open;
-    (globalThis as Record<string, unknown>).__setHeaderMenuOpen instanceof Function &&
-      ((globalThis as Record<string, unknown>).__setHeaderMenuOpen as (o: boolean) => void)(open);
+    setHeaderMenuOpen(open);
   };
 
   toggle.addEventListener("click", () => setOpen(menu.hidden));

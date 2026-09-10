@@ -70,7 +70,10 @@ if (!heads.length || reduced.matches || !capable) {
             el.setAttribute("data-split-ready", "");
             const tween = gsap.fromTo(
               self.lines,
-              { yPercent: 108 },
+              // 150, not 108: the mask carries 0.26em of padding below the line box
+              // (see global.css), and a line parked at 108% shows its cap height
+              // through that padding before it moves.
+              { yPercent: 150 },
               {
                 yPercent: 0,
                 duration,
@@ -116,12 +119,15 @@ if (!heads.length || reduced.matches || !capable) {
       const portrait = document.querySelector<HTMLElement>("[data-scrub-portrait-img]");
       const frame = portrait?.closest("section") ?? null;
       if (portrait && frame && innerWidth >= 900) {
+        // Small on purpose. The frame is top-aligned with his head at 18% of
+        // it, so the scale stays under 1.04: at 1.10 the head was pushed up
+        // under the bar at scroll 0.
         gsap.fromTo(
           portrait,
-          { yPercent: -2.5, scale: 1.10 },
+          { yPercent: -1, scale: 1.035 },
           {
-            yPercent: 2.5,
-            scale: 1.02,
+            yPercent: 1.2,
+            scale: 1.0,
             ease: "none",
             scrollTrigger: { trigger: frame, start: "top top", end: "bottom top", scrub: 0.6 },
           },

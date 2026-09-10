@@ -1,12 +1,34 @@
-import asyncio, sys
+"""
+Two assertions about his face in the opening frame, at every width.
+
+1. No type crosses it. The face box is projected through object-fit and
+   object-position and every glyph rect is tested against it.
+2. It stays lit. The mean luminance of the face region with the veil in place
+   must keep at least 85% of what the photograph has there without it, and
+   the top of the face must sit in the upper quarter of the frame. This is the
+   check that was missing when the scrim was darkening his chin: the type
+   cleared its thresholds, the frame passed, and his face was under 0.6 of navy.
+
+    python3 verify/hero-face.py [base-url]
+"""
+import asyncio, io, sys
 from playwright.async_api import async_playwright
+from PIL import Image
+
+BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:4321"
+MIN_LIGHT_KEPT = 0.85   # veiled / raw mean luminance over the face box
+MAX_FACE_TOP = 0.30     # top of the face box as a fraction of the frame height; the bar is under 12% of any frame this applies to
+
+def mean_lum(png: bytes) -> float:
+    px = list(Image.open(io.BytesIO(png)).convert("L").getdata())
+    return sum(px) / len(px)
 
 # His face in each source crop, as fractions of that crop. Read off the
 # original 6670x10000 frame: his head spans x 41-54%, y 19-31% of the source.
-# The wide crop is source y 8-45%, so the head maps to y 30-62% of it; the
+# The wide crop is source y 11-53%, so the head maps to y 19-48% of it; the
 # tall crop is source y 6-93%, so it maps to y 15-29%.
-FACE = {"juan-campos-hero-wide.jpg": (0.40, 0.28, 0.56, 0.64),
-        "juan-campos-hero-tall.jpg": (0.40, 0.13, 0.56, 0.31)}
+FACE = {"juan-campos-hero-wide.jpg": (0.416, 0.160, 0.519, 0.418),
+        "juan-campos-hero-tall.jpg": (0.410, 0.140, 0.545, 0.311)}
 
 JS = """(face) => {
   const img=document.querySelector('.opener-img');
@@ -14,8 +36,9 @@ JS = """(face) => {
   const f=face[name]; if(!f) return {err:'no face box for '+name};
   const r=img.getBoundingClientRect();
   const nw=img.naturalWidth, nh=img.naturalHeight;
-  // replicate object-fit: cover + object-position
-  const scale=Math.max(r.width/nw, r.height/nh);
+  // replicate object-fit (cover or contain) + object-position
+  const fit=getComputedStyle(img).objectFit;
+  const scale=(fit==='contain'?Math.min:Math.max)(r.width/nw, r.height/nh);
   const dw=nw*scale, dh=nh*scale;
   const cs=getComputedStyle(img);
   const [px,py]=cs.objectPosition.split(' ').map(v=>parseFloat(v)/100);
@@ -38,29 +61,46 @@ JS = """(face) => {
       }
     }
   }
-  return {img:name, face:{x:Math.round(box.x),y:Math.round(box.y),r:Math.round(box.r),b:Math.round(box.b)}, hits};
+  const hero=document.querySelector('.opener').getBoundingClientRect();
+  return {img:name, box, hits,
+          face:{x:Math.round(box.x),y:Math.round(box.y),r:Math.round(box.r),b:Math.round(box.b)},
+          faceTop:(box.y-hero.top)/hero.height};
 }"""
 
 async def main():
-    bad=0
+    bad_count=0
     async with async_playwright() as p:
         b=await p.chromium.launch()
         for w,h in [(1920,1080),(1680,1050),(1440,900),(1280,800),(1024,768),
                     (900,1200),(768,1024),(430,932),(390,844),(320,720),(844,390)]:
             c=await b.new_context(viewport={"width":w,"height":h}); pg=await c.new_page()
-            await pg.goto("http://127.0.0.1:4321/", wait_until="networkidle")
+            await pg.goto("http://localhost:4321/", wait_until="networkidle")
             await pg.wait_for_timeout(2200)
             r=await pg.evaluate(JS, FACE)
             hits=r.get('hits',[])
             merged={}
             for x in hits: merged[x['sel']]=merged.get(x['sel'],0)+x['overlapPx']
-            if merged:
-                bad+=1
-                print(f"  FAIL {w}x{h} {r['img']:<26} type over face: {merged}")
+            bad=[]
+            if merged: bad.append(f"type over face: {merged}")
+            if r['faceTop'] > MAX_FACE_TOP: bad.append(f"face top at {r['faceTop']*100:.0f}% of frame (max {MAX_FACE_TOP*100:.0f}%)")
+            # light kept: blank the type, shoot the face box with and without the veil
+            bx=r['box']; clip={"x":max(0,bx['x']),"y":max(0,bx['y']),
+                               "width":bx['r']-max(0,bx['x']),"height":bx['b']-max(0,bx['y'])}
+            await pg.add_style_tag(content=".opener-frame{opacity:0!important}")
+            await pg.wait_for_timeout(120)
+            veiled=mean_lum(await pg.screenshot(clip=clip))
+            await pg.add_style_tag(content=".opener-veil{display:none!important}")
+            await pg.wait_for_timeout(120)
+            raw=mean_lum(await pg.screenshot(clip=clip))
+            kept=veiled/raw if raw else 1.0
+            if kept < MIN_LIGHT_KEPT: bad.append(f"face keeps only {kept*100:.0f}% of its light (min {MIN_LIGHT_KEPT*100:.0f}%)")
+            if bad:
+                bad_count+=1
+                print(f"  FAIL {w}x{h} {r['img']:<26} " + "; ".join(bad))
             else:
-                print(f"  OK   {w}x{h} {r['img']:<26} face box {r['face']}")
+                print(f"  OK   {w}x{h} {r['img']:<26} face top {r['faceTop']*100:.0f}%, light kept {kept*100:.0f}%")
             await c.close()
         await b.close()
-    print(f"\nTYPE-OVER-FACE FAILURES: {bad}")
-    sys.exit(1 if bad else 0)
+    print(f"\nHERO FACE FAILURES: {bad_count}")
+    sys.exit(1 if bad_count else 0)
 asyncio.run(main())

@@ -597,7 +597,15 @@ a { color: inherit; }
    The signature move, once per page, on the opening heading only.
    GSAP SplitText wraps each line in .line, and each .line in .line-mask.
    ========================================================================== */
-.line-mask { overflow: hidden; display: block; }
+/* The mask is taller than the line box on purpose. Display type sits at a
+   line-height of 1.02 and the serif's ascenders and descenders reach about
+   0.2em beyond that box on each side, so a mask that is exactly the line box
+   clips the tail of every g, p and y on the last row of glyphs. The padding
+   extends the clip and the negative margin gives the height straight back,
+   so the heading's box does not change. The tween's start state is 150% of
+   the line box for the same reason: at 108% the next line's ascenders sat
+   inside this padding before the reveal. verify/split-lines.py asserts it. */
+.line-mask { overflow: hidden; display: block; padding: 0.26em 0; margin: -0.26em 0; }
 .line-mask > .line { display: block; will-change: transform; }
 
 /* Pre-hidden before paint, so the composed page never flashes then blinks out.
@@ -633,8 +641,6 @@ a { color: inherit; }
 /* The opening frame's image is scrubbed by script; give it room to move
    without revealing an edge, and a defined resting transform if script
    never runs. */
-[data-scrub-portrait] { overflow: hidden; }
-[data-scrub-portrait] img { will-change: transform; }
 
 
 /* ============================================================================

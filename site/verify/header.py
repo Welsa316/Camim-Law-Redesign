@@ -16,7 +16,7 @@ content, two link labels broke in two, and the bar rendered 109px tall.
 import asyncio, sys
 from playwright.async_api import async_playwright
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:4321"
+BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:4321"
 WIDTHS = [320, 360, 390, 430, 768, 900, 1023, 1024, 1100, 1159, 1160, 1280, 1440, 1920]
 FULL_BAR_AT = 1160
 

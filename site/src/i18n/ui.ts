@@ -36,7 +36,6 @@ export const ui = {
     "a11y.skip": "Saltar al contenido principal",
     "a11y.langSwitch": "Cambiar idioma",
     "a11y.currentLang": "Idioma actual: español",
-    "a11y.toEnglish": "Ver esta página en inglés",
     "a11y.breadcrumb": "Ruta de navegación",
     "a11y.mainNav": "Navegación principal",
     "a11y.footerNav": "Navegación del pie de página",
@@ -58,9 +57,6 @@ export const ui = {
     "label.nextStep": "Siguiente paso",
 
     "home.eyebrow": "Abogado de inmigración · Orlando, Florida",
-    "footer.rights": "Todos los derechos reservados.",
-    "footer.legal": "Aviso legal",
-    "footer.privacy": "Privacidad",
     "footer.notNotarios": "Somos un bufete de abogados. No somos notarios ni consultores de inmigración.",
 
     "form.firstName": "Nombre",
@@ -112,7 +108,6 @@ export const ui = {
     "a11y.skip": "Skip to main content",
     "a11y.langSwitch": "Change language",
     "a11y.currentLang": "Current language: English",
-    "a11y.toEnglish": "View this page in Spanish",
     "a11y.breadcrumb": "Breadcrumb",
     "a11y.mainNav": "Main navigation",
     "a11y.footerNav": "Footer navigation",
@@ -134,9 +129,6 @@ export const ui = {
     "label.nextStep": "Next step",
 
     "home.eyebrow": "Immigration attorney · Orlando, Florida",
-    "footer.rights": "All rights reserved.",
-    "footer.legal": "Legal notice",
-    "footer.privacy": "Privacy",
     "footer.notNotarios": "We are a law firm. We are not notarios or immigration consultants.",
 
     "form.firstName": "First name",

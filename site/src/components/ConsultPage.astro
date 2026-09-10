@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
-import { ORG, show } from "../lib/org";
+import { ORG, show, mapEmbedUrl } from "../lib/org";
 import { liveGroups } from "../lib/services";
 import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
 
@@ -197,6 +197,14 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
             {es ? "Lunes a viernes" : "Monday to Friday"} · {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}
           </span>
         </address>
+        <iframe
+          class="ways-map"
+          src={mapEmbedUrl()}
+          title={es ? "Mapa de la oficina de Campos Immigration Law en Orlando" : "Map of the Campos Immigration Law office in Orlando"}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        ></iframe>
       </div>
     </div>
   </Section>
@@ -241,4 +249,11 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
   .ways { display: grid; gap: var(--spacing-s4); justify-items: start; }
   .ways-addr { display: grid; gap: var(--spacing-s1); font-style: normal; }
   .ways-addr a { color: var(--surface-ink); display: inline-flex; align-items: center; min-height: 44px; }
+  .ways-map {
+    display: block; width: 100%; aspect-ratio: 4 / 3; min-height: 240px;
+    margin-top: var(--spacing-s4);
+    border: 1px solid var(--color-line); border-radius: var(--radius-sm);
+    background: var(--color-paper-2);
+    filter: saturate(0.85);
+  }
 </style>

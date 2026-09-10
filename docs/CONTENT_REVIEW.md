@@ -103,6 +103,30 @@ one-click verification and is worth doing before launch.
 **Where:** `ORG.googleRating` and `ORG.statesServed` in `site/src/lib/org.ts`.
 Removing either fact from the frame is deleting one list item.
 
+### 1.2d The opening frame: what is photograph and what is generated
+
+The landscape hero (`/img/juan-campos-hero-wide.jpg`) is a composite. From 22%
+to 75% of its width it is the Google Business Profile photograph at full
+resolution, including the real ceiling and pendant above his head. Beyond a
+feathered band on each side, the room is a generated extension the client
+produced from this photograph with ChatGPT's image model and supplied on
+2026-09-09. That file had also re-drawn him, with different hair strands and a
+smoother, slightly wider face, so nothing of its figure is used: the
+photograph is laid over it, and the generated pixels are only ever floor,
+wall, chairs and a sofa. The band above the generated frame in the margins is
+a colour falloff taken from the file's own top rows, with no texture. Portrait
+viewports get the untouched photograph.
+
+**Why it is acceptable and what to check.** No person, text, mark, flag or
+symbol appears in the generated region, and it depicts nothing that could be
+taken as a fact about the firm. It is not a dramatization of an event and
+uses no actor, so Rule 4-7.13(b)(6) and (b)(7) do not reach it, and the
+Bar has issued nothing on generated backgrounds. Confirm the firm is content
+to use it; the untouched photograph works at every width if not.
+
+**Where:** `ATTORNEY.hero` in `site/src/lib/org.ts`, whose source string
+records the provenance.
+
 ### 1.2b Every legal statement on the asylum page, and where it came from
 
 The asylum page is the only page on this site that states immigration law, and

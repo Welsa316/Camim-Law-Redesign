@@ -37,6 +37,8 @@ export interface GalleryItem {
   ordinal?: string;
   /** Sub-links listed inside an open text panel. */
   links?: GalleryLink[];
+  /** A short trailing label on an open image panel, e.g. "Leer más". */
+  more?: string;
   /**
    * Imagery is optional. Without it the panel is typographic: a ground, an
    * ordinal, the label, the line and the sub-links, with a vertical tab that
@@ -121,6 +123,12 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
     >
       {item.image ? (
         <a class="ag-link" href={item.link ?? `#${id}`} aria-current={i === active ? "true" : undefined}>
+          {(item.ordinal || item.label) && (
+            <span class="ag-tab ag-tab--dark" aria-hidden="true">
+              {item.ordinal && <span class="ag-tab-n">{item.ordinal}</span>}
+              <span class="ag-tab-l">{item.label}</span>
+            </span>
+          )}
           <span class="ag-frame">
             <span class="ag-media" data-ag-media>
               <img
@@ -139,8 +147,10 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
           <span class="ag-caption">
             <span class="ag-bar" data-ag-bar aria-hidden="true"></span>
             <span class="ag-text" data-ag-text>
+              {item.ordinal && <span class="ag-n ag-n--dark apparatus">{item.ordinal}</span>}
               <span class="ag-label">{item.label}</span>
-              {item.meta && <span class="ag-meta apparatus">{item.meta}</span>}
+              {item.meta && <span class="ag-meta">{item.meta}</span>}
+              {item.more && <span class="ag-more apparatus">{item.more}<span aria-hidden="true"> &rarr;</span></span>}
             </span>
           </span>
         </a>
@@ -243,7 +253,17 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
     inset: 0;
     pointer-events: none;
     background:
-      linear-gradient(180deg, transparent 42%, rgb(11 31 51 / 0.86) 100%),
+      linear-gradient(180deg, transparent 30%, rgb(11 31 51 / 0.55) 62%, rgb(11 31 51 / 0.92) 100%),
+      rgb(11 31 51 / var(--ag-dim, 0.42));
+  }
+  /* A collapsed panel carries its name up its left edge, over whatever part
+     of the photograph happens to be there. This wash sits under that edge
+     only; measured: the label read 2.6:1 over the passport's pale table
+     without it. */
+  .ag-item:not([data-active]) .ag-overlay {
+    background:
+      linear-gradient(90deg, rgb(11 31 51 / 0.86) 0%, rgb(11 31 51 / 0.55) 34%, rgb(11 31 51 / 0) 70%),
+      linear-gradient(180deg, transparent 30%, rgb(11 31 51 / 0.55) 62%, rgb(11 31 51 / 0.92) 100%),
       rgb(11 31 51 / var(--ag-dim, 0.42));
   }
 
@@ -252,6 +272,7 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
     left: var(--spacing-s5);
     right: var(--spacing-s5);
     bottom: var(--spacing-s5);
+    z-index: 3;
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-s3);
@@ -273,7 +294,16 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
     color: var(--color-paper);
     text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
   }
-  .ag-meta { color: #c8d2dd; text-shadow: 0 1px 10px rgb(0 0 0 / 0.5); }
+  .ag-meta { color: #dbe3ea; text-shadow: 0 1px 10px rgb(0 0 0 / 0.5); font-size: var(--text-base); line-height: 1.45; max-width: 38ch; }
+  /* Paper, not brass: a 15px brass ordinal over the mid-tones of a photograph
+     measured 2.8-3.2:1. The brass stays on the bar and on the collapsed tab,
+     which sit over the edge wash. */
+  .ag-text .ag-n--dark { color: var(--color-paper); }
+  .ag-more { color: var(--color-brass-light); margin-top: var(--spacing-s2); }
+  /* the collapsed tab on a photograph: light type, and it fades as the panel opens */
+  .ag-tab--dark { z-index: 2; }
+  .ag-tab--dark .ag-tab-n { color: var(--color-brass-light); }
+  .ag-tab--dark .ag-tab-l { color: var(--color-paper); text-shadow: 0 1px 12px rgb(0 0 0 / 0.55); }
 
   /* Below the breakpoint the accordion is a stack: an accordion whose panels
      are 60px wide tells a phone user nothing, and hiding options behind a
@@ -287,13 +317,19 @@ const active = Math.min(Math.max(defaultIndex, 0), items.length - 1);
       gap: var(--spacing-s4);
     }
     .ag-item { flex: none; transform: none !important; }
-    .ag-link { position: relative; inset: auto; display: block; aspect-ratio: 3 / 2; }
+    /* Stacked, the caption is in flow and the panel is as tall as the caption
+       needs, with the photograph filling whatever that height is. A fixed
+       aspect ratio put a five-line caption over the top edge of the panel. */
+    .ag-link { position: relative; inset: auto; display: grid; align-items: end; min-height: 240px; }
+    .ag-caption { position: relative; left: auto; right: auto; bottom: auto; padding: var(--spacing-s5); }
     .ag-media {
       position: absolute; width: 100%; height: 100%;
       transform: translate(-50%, -50%) !important;
       filter: none !important;
     }
-    .ag-overlay { background: linear-gradient(180deg, transparent 40%, rgb(11 31 51 / 0.86) 100%); }
+    .ag-overlay, .ag-item:not([data-active]) .ag-overlay {
+      background: linear-gradient(180deg, rgb(11 31 51 / 0.58) 0%, rgb(11 31 51 / 0.72) 50%, rgb(11 31 51 / 0.92) 100%);
+    }
     .ag-bar, .ag-text { opacity: 1 !important; transform: none !important; }
   }
 

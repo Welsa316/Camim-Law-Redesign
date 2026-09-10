@@ -29,6 +29,14 @@ export interface Service {
   blocks: { es: Block[]; en: Block[] };
   related: string[];
   source: string;
+  /**
+   * Stock photograph for the home accordion, on the client's instruction of
+   * 2026-09-10 (Unsplash first, the sister site's images as fallback). Each is
+   * under the Unsplash License; photographer and page are recorded here and
+   * in docs/sources/images.json. Decorative: the panel's text is the link, so
+   * the image carries an empty alt and no written description.
+   */
+  image?: { src: string; width: number; height: number; focus: string; credit: string; page: string };
 }
 
 export const SERVICES: Service[] = [
@@ -104,7 +112,15 @@ export const SERVICES: Service[] = [
       "peticiones-familiares",
       "ead"
     ],
-    "source": "camulaw.com/servicios/green-card; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)"
+    "source": "camulaw.com/servicios/green-card; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)",
+    "image": {
+      "src": "/img/services/green-card.jpg",
+      "width": 2000,
+      "height": 1334,
+      "focus": "50% 45%",
+      "credit": "Jakub \u017berdzicki (@jakubzerdzicki), Unsplash License",
+      "page": "https://unsplash.com/photos/hand-holding-keys-with-house-keychain-V7Q94jc04wQ"
+    }
   },
   {
     "id": "peticionesFamiliares",
@@ -194,7 +210,15 @@ export const SERVICES: Service[] = [
       "ciudadania",
       "visas-de-prometido"
     ],
-    "source": "camulaw.com/servicios/peticiones-familiares; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)"
+    "source": "camulaw.com/servicios/peticiones-familiares; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)",
+    "image": {
+      "src": "/img/services/peticiones-familiares.jpg",
+      "width": 2000,
+      "height": 1333,
+      "focus": "50% 50%",
+      "credit": "rfp80 (@rfp80), Unsplash License",
+      "page": "https://unsplash.com/photos/a-group-of-people-looking-out-a-window-at-an-airplane-cKN6mJqP43U"
+    }
   },
   {
     "id": "ciudadania",
@@ -267,7 +291,15 @@ export const SERVICES: Service[] = [
       "green-card",
       "peticiones-familiares"
     ],
-    "source": "camulaw.com/servicios/ciudadania; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)"
+    "source": "camulaw.com/servicios/ciudadania; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)",
+    "image": {
+      "src": "/img/services/ciudadania.jpg",
+      "width": 2000,
+      "height": 1174,
+      "focus": "55% 50%",
+      "credit": "Kelly Sikkema (@kellysikkema), Unsplash License",
+      "page": "https://unsplash.com/photos/passport-book-RiUZQOfQ8XE"
+    }
   },
   {
     "id": "defensaDeportacion",
@@ -341,7 +373,15 @@ export const SERVICES: Service[] = [
       "daca",
       "vawa"
     ],
-    "source": "camulaw.com/servicios/defensa-contra-la-deportacion; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)"
+    "source": "camulaw.com/servicios/defensa-contra-la-deportacion; names and lines from the site's ES/EN dictionaries; practice confirmed by client instruction 2026-09-10 (services mirror Campos Muños Law LLC)",
+    "image": {
+      "src": "/img/services/defensa-contra-la-deportacion.jpg",
+      "width": 2000,
+      "height": 1500,
+      "focus": "50% 55%",
+      "credit": "fotomagi (@fotomagi), Unsplash License",
+      "page": "https://unsplash.com/photos/an-empty-courtroom-with-wooden-paneling-and-columns-Bh6u25Qv9qA"
+    }
   },
   {
     "id": "visasJovenes",

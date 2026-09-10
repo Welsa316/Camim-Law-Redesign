@@ -58,11 +58,17 @@ const src = es
       description: "We are here to help you. Virtual consultation available.",
     };
 
+/* Photographs are decorative here: the panel's own text is the link, so the
+   image gets an empty alt and no written description (the copy rule). */
 const serviceItems: GalleryItem[] = featured().map((s, i) => ({
   ordinal: String(i + 1).padStart(2, "0"),
   label: s.name[lang],
   meta: s.line[lang],
   link: langPath(lang, s.slug),
+  more: _("readMore"),
+  ...(s.image
+    ? { image: s.image.src, width: s.image.width, height: s.image.height, focus: s.image.focus, alt: "" }
+    : {}),
 }));
 
 const altFor: Record<string, string> = {

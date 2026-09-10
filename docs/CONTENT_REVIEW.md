@@ -101,6 +101,23 @@ would be a new claim about this firm. Every omission:
 | visaU | en | paragraph | Our firm has experience guiding crime victims from the very beginning to determine whether they meet the requi… | names the sister firm, its city or state, or addresses the reader as the sister firm |
 | visaU | en | paragraph | Contact us if you would like to review your U visa case and learn about the options available to you. At Campo… | names the sister firm, its city or state, or addresses the reader as the sister firm |
 
+**Photographs on the home accordion.** On the client's instruction of
+2026-09-10 the four featured panels carry stock photographs, Unsplash first
+and the sister site's images as the fallback. All four came from Unsplash;
+each was free to use under the Unsplash License on its photo page that day
+(none is Unsplash+), and each is recorded in `docs/sources/images.json`. The
+choices avoid the things the brief bans and the things the rules frown on:
+no gavel, no scales, no flag, no Statue of Liberty, no posed "client" faces.
+They are decorative on the page: the panel's own text is the link, so each
+image carries an empty alt and no written description.
+
+| Panel | Photographer | Unsplash page | Size |
+|---|---|---|---|
+| green-card | Jakub Żerdzicki (@jakubzerdzicki) | [hand-holding-keys-with-house-keychain-V7Q94jc04wQ](https://unsplash.com/photos/hand-holding-keys-with-house-keychain-V7Q94jc04wQ) | 2000×1334 |
+| peticiones-familiares | rfp80 (@rfp80) | [a-group-of-people-looking-out-a-window-at-an-airplane-cKN6mJqP43U](https://unsplash.com/photos/a-group-of-people-looking-out-a-window-at-an-airplane-cKN6mJqP43U) | 2000×1333 |
+| ciudadania | Kelly Sikkema (@kellysikkema) | [passport-book-RiUZQOfQ8XE](https://unsplash.com/photos/passport-book-RiUZQOfQ8XE) | 2000×1174 |
+| defensa-contra-la-deportacion | fotomagi (@fotomagi) | [an-empty-courtroom-with-wooden-paneling-and-columns-Bh6u25Qv9qA](https://unsplash.com/photos/an-empty-courtroom-with-wooden-paneling-and-columns-Bh6u25Qv9qA) | 2000×1500 |
+
 **Florida, not Louisiana.** Immigration law is federal and the imported
 descriptions describe federal processes. The one place state law enters is
 Special Immigrant Juvenile Status, which depends on a state-court order; the

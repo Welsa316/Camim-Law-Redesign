@@ -1,0 +1,54 @@
+---
+import { t, type Lang } from "../i18n/ui";
+
+/**
+ * A floating language switch, so the way to the other language is never only
+ * the small pill in the bar. It offers the language the reader can switch TO,
+ * with that language's flag, as asked: the United States for English and
+ * Mexico for Spanish. The flags are the MIT-licensed flag-icons set, not
+ * drawn here. The label is the target language's own name, a sourced string.
+ *
+ * FLAGS: set to false to show the label only. The client asked for flags; a
+ * Mexican flag for Spanish can read wrongly to readers from elsewhere in Latin
+ * America, and the original brief excluded flags, so the switch is one line.
+ */
+const FLAGS = true;
+
+interface Props { lang: Lang; href: string }
+const { lang, href } = Astro.props;
+const _ = t(lang);
+const other: Lang = lang === "es" ? "en" : "es";
+const label = other === "en" ? _("lang.en") : _("lang.es");
+const flag = other === "en" ? "/img/flags/us.svg" : "/img/flags/mx.svg";
+---
+<a class="lw" href={href} lang={other} hreflang={other} data-lang-widget>
+  {FLAGS && <img class="lw-flag" src={flag} width="20" height="15" alt="" aria-hidden="true" decoding="async" />}
+  <span class="lw-label">{label}</span>
+</a>
+
+<style>
+  .lw {
+    /* Bottom-left, not bottom-right: on every page the left column under the
+       section label is empty, so a widget there sits on nothing. Bottom-right
+       measured 27 overlaps with text and one with a form field. */
+    position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 95;
+    display: inline-flex; align-items: center; gap: 10px;
+    min-height: 44px; padding: 0 16px 0 12px;
+    border-radius: 999px;
+    background: var(--color-paper); color: var(--color-ink);
+    border: 1px solid var(--color-line-strong);
+    box-shadow: 0 6px 24px rgb(11 31 51 / 0.18);
+    font-weight: var(--font-weight-semibold); font-size: var(--text-sm);
+    text-decoration: none;
+    transition: transform var(--d-state) var(--ease-state), box-shadow var(--d-state) var(--ease-state);
+  }
+  @media (any-hover: hover) { .lw:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgb(11 31 51 / 0.24); } }
+  .lw:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; }
+  .lw-flag { width: 20px; height: 15px; border-radius: 2px; box-shadow: 0 0 0 1px rgb(37 40 43 / 0.15); }
+  /* Below 1024 the switch lives inside the phone bar instead, where nothing
+     can be underneath it; at tablet width a floating pill sat on body text on
+     every service page. */
+  @media (max-width: 1023px) { .lw { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .lw { transition: none; } }
+</style>

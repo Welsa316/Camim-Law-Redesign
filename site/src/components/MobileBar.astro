@@ -2,8 +2,9 @@
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, show } from "../lib/org";
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props { lang: Lang; otherHref?: string }
+const { lang, otherHref } = Astro.props;
+const other: Lang = lang === "es" ? "en" : "es";
 const _ = t(lang);
 const whatsapp = show(ORG.whatsapp);
 ---
@@ -28,12 +29,18 @@ const whatsapp = show(ORG.whatsapp);
   ) : (
     <a class="mbar-btn" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
   )}
+  {otherHref && (
+    <a class="mbar-btn mbar-btn--lang" href={otherHref} lang={other} hreflang={other} aria-label={other === "en" ? _("lang.en") : _("lang.es")}>
+      <img class="mbar-flag" src={other === "en" ? "/img/flags/us.svg" : "/img/flags/mx.svg"} width="20" height="15" alt="" aria-hidden="true" decoding="async" />
+      <span aria-hidden="true">{other === "en" ? "EN" : "ES"}</span>
+    </a>
+  )}
 </div>
 
 <style>
   .mbar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
-    display: grid; grid-template-columns: 1.6fr 1fr;
+    display: grid; grid-template-columns: 1.5fr 1fr 0.72fr;
     gap: 1px; background: var(--color-line-strong);
     border-top: 1px solid var(--color-line-strong);
     padding-bottom: env(safe-area-inset-bottom);
@@ -47,6 +54,12 @@ const whatsapp = show(ORG.whatsapp);
   .mbar-btn--primary { background: var(--color-navy); color: var(--color-paper); }
   .mbar-btn--wa { grid-auto-flow: column; gap: var(--spacing-s2); color: var(--color-ink); }
   .mbar-wa { color: #25d366; flex: none; }
+  .mbar-btn--lang { grid-auto-flow: column; gap: 8px; font-family: var(--font-mono); letter-spacing: 0.08em; }
+  /* At 320 the middle cell is under 100px: the glyph plus the word do not fit,
+     and the glyph was being pushed out of the button. Below 360 the glyph
+     carries it; the name stays for assistive technology. */
+  @media (max-width: 359px) { .mbar-btn--wa > span:not(.sr-only) { display: none; } }
+  .mbar-flag { width: 20px; height: 15px; border-radius: 2px; box-shadow: 0 0 0 1px rgb(37 40 43 / 0.15); }
   .mbar-num { font-size: var(--text-eyebrow); color: inherit; opacity: 0.85; }
   .mbar-btn:active { filter: brightness(0.94); }
   /* The bar covers the last strip of the page, so the page reserves room. */

@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
+import LangWidget from "../components/LangWidget.astro";
 import { IS_DEMO } from "../lib/site.js";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileBar from "../components/MobileBar.astro";
@@ -88,8 +89,9 @@ const alts = hreflang(alternates);
     <main id="main">
       <slot />
     </main>
+    <LangWidget lang={lang} href={lang === "es" ? alternates.en : alternates.es} />
     <SiteFooter lang={lang} />
-    <MobileBar lang={lang} />
+    <MobileBar lang={lang} otherHref={lang === "es" ? alternates.en : alternates.es} />
     <script src="../scripts/app.ts"></script>
     <script src="../scripts/motion.ts"></script>
     <script src="../scripts/gallery.ts"></script>

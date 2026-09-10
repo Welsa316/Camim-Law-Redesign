@@ -17,5 +17,8 @@
     "astro": "^7.3.2",
     "gsap": "^3.15.0",
     "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "flag-icons": "^7.5.0"
   }
 }

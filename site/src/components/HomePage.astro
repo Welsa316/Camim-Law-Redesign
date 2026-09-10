@@ -346,7 +346,9 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
        the bright part of the frame. Measured, not assumed: in the top corner
        the figures' labels read 3.1:1 against the wall behind him, and
        darkening the veil enough to fix that put his face in shadow. */
-    .opener-frame { grid-template-rows: 1fr auto auto; padding-block: var(--spacing-s6); }
+    /* The floating language switch sits above the phone bar at the right,
+       44px tall; the frame's last line has to end above it. */
+    .opener-frame { grid-template-rows: 1fr auto auto; padding-block: var(--spacing-s6) calc(var(--spacing-s6) + 60px); }
     .opener-top { grid-row: 2; gap: var(--spacing-s4); }
     .opener-bottom { grid-row: 3; gap: var(--spacing-s4); }
     .opener-lead { display: none; }
@@ -399,6 +401,16 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
        and at 5.6vw its tail reached his shoulder at 1440. The frame's left
        third is the column; the word has to fit it. */
     .opener-display { font-size: clamp(2.4rem, 4.8vw, 6rem); line-height: 1.02; max-width: min(13ch, 32vw); }
+  }
+  /* The language switch floats at the bottom-left, 44px tall with a 16px
+     margin, from 1024px up; the statement's last line has to end above it at
+     every height. Measured: at the frame's own padding the serif's descender
+     box reached the widget. Only the statement is lifted: the action column
+     on the right stays low, in the heaviest part of the wash, because moving
+     the whole row up put the small admitted line over the chair and cost it
+     its contrast at 1280x800. */
+  @media (min-width: 1024px) {
+    .opener-display { margin-bottom: 56px; }
   }
 
   /* Landscape phones. The frame is shorter than the type wants to be, so the

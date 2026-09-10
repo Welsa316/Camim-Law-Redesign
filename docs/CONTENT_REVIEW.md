@@ -148,6 +148,29 @@ number, on the client's instruction. Whether that number is registered on
 WhatsApp has not been checked here; if it is not, the button opens to nothing.
 `ORG.whatsapp` in `org.ts`.
 
+**The language switch.** Besides the header link, every page carries a
+floating language button: bottom-left on screens from 1024px, and the third
+button of the phone bar below that. Each shows the *other* language's name
+with a flag beside it, the United States flag for English and the Mexican
+flag for Spanish, on the client's instruction of 2026-09-10. One caution for
+the firm: a flag stands for a country, not a language, and the firm's Spanish-
+speaking clients in Orlando come from Puerto Rico, Venezuela, Colombia, Cuba
+and elsewhere as much as from Mexico. If that reads wrong to the firm, the
+flags switch off in one place (`FLAGS` at the top of
+`site/src/components/LangWidget.astro` and the `<img>` in `MobileBar.astro`)
+and the button keeps the language name alone. The flag artwork is the
+`flag-icons` package (MIT), not a photograph; the ban on flags elsewhere on
+the site is about hero imagery, and this is a 20px control.
+
+**The preview build.** `site/scripts/build-demo.sh` produces `demo/` and
+`demo.zip` at the repository root: the two home pages (`/` and `/en/`) with
+their assets and nothing else. Every internal link on those pages is inert
+(`PUBLIC_DEMO=1` makes them point at the page itself), the pages carry
+`noindex`, and a `robots.txt` disallows crawling, so the preview can be put on
+a throwaway URL for the attorney without exposing the unreviewed pages. It is
+a build output and is not committed; regenerate it with the script, then run
+the normal build again, because the demo build overwrites `site/dist/`.
+
 ---
 
 ## 1. Blocks launch

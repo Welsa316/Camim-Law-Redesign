@@ -28,6 +28,20 @@ of whole sourced parts (a label beside a phone number; a headline the reveal
 has split into lines). It writes the result to `docs/COPY_PROVENANCE.md`.
 Run it after any change to copy. A failing gate is a string somebody wrote.
 
+**Fragments promoted to headings.** The gate accepts a sourced fragment of
+twelve characters or more, and the home page now uses four of them as display
+type: "Nos esforzaremos por tratarlo como familia" / "We will strive to treat
+you like family" and "Nos aseguraremos de que comprenda lo que está sucediendo
+con su caso" / "We will make sure you understand what is happening with your
+case" are both clauses of camimlaw.com's own "¿Por qué elegirnos?" paragraph,
+and "Agende su consulta" / "Schedule your consultation" is camulaw.com's
+"Agende Su Consulta Ahora" without the last word. The words are the firm's
+own and their order is unchanged; what this site added is a capital letter, a
+full stop and the decision to set them large. **The firm should read them as
+headlines rather than as sentences in a paragraph**, because that is how a
+visitor will now meet them — and because Rule 4-7.13 reaches a claim more
+readily when it is the first thing on the screen.
+
 **What was removed to get there.** The FAQ, detained-relative and Orlando
 pages; the situation finder, the commitments, the consultation steps, the
 first-person attorney narrative, every disclaimer, every meta description
@@ -177,7 +191,25 @@ the normal build again, because the demo build overwrites `site/dist/`.
 
 ### 1.1 Bar admission and jurisdiction
 
-The research found no Florida Bar record for the attorney, and a Louisiana admission dating to 2020. The site therefore states, in the footer of every page and on the attorney page, that he is admitted in Louisiana and not in Florida, and explains that immigration is federal practice.
+The research found no Florida Bar record for the attorney, and a Louisiana admission dating to 2020.
+
+**This is the one place where the copy rule and the advertising rules pull
+against each other, and it is currently unresolved.** The footer and the
+attorney page carry Campos Muños Law's own sentence — "Juan está admitido para
+ejercer la abogacía ante la Corte Suprema del Estado de Luisiana y es miembro
+de la American Immigration Lawyers Association (AILA)" — because that sentence
+is published by the firm and can be quoted. What the site no longer says,
+because no published source says it anywhere, is the part a Florida reader
+most needs: **that he is not admitted in Florida, and that immigration is a
+federal practice.** Earlier drafts said both; the sentences were written here,
+so the copy rule removed them along with everything else that had no source
+(commit `4b13c67`).
+
+Stating a Louisiana admission without the Florida limitation is a weaker
+position than saying nothing at all, because the site is advertising to
+Florida readers. Rule 4-7.21(d) is the rule, and only the firm or its counsel
+can close this: **supply the sentence and it goes in.** Nothing will be
+drafted here.
 
 **Confirm:** the exact admission wording, the Louisiana bar roll number if it is to be published, the admission date, and any federal court or agency admissions worth listing.
 
@@ -222,12 +254,18 @@ Earlier drafts of this site carried all three, written here, which is
 information the firm never published. They are gone: the four pages, their
 footer links, and the "© 2026 Campos Immigration Law Firm LLC" line.
 
-What remains in the footer is the set of statements the advertising rules
-require and that are verified facts: the firm name and the responsible
-attorney (Rule 4-7.12(a)), the Orlando office and the Louisiana admission
-with the Florida limitation (Rule 4-7.21(d)), "not notaries or immigration
-consultants", and the attorney-advertising line. Strike any of them and the
-rule it serves is the reason to put it back.
+**Four more statements went with them, and this paragraph used to claim they
+had stayed.** The same copy rule removed, from the footer: the Florida
+limitation and the federal-practice explanation (Rule 4-7.21(d)), "no somos
+notarios ni consultores de inmigración", and the attorney-advertising and
+no-legal-advice line. Every one was written here rather than quoted, so the
+gate took them. What the footer carries now is the firm's name, the
+registered entity, the responsible attorney (Rule 4-7.12(a)), the office
+address and hours, and the sister firm's published admission sentence.
+
+Each of the four is a statement the rules expect and a statement this site
+cannot invent. They are listed here so the firm can supply the wording it
+wants to use; the moment it does, they go back in the footer. See §1.1.
 
 **Decide:** whether the firm wants a privacy policy at all. The consultation
 form collects a name, a phone number, an email address and a topic. No
@@ -436,10 +474,15 @@ Deep green, warm paper, clay accent. The green is drawn from the attorney's own 
 **Confirm three imported images.**
 
 1. **The seated portrait** carries the opening frame of the home page and nothing else. It comes from the firm's own Google Business Profile for the Orlando entity, fetched at full resolution rather than as the 228px thumbnail the listing shows. It is a professional environmental portrait: seated in a wooden chair, a real room, symmetric composition. The margins of the wide version were generated by the client and are disclosed in §1.2d. **Confirm permission and whether the photographer needs a credit.**
-2. **The café photograph on the attorney page** replaced the video frame that was there before, on the client's instruction of 2026-09-10 ("one of the newer ones from the Campos Muños site"). It is the right half of `Slideshow2-desktop.jpg` from camulaw.com's home slideshow, cropped so that he is alone at the table; the other person in the original frame is entirely outside the crop, and nothing in the crop names a place. It is captioned only with his name and credential. **Confirm which city it was taken in and whether the photographer needs a credit**, since the sister firm's page does not say.
-3. **The texture behind the statement band** is a dark, near-abstract detail of flag fabric. It is a material, not a flag hero: no waving flag, no seal, and a heavy overlay. Confirm the direction.
+2. **The café photograph** now carries both the home page's introduction and the attorney page, on the client's instruction of 2026-09-10 ("one of the newer ones from the Campos Muños site"). It is the right half of `Slideshow2-desktop.jpg` from camulaw.com's home slideshow, cropped so that he is alone at the table; the other person in the original frame is entirely outside the crop, and nothing in the crop names a place. It is shown whole, at its own proportions, captioned only with his name, his credential and the firm. **Confirm which city it was taken in and whether the photographer needs a credit**, since the sister firm's page does not say.
 
-Four earlier photographs of him (`juan-campos-at-work.jpg`, `-seated.jpg`, `-portrait.jpg`, `-headshot.jpg`) are still on disk with their provenance recorded in `org.ts`, but no page uses them.
+The flag-fabric texture that used to sit behind the closing band has been
+removed, so there is nothing left to confirm there: at the opacity the type
+needed it was invisible, and a solid navy carries the words better. The file
+is still in `public/img/` and no page references it. Five earlier photographs
+of him (`juan-campos-at-work.jpg`, `-seated.jpg`, `-portrait.jpg`,
+`-headshot.jpg`, and `flag-texture.jpg`) are on disk with their provenance
+recorded in `org.ts`, and no page uses them.
 
 Deliberately **not** used from that library, and why:
 

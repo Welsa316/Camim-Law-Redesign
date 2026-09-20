@@ -223,6 +223,17 @@ const nav = [
      hairline in white instead of stone, and light ink. The script removes
      `data-over` once the frame has scrolled past, and the transition below is
      what makes that read as the bar settling rather than blinking. */
+  /* The bar's own scrim. Measured over the photograph, "Acerca de" sat on the
+     brass lift at 4.17:1 — under 4.5 for 18px text — because the only thing
+     under the bar was whatever the frame happened to be. A gradient confined
+     to the bar's own height fades out before it reaches his face, and it is a
+     pseudo-element so the state change stays a fade rather than a snap. */
+  .hdr::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg, rgb(11 31 51 / 0.58) 0%, rgb(11 31 51 / 0.30) 64%, rgb(11 31 51 / 0) 100%);
+    opacity: 0; transition: opacity var(--d-state) var(--ease-state);
+  }
+  :global(html.js-on) .hdr[data-over]::before { opacity: 1; }
   :global(html.js-on) .hdr[data-over] {
     background: transparent;
     /* Not `none`. Any backdrop-filter other than none makes this element the

@@ -450,7 +450,11 @@ a { color: inherit; }
 /* A wipe rather than a fade: the rule grows from the left on hover and
    retracts to the left on exit, so the two directions are not symmetrical.
    Cheaper and steadier than animating text-decoration. */
-.prose a {
+/* `:not(.btn)` on every one of these: a button dropped into prose is a button.
+   `.prose a` is one class plus one element and outranks `.btn-primary`, so the
+   payment page's call to action took the prose link's oxblood — 1.14:1 on its
+   own navy ground, which is text nobody can read. */
+.prose a:not(.btn) {
   color: var(--surface-accent-ink);
   text-decoration: none;
   background-image: linear-gradient(currentColor, currentColor);
@@ -461,12 +465,12 @@ a { color: inherit; }
   transition: background-size var(--d-state) var(--ease-reveal);
 }
 @media (any-hover: hover) {
-  .prose a:hover { background-size: 0 1px; background-position: 100% 100%; }
+  .prose a:not(.btn):hover { background-size: 0 1px; background-position: 100% 100%; }
 }
 @media (any-hover: none) {
-  .prose a { text-decoration: underline; text-underline-offset: 0.2em; }
+  .prose a:not(.btn) { text-decoration: underline; text-underline-offset: 0.2em; }
 }
-[data-surface="navy"] .prose a, [data-surface="navy-deep"] .prose a { color: var(--surface-ink); }
+[data-surface="navy"] .prose a:not(.btn), [data-surface="navy-deep"] .prose a:not(.btn) { color: var(--surface-ink); }
 
 /* --- rules --------------------------------------------------------------- */
 .rule { border: 0; border-top: 1px solid var(--surface-line); margin: 0; }

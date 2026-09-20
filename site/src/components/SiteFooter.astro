@@ -1,7 +1,7 @@
 ---
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, ATTORNEY } from "../lib/org";
-import { IS_DEMO } from "../lib/site.js";
+import { demoAllows } from "../lib/site.js";
 
 interface Props {
   lang: Lang;
@@ -18,11 +18,11 @@ const a = ORG.address.value;
 
 /* Same lockup as the header, one rank larger: the firm signs the page. */
 const links = [
-  { href: langPath(lang, "servicios"), label: _("nav.services") },
-  { href: langPath(lang, "juan-campos"), label: _("nav.attorney") },
-  { href: langPath(lang, "consulta"), label: _("nav.consultation") },
-  { href: langPath(lang, "pagos"), label: _("nav.payment") },
-];
+  { slug: "servicios", label: _("nav.services") },
+  { slug: "juan-campos", label: _("nav.attorney") },
+  { slug: "consulta", label: _("nav.consultation") },
+  { slug: "pagos", label: _("nav.payment") },
+].map((l) => ({ ...l, href: langPath(lang, l.slug) }));
 const social = [
   { href: ORG.social.value.instagram, label: "Instagram" },
   { href: ORG.social.value.facebook, label: "Facebook" },
@@ -33,12 +33,12 @@ const social = [
 <footer class="ftr" data-surface="navy-deep" data-flush={flush ? "" : undefined}>
   <div class="ftr-inner wrap-wide">
     <div class="ftr-top">
-      {IS_DEMO
-        ? <span class="ftr-mark"><span class="ftr-mark-name">Campos</span><span class="ftr-mark-rest">Immigration Law</span></span>
-        : <a class="ftr-mark" href={langPath(lang)}><span class="ftr-mark-name">Campos</span><span class="ftr-mark-rest">Immigration Law</span></a>}
+      {demoAllows()
+        ? <a class="ftr-mark" href={langPath(lang)}><span class="ftr-mark-name">Campos</span><span class="ftr-mark-rest">Immigration Law</span></a>
+        : <span class="ftr-mark"><span class="ftr-mark-name">Campos</span><span class="ftr-mark-rest">Immigration Law</span></span>}
       <ul class="ftr-links">
         {links.map((l) => (
-          <li>{IS_DEMO ? <span class="ftr-link">{l.label}</span> : <a class="ftr-link" href={l.href}>{l.label}</a>}</li>
+          <li>{demoAllows(l.slug) ? <a class="ftr-link" href={l.href}>{l.label}</a> : <span class="ftr-link">{l.label}</span>}</li>
         ))}
       </ul>
     </div>

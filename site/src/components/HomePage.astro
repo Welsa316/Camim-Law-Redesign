@@ -6,7 +6,7 @@ import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, ATTORNEY, MEDIA, show, mapEmbedUrl } from "../lib/org";
 import { featured } from "../lib/services";
 import { graph, orgSchema, attorneySchema } from "../lib/seo";
-import { IS_DEMO } from "../lib/site.js";
+import { demoAllows } from "../lib/site.js";
 
 /*
   Every visible string on this page is copied from camimlaw.com, from Campos
@@ -76,7 +76,7 @@ const serviceItems: GalleryItem[] = featured().map((s, i) => ({
   ordinal: String(i + 1).padStart(2, "0"),
   label: s.name[lang],
   meta: s.line[lang],
-  link: IS_DEMO ? "#servicios-acordeon" : langPath(lang, s.slug),
+  link: demoAllows(s.slug) ? langPath(lang, s.slug) : "#servicios-acordeon",
   more: _("readMore"),
   ...(s.image
     ? { image: s.image.src, width: s.image.width, height: s.image.height, focus: s.image.focus, alt: "" }
@@ -130,7 +130,7 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
       <div class="opener-bottom">
         <h1 class="hero-type opener-display" data-split-lines="hero">{src.display}</h1>
         <div class="opener-side">
-          <a class="opener-pill" href={IS_DEMO ? `tel:${ORG.phone.value}` : langPath(lang, "consulta")} data-reveal="control">
+          <a class="opener-pill" href={demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`} data-reveal="control">
             {_("cta.book")}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span>
           </a>
           <div class="opener-rule" aria-hidden="true"></div>
@@ -148,9 +148,9 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
         <h2 class="home-title intro-title" id="intro-title" data-split-lines>{src.introTitle}</h2>
         <p class="intro-body" data-reveal="text">{src.introBody}</p>
         <p class="intro-note" data-reveal="text">{src.introNote}</p>
-        {IS_DEMO
-          ? <span class="home-link intro-link">{_("nav.attorney")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></span>
-          : <a class="home-link intro-link" href={langPath(lang, "juan-campos")}>{_("nav.attorney")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></a>}
+        {demoAllows("juan-campos")
+          ? <a class="home-link intro-link" href={langPath(lang, "juan-campos")}>{_("nav.attorney")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></a>
+          : <span class="home-link intro-link">{_("nav.attorney")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></span>}
       </div>
       <figure class="intro-portrait" data-reveal="portrait">
         <div class="intro-photo">
@@ -172,9 +172,9 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
           <span class="chapter-number" aria-hidden="true">02</span>
           <h2 class="home-title" id="services-title" data-split-lines>{_("nav.services")}</h2>
         </div>
-        {IS_DEMO
-          ? <span class="home-link">{_("nav.allServices")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></span>
-          : <a class="home-link" href={langPath(lang, "servicios")}>{_("nav.allServices")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></a>}
+        {demoAllows("servicios")
+          ? <a class="home-link" href={langPath(lang, "servicios")}>{_("nav.allServices")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></a>
+          : <span class="home-link">{_("nav.allServices")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></span>}
       </div>
       <div class="scope-acc">
         <AccordionGallery items={serviceItems} id="servicios-acordeon" defaultIndex={0} height={460} expandRatio={0.5} tilt={2} />
@@ -256,7 +256,7 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
       </div>
       <div class="statement-action">
         <p class="statement-support">{_("contact.subtitle")}</p>
-        <a class="opener-pill" href={IS_DEMO ? `tel:${ORG.phone.value}` : langPath(lang, "consulta")}>{src.book}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="opener-pill" href={demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`}>{src.book}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
         <p class="statement-meta apparatus">{_("contact.confidential")}</p>
       </div>
     </div>

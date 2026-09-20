@@ -1,6 +1,5 @@
 ---
 import Base from "../layouts/Base.astro";
-import Section from "./Section.astro";
 import AccordionGallery from "./AccordionGallery.astro";
 import type { GalleryItem } from "./AccordionGallery.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
@@ -22,6 +21,9 @@ const es = lang === "es";
 const media = MEDIA.filter((m) => m.verified);
 const rating = show(ORG.googleRating);
 const heroImg = ATTORNEY.hero.value;
+const portrait = ATTORNEY.recent.value;
+const address = ORG.address.value;
+const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address.street}, ${address.locality}, ${address.region} ${address.postalCode}`)}`;
 
 const src = es
   ? {
@@ -35,11 +37,17 @@ const src = es
       statStates: "estados de Estados Unidos",
       // camulaw.com team.members.juan.bio, fragment
       admitted: "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana",
-      sections: [
-        { h: "¿Quiénes somos?", p: "Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos. Nuestros abogados tienen diferentes antecedentes y áreas específicas de especialización, y pueden analizar su caso desde múltiples ángulos." },
-        { h: "¿Por qué elegirnos?", p: "Porque nos aseguraremos de que comprenda lo que está sucediendo con su caso, nos esforzaremos por tratarlo como familia y siempre estaremos disponibles para responder sus preguntas e inquietudes. Haremos todo lo posible para mantenerlo informado sobre el panorama cambiante de la ley de inmigración y cómo afecta su caso." },
-        { h: "¿Qué hacemos?", p: "Representamos a inmigrantes en todas las facetas de su caso. Queremos brindar soluciones a procesos y procedimientos que pueden ser desalentadores para que los inmigrantes naveguen por su cuenta." },
-      ],
+      // camimlaw.com home, fragments of "¿Por qué elegirnos?" / "¿Qué hacemos?"
+      // The label has to be the question the section answers: the display line
+      // and the note are both clauses of camimlaw.com's "¿Por qué elegirnos?"
+      // paragraph, so labelling them "¿Quiénes somos?" put one section's
+      // heading over another section's words.
+      introLabel: "¿Por qué elegirnos?",
+      introTitle: "Nos esforzaremos por tratarlo como familia.",
+      introBody: "Queremos brindar soluciones a procesos y procedimientos que pueden ser desalentadores para que los inmigrantes naveguen por su cuenta.",
+      introNote: "Nos aseguraremos de que comprenda lo que está sucediendo con su caso",
+      // camulaw contact.title, fragment
+      book: "Agende su consulta",
       // camimlaw.com home, "Áreas en las que prestamos servicios"
       where: "Nuestras oficinas están ubicadas en Orlando, sin embargo, atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero.",
       title: "Campos Immigration Law",                        // camimlaw.com <title>
@@ -51,10 +59,13 @@ const src = es
       statReviews: "Five-Star Review",                       // camulaw home.reviewsTitle, fragment
       statStates: "states and abroad",                       // camulaw home.dondeEstamosText, fragment
       admitted: "Juan is admitted to practice law before the Louisiana Supreme Court", // camulaw bio, fragment
-      sections: [
-        { h: "Why Us?", p: "Because we will make sure you understand what is happening with your case, we will strive to treat you like family, and we will always be available to answer your questions and concerns. We will do everything possible to keep you informed about changes in immigration laws and how they may affect your case." }, // camulaw home.porQueNosotros(+Text)
-      ],
-      where: "",
+      introLabel: "Why Us?", // camulaw home.porQueNosotros
+      introTitle: "We will strive to treat you like family.", // camulaw home.porQueNosotrosText, fragment
+      // camulaw team.members.juan.bio, final sentence
+      introBody: "As an immigrant himself, he understands his clients' concerns firsthand, and works to explain the complexities of immigration law in a way that's simple, clear, and easy to understand.",
+      introNote: "We will make sure you understand what is happening with your case", // camulaw home.porQueNosotrosText, fragment
+      book: "Schedule your consultation", // camulaw contact.title, fragment
+      where: "We serve clients in all 50 states and abroad.", // camulaw home.dondeEstamosText, fragment (without the other firm's location)
       title: "Campos Immigration Law",
       description: "We are here to help you. Virtual consultation available.",
     };
@@ -81,7 +92,7 @@ const altFor: Record<string, string> = {
 const alternates = { es: "/", en: "/en/" };
 const schema = graph([orgSchema(), attorneySchema(lang)]);
 ---
-<Base lang={lang} title={src.title} description={src.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema} overHero>
+<Base lang={lang} title={src.title} description={src.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema} overHero landing>
 
   <section class="opener" data-surface="navy-deep" data-hero>
     <picture>
@@ -129,85 +140,127 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     </div>
   </section>
 
-  <!-- camimlaw.com's own three sections, in their order and their words -->
-  <Section surface="paper-2">
-    <div class="who">
-      {src.sections.map((s) => (
-        <div class="editorial who-row">
-          <div><h2 class="eyebrow who-h">{s.h}</h2></div>
-          <p class="lead who-p">{s.p}</p>
-        </div>
-      ))}
-    </div>
-  </Section>
-
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("nav.services")}</p></div>
-      <div></div>
-    </div>
-    <div class="scope-acc">
-      <AccordionGallery items={serviceItems} id="servicios-acordeon" defaultIndex={0} height={460} expandRatio={0.5} tilt={2} />
-    </div>
-    <p class="scope-more">
-      {IS_DEMO
-        ? <span class="link-arrow">{_("nav.allServices")} <span aria-hidden="true">&rarr;</span></span>
-        : <a class="link-arrow" href={langPath(lang, "servicios")}>{_("nav.allServices")} <span aria-hidden="true">&rarr;</span></a>}
-    </p>
-  </Section>
-
-  {media.length > 0 && (
-    <Section surface="paper-2" wide>
-      <div class="editorial gal-head">
-        <div><p class="eyebrow">{_("press.heading")}</p></div>
+  <!-- 01 — the introduction: the firm's own words beside the attorney -->
+  <section class="home-intro" data-surface="paper-2" aria-labelledby="intro-title">
+    <div class="wrap-wide intro-grid">
+      <div class="intro-copy">
+        <p class="chapter"><span class="chapter-number" aria-hidden="true">01</span>{src.introLabel}</p>
+        <h2 class="home-title intro-title" id="intro-title" data-split-lines>{src.introTitle}</h2>
+        <p class="intro-body" data-reveal="text">{src.introBody}</p>
+        <p class="intro-note" data-reveal="text">{src.introNote}</p>
+        {IS_DEMO
+          ? <span class="home-link intro-link">{_("nav.attorney")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></span>
+          : <a class="home-link intro-link" href={langPath(lang, "juan-campos")}>{_("nav.attorney")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></a>}
       </div>
-      <ul class="press" data-stagger aria-label={_("press.aria")}>
-        {media.map((m) => (
-          <li class="press-item" data-reveal="text">
-            <figure class="press-fig">
-              <div class="press-still">
-                <img src={m.still} width={m.width} height={m.height} alt={altFor[m.id] ?? m.outlet} loading="lazy" decoding="async" />
-              </div>
-              <figcaption class="press-cap">
-                <span class="press-outlet">{m.outlet}</span>
-                <span class="press-prog apparatus">{m.station ? `${m.station} · ${m.programme}` : m.programme}</span>
-                <span class="press-chyron">&ldquo;{m.chyron[lang]}&rdquo;</span>
-              </figcaption>
-            </figure>
-          </li>
-        ))}
-      </ul>
-    </Section>
-  )}
-
-  <!-- camulaw.com home.popupTitle, as the page's one statement -->
-  <section class="statement" data-surface="navy-deep">
-    <img class="statement-bg" src="/img/flag-texture.jpg" width="1600" height="926" alt="" aria-hidden="true" loading="lazy" decoding="async" />
-    <div class="wrap-wide statement-inner">
-      <p class="hero-type statement-line" data-split-lines>{_("home.questions")}</p>
-      <p class="statement-cta">
-        <a class="opener-pill" href={IS_DEMO ? `tel:${ORG.phone.value}` : langPath(lang, "consulta")}>{_("cta.book")}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
-        <span class="apparatus statement-meta">{_("contact.confidential")}</span>
-      </p>
+      <figure class="intro-portrait" data-reveal="portrait">
+        <div class="intro-photo">
+          <img src={portrait.src} width={portrait.width} height={portrait.height} alt={`${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}`} loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="intro-cap">
+          <span class="portrait-name">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</span>
+          <span class="portrait-firm">{ORG.name.value}</span>
+        </figcaption>
+      </figure>
     </div>
   </section>
 
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("home.where")}</p></div>
-      <div class="office">
-        {src.where && <p class="lead">{src.where}</p>}
-        <address class="office-addr">
-          <span>{ORG.address.value.street}</span>
-          <span>{ORG.address.value.locality}, {ORG.address.value.region} {ORG.address.value.postalCode}</span>
-          <a class="apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
-        </address>
+  <!-- 02 — the four featured matters -->
+  <section class="home-services" data-surface="paper" aria-labelledby="services-title">
+    <div class="wrap-wide">
+      <div class="section-heading">
+        <div class="section-heading-title">
+          <span class="chapter-number" aria-hidden="true">02</span>
+          <h2 class="home-title" id="services-title" data-split-lines>{_("nav.services")}</h2>
+        </div>
+        {IS_DEMO
+          ? <span class="home-link">{_("nav.allServices")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></span>
+          : <a class="home-link" href={langPath(lang, "servicios")}>{_("nav.allServices")}<span class="home-link-arrow" aria-hidden="true">&rarr;</span></a>}
+      </div>
+      <div class="scope-acc">
+        <AccordionGallery items={serviceItems} id="servicios-acordeon" defaultIndex={0} height={460} expandRatio={0.5} tilt={2} />
       </div>
     </div>
-    <div class="map wrap-wide">
-      <iframe class="map-frame" src={mapEmbedUrl()} title={_("home.where")} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+  </section>
+
+  <!-- 03 — broadcast appearances. The stills carry the description; the only
+       words are the outlet, the station's own chyron and the programme. -->
+  {media.length > 0 && (
+    <section class="home-press" data-surface="paper-2" aria-labelledby="press-title">
+      <div class="wrap-wide">
+        <div class="section-heading">
+          <div class="section-heading-title">
+            <span class="chapter-number" aria-hidden="true">03</span>
+            <h2 class="home-title" id="press-title" data-split-lines>{_("press.heading")}</h2>
+          </div>
+        </div>
+        <ul class="press" data-stagger aria-label={_("press.aria")}>
+          {media.map((m, i) => (
+            <li class:list={["press-item", { "press-item--lead": i === 0 }]} data-reveal="media">
+              <figure class="press-fig">
+                <div class="press-still">
+                  <img src={m.still} width={m.width} height={m.height} alt={altFor[m.id] ?? m.outlet} loading="lazy" decoding="async" />
+                </div>
+                <figcaption class="press-cap">
+                  <span class="press-outlet">{m.outlet}</span>
+                  <h3 class="press-chyron">{m.chyron[lang]}</h3>
+                  <span class="press-prog apparatus">{m.station ? `${m.station} · ${m.programme}` : m.programme}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- 04 — the office. The city carries the section; the map supports it. -->
+  <section class="home-office" data-surface="paper" aria-labelledby="office-title">
+    <div class="wrap-wide office-grid">
+      <div class="office-copy">
+        <p class="chapter"><span class="chapter-number" aria-hidden="true">04</span>{_("home.where")}</p>
+        <h2 class="office-city" id="office-title" data-split-lines>{address.locality}</h2>
+        <p class="office-reach">{src.where}</p>
+        <p class="office-virtual"><span class="office-virtual-mark" aria-hidden="true"></span>{_("contact.virtual")}</p>
+      </div>
+      <div class="office-details">
+        <div class="office-block">
+          <p class="detail-label">{_("contact.address")}</p>
+          <address class="office-addr">
+            <a class="office-directions" href={directionsUrl} target="_blank" rel="noopener noreferrer">{address.street}<span class="address-arrow" aria-hidden="true">&#8599;</span></a>
+            <span>{address.locality}, {address.region} {address.postalCode}</span>
+          </address>
+        </div>
+        <div class="office-info">
+          <div class="office-block">
+            <p class="detail-label">{_("contact.hours")}</p>
+            <p>{_("contact.monFri")}</p>
+            <p class="apparatus">{ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</p>
+          </div>
+          <div class="office-block">
+            <p class="detail-label">{_("contact.contact")}</p>
+            <a class="apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+            <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
+          </div>
+        </div>
+      </div>
+      <iframe class="office-map" src={mapEmbedUrl()} title={_("home.where")} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     </div>
-  </Section>
+  </section>
+
+  <!-- 05 — the closing invitation, flush against the footer's own navy -->
+  <section class="statement" data-surface="navy-deep" aria-labelledby="consult-title">
+    <div class="wrap-wide statement-inner">
+      <div class="statement-copy">
+        <p class="chapter statement-label">{_("nav.consultation")}</p>
+        <h2 class="home-title statement-line" id="consult-title" data-split-lines>{_("home.questions")}</h2>
+      </div>
+      <div class="statement-action">
+        <p class="statement-support">{_("contact.subtitle")}</p>
+        <a class="opener-pill" href={IS_DEMO ? `tel:${ORG.phone.value}` : langPath(lang, "consulta")}>{src.book}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
+        <p class="statement-meta apparatus">{_("contact.confidential")}</p>
+      </div>
+    </div>
+  </section>
 </Base>
 
 <style>
@@ -436,67 +489,251 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     .opener-rule { display: none; }
   }
 
-  /* --- services accordion + press strip --- */
+  /* ==========================================================================
+     THE LOWER PAGE
+
+     The opening frame is one composition; everything under it used to be the
+     same section repeated — identical padding, an eyebrow in the margin, a
+     paragraph. Five sections now carry five jobs, and three things separate
+     them: a numbered chapter label, a spacing rhythm that varies by purpose
+     rather than repeating, and a middle rank of type between the small mono
+     labels and the display sizes, which is what the page was missing.
+     ========================================================================== */
+
+  /* --- the shared apparatus of a chapter ---------------------------------- */
+
+  /* The missing rank: bigger than a heading in running text, smaller than the
+     opening frame's display. Stated with its own line-height and tracking,
+     because a custom class that sets only font-size inherits the body's 1.65. */
+  .home-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(30px, 21px + 1.95vw, 50px);
+    font-weight: 400; line-height: 1.08; letter-spacing: -0.022em;
+    color: var(--surface-ink);
+    text-wrap: balance;
+  }
+
+  .chapter {
+    display: flex; align-items: baseline; gap: var(--spacing-s3);
+    margin: 0 0 var(--spacing-s5);
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--surface-ink-2);
+  }
+  .chapter-number {
+    font-variant-numeric: tabular-nums;
+    color: var(--surface-accent-ink);
+  }
+  [data-surface="navy-deep"] .chapter-number { color: var(--surface-accent); }
+
+  .section-heading {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    justify-content: space-between; gap: var(--spacing-s4) var(--spacing-s6);
+    padding-bottom: var(--spacing-s5);
+    border-bottom: 1px solid var(--surface-line);
+  }
+  .section-heading-title { display: flex; align-items: baseline; gap: var(--spacing-s4); min-width: 0; }
+  .section-heading-title .chapter-number {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.14em; color: var(--surface-accent-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Same accent wipe as every other link on the site: the background grows
+     from the left and retracts to the left, so the two directions are not
+     symmetrical. */
+  .home-link {
+    display: inline-flex; align-items: baseline; gap: var(--spacing-s2);
+    color: var(--surface-accent-ink); text-decoration: none;
+    font-weight: var(--font-weight-medium); font-size: var(--text-base);
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat; background-position: 0 100%; background-size: 0 1px;
+    padding-bottom: 0.12em;
+    transition: background-size var(--d-state) var(--ease-reveal);
+    white-space: nowrap;
+  }
+  .home-link-arrow { transition: transform var(--d-quick) var(--ease-state); }
+  @media (any-hover: hover) {
+    .home-link:hover { background-size: 100% 1px; }
+    .home-link:hover .home-link-arrow { transform: translateX(4px); }
+  }
+
+  /* --- the spacing rhythm --------------------------------------------------
+     Not one padding token repeated. The introduction and the services get
+     room, the practical sections tighten, and the closing invitation is
+     concentrated rather than the tallest block on the page. */
+  .home-intro    { padding-block: clamp(80px, 8.4vw, 148px); }
+  .home-services { padding-block: clamp(72px, 7.2vw, 128px); }
+  .home-press    { padding-block: clamp(64px, 6vw, 104px); }
+  .home-office   { padding-block: clamp(56px, 5vw, 88px); }
+  .statement     { padding-block: clamp(72px, 6.6vw, 112px) clamp(56px, 5vw, 88px); }
+
+  /* --- 01 the introduction ------------------------------------------------- */
+  .intro-grid { display: grid; gap: var(--spacing-s7); }
+  .intro-copy { display: grid; gap: var(--spacing-s5); align-content: start; }
+  .intro-title { max-width: 16ch; font-size: clamp(34px, 21px + 3.1vw, 62px); line-height: 1.04; }
+  .intro-body { margin: 0; font-size: var(--text-lead); line-height: 1.58; max-width: var(--container-m-lead); }
+  /* The second point, held one rank down so the two do not compete. */
+  .intro-note {
+    margin: 0; max-width: var(--container-m-lead);
+    padding-left: var(--spacing-s5);
+    border-left: 2px solid var(--surface-accent);
+    color: var(--surface-ink-2);
+  }
+  .intro-link { justify-self: start; margin-top: var(--spacing-s2); }
+
+  .intro-portrait { margin: 0; display: grid; gap: var(--spacing-s4); }
+  /* No crop. The photograph is a 1100x1527 portrait and the column is sized
+     to it, rather than a frame being imposed and his feet or his hair being
+     cut to fit it. */
+  .intro-photo { overflow: hidden; border-radius: var(--radius-md); background: var(--color-navy-deep); }
+  .intro-photo img { display: block; width: 100%; height: auto; }
+  .intro-cap {
+    display: grid; gap: 2px;
+    padding-top: var(--spacing-s3);
+    border-top: 1px solid var(--surface-line);
+  }
+  .portrait-name { font-family: var(--font-serif); font-size: var(--text-h4); color: var(--surface-ink); }
+  .portrait-firm {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--surface-ink-2);
+  }
+
+  @media (min-width: 900px) {
+    .intro-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);
+      gap: clamp(48px, 5.4vw, 104px);
+      align-items: start;
+    }
+    /* The deliberate asymmetry: the photograph starts at the top of the
+       section and the text starts below it, so the two columns do not read as
+       a pair of boxes set side by side. */
+    .intro-copy { padding-top: clamp(20px, 3.4vw, 64px); }
+    .intro-portrait { justify-self: end; width: 100%; max-width: 440px; }
+  }
+
+  /* --- 02 the services ----------------------------------------------------- */
   .scope-acc { margin-top: var(--spacing-s7); }
+
+  /* --- 03 broadcast appearances -------------------------------------------- */
   .press {
     list-style: none; margin: var(--spacing-s7) 0 0; padding: 0;
     display: grid; gap: var(--spacing-s6);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   }
-  .press-fig { margin: 0; display: grid; gap: var(--spacing-s3); }
+  .press-fig { margin: 0; display: grid; gap: var(--spacing-s4); }
+  /* One crop rule for every still, whatever its size on the page: the three
+     frames come from three stations and only consistent proportions hold them
+     together. */
   .press-still {
-    aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-sm);
-    background: var(--color-navy-deep);
+    aspect-ratio: 16 / 9; overflow: hidden;
+    border-radius: var(--radius-sm); background: var(--color-navy-deep);
   }
   .press-still img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
-  .press-cap { display: grid; gap: 4px; }
-  .press-outlet { font-family: var(--font-serif); font-size: var(--text-h4); line-height: 1.1; color: var(--surface-ink); }
+  .press-cap { display: grid; gap: var(--spacing-s2); }
+  .press-outlet {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--surface-accent-ink);
+  }
+  /* The station's own on-screen line, given the rank of a headline. */
+  .press-chyron {
+    margin: 0; font-family: var(--font-serif); font-weight: 400;
+    font-size: var(--text-h4); line-height: 1.22; letter-spacing: -0.01em;
+    color: var(--surface-ink); max-width: 34ch;
+  }
   .press-prog { color: var(--surface-ink-2); }
-  .press-chyron { color: var(--surface-ink-2); font-size: var(--text-sm); line-height: 1.45; max-width: 36ch; }
 
-  /* --- map --- */
-  .map { margin-top: var(--spacing-s7); }
-  .map-frame {
-    display: block; width: 100%; aspect-ratio: 16 / 7; min-height: 320px;
-    border: 1px solid var(--color-line); border-radius: var(--radius-sm);
-    background: var(--color-paper-2);
-    filter: saturate(0.85);
+  @media (min-width: 900px) {
+    .press {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: clamp(32px, 3.2vw, 56px);
+      align-items: start;
+    }
+    /* One appearance carries the section and the others support it. */
+    .press-item--lead { grid-row: 1 / span 2; }
+    .press-item--lead .press-chyron { font-size: var(--text-h3); line-height: 1.18; }
+    .press-item--lead .press-fig { gap: var(--spacing-s5); }
   }
-  @media (max-width: 767px) { .map-frame { aspect-ratio: 4 / 3; } }
 
-
-  /* --- statement band --- */
-  .statement { position: relative; padding-block: var(--spacing-s11); overflow: hidden; isolation: isolate; }
-  .statement-bg {
-    position: absolute; inset: 0; z-index: -2;
-    width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%;
+  /* --- 04 the office ------------------------------------------------------- */
+  .office-grid { display: grid; gap: var(--spacing-s7); }
+  .office-copy { display: grid; gap: var(--spacing-s5); align-content: start; }
+  .office-city {
+    margin: 0; font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(38px, 22px + 3.6vw, 72px);
+    line-height: 1; letter-spacing: -0.03em; color: var(--surface-ink);
   }
-  .statement::after {
-    content: ""; position: absolute; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgb(11 31 51 / 0.955), rgb(11 31 51 / 0.975));
+  .office-reach { margin: 0; font-size: var(--text-lead); line-height: 1.58; max-width: var(--container-m-lead); }
+  .office-virtual {
+    display: flex; align-items: center; gap: var(--spacing-s3);
+    margin: 0; color: var(--surface-ink-2); font-size: var(--text-base);
   }
-  .statement-inner { position: relative; }
-  .statement-line { margin: 0; max-width: 18ch; color: var(--color-paper); }
-  .statement-meta { margin-top: var(--spacing-s6); color: #a8b6c6; }
+  .office-virtual-mark {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--surface-accent); flex: 0 0 auto;
+  }
 
-  /* --- camimlaw's three sections --- */
-  .who { display: grid; gap: var(--spacing-s7); }
-  .who-h { margin: 0; }
-  .who-p { margin: 0; max-width: var(--container-m-lead); }
-  .statement-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-s4); margin-top: var(--spacing-s6); }
-  .statement-meta { color: #b6c3d1; }
+  .office-details { display: grid; gap: var(--spacing-s6); align-content: start; }
+  .office-block { display: grid; gap: var(--spacing-s1); align-content: start; min-width: 0; }
+  .office-block p { margin: 0; }
+  .detail-label {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--surface-ink-2); margin: 0 0 var(--spacing-s2);
+  }
+  .office-addr { font-style: normal; display: grid; gap: 2px; font-size: var(--text-lead); }
+  /* Padding, not inline-flex: an inline-flex link sizes to max-content and a
+     two-line address then widens the whole document. */
+  .office-details a { color: var(--surface-ink); text-decoration: none; display: inline-block; padding-block: 3px; }
+  @media (any-hover: hover) { .office-details a:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+  .address-arrow { margin-left: 0.35em; color: var(--surface-accent-ink); }
+  .office-info { display: grid; gap: var(--spacing-s6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
+  /* The map is the support, not the anchor: it sits in the details column at
+     the size of the details, rather than as a full-width band. */
+  .office-map {
+    display: block; width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--surface-line);
+    border-radius: var(--radius-sm); background: var(--color-paper-2); filter: saturate(0.85);
+  }
 
-  /* --- sections --- */
+  @media (min-width: 900px) {
+    /* The city and the practical detail read as one editorial column, and the
+       map is the panel beside it. The map takes its height from that column
+       rather than from an aspect ratio, so neither side ends in a hole —
+       which is what a fixed ratio produced on whichever side was shorter. */
+    .office-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.85fr);
+      column-gap: clamp(48px, 5vw, 96px);
+      row-gap: var(--spacing-s7);
+      align-items: start;
+    }
+    .office-copy { grid-column: 1; grid-row: 1; }
+    .office-details { grid-column: 1; grid-row: 2; }
+    .office-map {
+      grid-column: 2; grid-row: 1 / span 2;
+      aspect-ratio: auto; height: 100%; min-height: 420px; align-self: stretch;
+    }
+  }
 
+  /* --- 05 the closing invitation -------------------------------------------
+     Shorter than it was, and no longer taller than the opening frame. The
+     texture behind it is gone: a solid navy carries the type better than a
+     photograph at 3% opacity ever did, and it removes an image from the page
+     that no reader could see. */
+  .statement { position: relative; }
+  .statement-inner { display: grid; gap: var(--spacing-s7); }
+  .statement-copy { min-width: 0; }
+  .statement-label { color: var(--surface-ink-2); }
+  .statement-line { max-width: 15ch; color: var(--color-paper); font-size: clamp(32px, 21px + 2.5vw, 56px); }
+  .statement-action { display: grid; justify-items: start; gap: var(--spacing-s5); }
+  .statement-support { margin: 0; font-size: var(--text-lead); color: var(--surface-ink); max-width: 30ch; }
+  .statement-meta { margin: 0; color: var(--surface-ink-2); }
 
-  /* The overlay is what keeps this a texture rather than a picture, and it is
-     what makes the type contrast measurable rather than hopeful. */
-
-
-  .gal-head { margin-bottom: var(--spacing-s7); }
-
-
-  .office { display: grid; gap: var(--spacing-s5); }
-  .office-addr { display: grid; gap: var(--spacing-s1); font-style: normal; font-size: var(--text-lead); }
-  .office-addr a { color: var(--surface-ink); text-decoration: none; }
+  @media (min-width: 900px) {
+    .statement-inner {
+      grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+      gap: clamp(48px, 5vw, 96px);
+      align-items: end;
+    }
+  }
 </style>

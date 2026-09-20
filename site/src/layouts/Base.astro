@@ -19,9 +19,15 @@ interface Props {
   noindex?: boolean;
   /** The page opens on a dark full-bleed frame, so the header sits over it. */
   overHero?: boolean;
+  /**
+   * The page ends on the navy closing band, so the footer's own navy runs
+   * straight on from it instead of opening with a strip of paper between two
+   * dark blocks.
+   */
+  landing?: boolean;
 }
 
-const { lang, title, description, path, alternates, schema, ogImage = "/img/og-default.jpg", noindex: noindexProp = false, overHero = false } = Astro.props;
+const { lang, title, description, path, alternates, schema, ogImage = "/img/og-default.jpg", noindex: noindexProp = false, overHero = false, landing = false } = Astro.props;
 const noindex = noindexProp || IS_DEMO;
 const _ = t(lang);
 const canonical = abs(path);
@@ -90,7 +96,7 @@ const alts = hreflang(alternates);
       <slot />
     </main>
     <LangWidget lang={lang} href={lang === "es" ? alternates.en : alternates.es} />
-    <SiteFooter lang={lang} />
+    <SiteFooter lang={lang} flush={landing} />
     <MobileBar lang={lang} otherHref={lang === "es" ? alternates.en : alternates.es} />
     <script src="../scripts/app.ts"></script>
     <script src="../scripts/motion.ts"></script>

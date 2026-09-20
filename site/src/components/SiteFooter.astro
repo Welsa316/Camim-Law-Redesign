@@ -1,45 +1,77 @@
 ---
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, ATTORNEY } from "../lib/org";
+import { IS_DEMO } from "../lib/site.js";
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props {
+  lang: Lang;
+  /**
+   * The page above ends on the navy closing band, so the footer runs straight
+   * on from it rather than opening with a band of paper between two dark
+   * blocks. Layout only: every page carries the same footer content.
+   */
+  flush?: boolean;
+}
+const { lang, flush = false } = Astro.props;
 const _ = t(lang);
 const a = ORG.address.value;
+
+/* Same lockup as the header, one rank larger: the firm signs the page. */
+const links = [
+  { href: langPath(lang, "servicios"), label: _("nav.services") },
+  { href: langPath(lang, "juan-campos"), label: _("nav.attorney") },
+  { href: langPath(lang, "consulta"), label: _("nav.consultation") },
+  { href: langPath(lang, "pagos"), label: _("nav.payment") },
+];
+const social = [
+  { href: ORG.social.value.instagram, label: "Instagram" },
+  { href: ORG.social.value.facebook, label: "Facebook" },
+  { href: ORG.social.value.youtube, label: "YouTube" },
+  { href: ORG.social.value.tiktok, label: "TikTok" },
+];
 ---
-<footer class="ftr" data-surface="navy-deep">
+<footer class="ftr" data-surface="navy-deep" data-flush={flush ? "" : undefined}>
   <div class="ftr-inner wrap-wide">
-    {/* camimlaw.com's own footer: Ubicación, Horario, Contactanos, and the values. */}
+    <div class="ftr-top">
+      {IS_DEMO
+        ? <span class="ftr-mark"><span class="ftr-mark-name">Campos</span><span class="ftr-mark-rest">Immigration Law</span></span>
+        : <a class="ftr-mark" href={langPath(lang)}><span class="ftr-mark-name">Campos</span><span class="ftr-mark-rest">Immigration Law</span></a>}
+      <ul class="ftr-links">
+        {links.map((l) => (
+          <li>{IS_DEMO ? <span class="ftr-link">{l.label}</span> : <a class="ftr-link" href={l.href}>{l.label}</a>}</li>
+        ))}
+      </ul>
+    </div>
+
+    {/* camimlaw.com's own footer headings: Ubicación, Horario, Contactanos. */}
     <div class="ftr-grid">
       <div class="ftr-col">
-        <p class="ftr-h apparatus">{_("contact.address")}</p>
+        <p class="ftr-h">{_("contact.address")}</p>
         <address class="ftr-addr">
           <span>{a.street}</span>
           <span>{a.locality}, {a.region} {a.postalCode}</span>
         </address>
       </div>
       <div class="ftr-col">
-        <p class="ftr-h apparatus">{_("contact.hours")}</p>
+        <p class="ftr-h">{_("contact.hours")}</p>
         <p>{_("contact.monFri")}</p>
         <p class="apparatus">{ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</p>
       </div>
       <div class="ftr-col">
-        <p class="ftr-h apparatus">{_("contact.contact")}</p>
-        <a class="ftr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
+        <p class="ftr-h">{_("contact.contact")}</p>
+        <a class="apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
         <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
       </div>
       <div class="ftr-col">
-        <p class="ftr-h apparatus">{_("contact.connect")}</p>
+        <p class="ftr-h">{_("contact.connect")}</p>
         <ul class="ftr-social">
-          <li><a href={ORG.social.value.instagram} rel="noopener">Instagram</a></li>
-          <li><a href={ORG.social.value.facebook} rel="noopener">Facebook</a></li>
-          <li><a href={ORG.social.value.youtube} rel="noopener">YouTube</a></li>
-          <li><a href={ORG.social.value.tiktok} rel="noopener">TikTok</a></li>
+          {social.map((sx) => <li><a href={sx.href} rel="noopener">{sx.label}</a></li>)}
         </ul>
       </div>
     </div>
+
     <div class="ftr-legal">
-      <p class="ftr-firm">{ORG.name.value} &middot; {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</p>
+      <p class="ftr-firm">{ORG.legalName.value} &middot; {ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</p>
       {/* camulaw.com, team.members.juan.bio: the admission sentence. Rule 4-7.21(d). */}
       <p class="ftr-note">
         {lang === "es"
@@ -51,52 +83,86 @@ const a = ORG.address.value;
 </footer>
 
 <style>
-  .ftr-grid { display: grid; gap: var(--spacing-s6); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-  .ftr-col { display: grid; gap: var(--spacing-s2); align-content: start; }
-  .ftr-col p { margin: 0; }
-  .ftr-h { color: var(--surface-ink-2); }
-  .ftr-addr { display: grid; gap: 2px; font-style: normal; }
-  .ftr-col a { color: var(--surface-ink); text-decoration: none; }
-  .ftr-social { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--spacing-s3) var(--spacing-s4); }
-  .ftr-legal { margin-top: var(--spacing-s8); padding-top: var(--spacing-s5); border-top: 1px solid rgb(252 252 250 / 0.14); display: grid; gap: var(--spacing-s2); }
-  .ftr-firm { margin: 0; font-family: var(--font-serif); font-size: var(--text-h4); }
-  .ftr-note { margin: 0; color: var(--surface-ink-2); max-width: 70ch; font-size: var(--text-sm); }
+  /* The footer used to open with a band of paper above it — `margin-top` on a
+     navy block — which on the home page put a stripe of a third colour
+     between the closing navy band and the navy footer. The separation is the
+     footer's own padding now, so the two dark blocks meet. */
+  .ftr { padding-block: var(--spacing-s10) var(--spacing-s8); }
+  .ftr[data-flush] { padding-top: var(--spacing-s8); }
+  .ftr-inner { display: grid; gap: var(--spacing-s7); }
 
-  .ftr { margin-top: var(--section-y); padding-block: var(--spacing-s10) var(--spacing-s8); }
-  .ftr-inner { display: grid; gap: var(--spacing-s8); }
-  .ftr-cols { display: grid; gap: var(--spacing-s8); }
-  @media (min-width: 768px) { .ftr-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  /* --- the signature ------------------------------------------------------ */
+  .ftr-top {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    justify-content: space-between; gap: var(--spacing-s5) var(--spacing-s8);
+    padding-bottom: var(--spacing-s6);
+    border-bottom: 1px solid var(--surface-line);
+  }
+  /* The header's lockup, one rank up. Grid rather than flex so the descriptor
+     sits under the name rather than beside it at any width. */
+  .ftr-mark {
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    row-gap: 6px; min-width: 0;
+    text-decoration: none; color: var(--surface-ink);
+  }
+  .ftr-mark-name {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(30px, 22px + 1.4vw, 44px); line-height: 1; letter-spacing: -0.025em;
+  }
+  .ftr-mark-rest {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--surface-ink-2);
+  }
+  .ftr-links {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: var(--spacing-s2) var(--spacing-s6);
+  }
+  .ftr-link { font-size: var(--text-base); }
+
+  /* --- the practical columns ---------------------------------------------- */
+  /* `max-content` rather than `1fr`: two columns on the landing page and four
+     elsewhere, each hugging its own content instead of stretching a phone
+     number across a third of the viewport. */
+  .ftr-grid {
+    display: grid; gap: var(--spacing-s6) clamp(40px, 6vw, 104px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), max-content));
+  }
   .ftr-col {
     display: grid; grid-template-columns: minmax(0, 1fr);
-    gap: var(--spacing-s4); align-content: start; min-width: 0;
+    gap: var(--spacing-s1); align-content: start; min-width: 0;
   }
   .ftr-col > * { min-width: 0; }
-  .ftr-list, .ftr-social { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--spacing-s2); min-width: 0; }
-  /* Flex-wrap, not a column grid: four links in fixed columns cannot fit a
-     192px track and pushed the document wider than the viewport. */
+  .ftr-col p { margin: 0; }
+  /* `.ftr-col p` is one class plus one element and outranks a bare class, so
+     the label's own margin is written at the same weight rather than with an
+     `!important` that the next edit would have to fight. */
+  .ftr-col .ftr-h {
+    font-family: var(--font-mono); font-size: var(--text-eyebrow);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--surface-ink-2); margin-bottom: var(--spacing-s2);
+  }
+  .ftr-addr { display: grid; gap: 2px; font-style: normal; }
+  /* An implicit `auto` track sizes to max-content and a grid item's default
+     `min-width: auto` resolves to min-content, so an unpinned address grows to
+     fit its longest line and widens the whole document. Both are pinned above. */
   .ftr-social {
-    display: flex; flex-wrap: wrap;
-    gap: var(--spacing-s2) var(--spacing-s5);
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 0 var(--spacing-s5);
   }
   /* Not inline-flex: an inline-flex link sizes to max-content and will not
-     wrap, which pushed the address past its grid track and widened the whole
-     document at 768 and 1024. Padding gives the touch height instead. */
-  .ftr a { color: var(--surface-ink); text-decoration: none; display: inline-block; padding-block: 4px; }
-  .ftr-list a, .ftr-social a { padding-block: 6px; }
-  @media (any-hover: hover) { .ftr a:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
-  /* An implicit `auto` grid track sizes to max-content, and a grid item's
-     default `min-width: auto` resolves to min-content, so the address grew to
-     fit its longest line and widened the whole document. Both are pinned. */
-  .ftr-address {
-    display: grid; grid-template-columns: minmax(0, 1fr);
-    gap: var(--spacing-s2); font-style: normal; min-width: 0;
+     wrap. Padding gives the touch height instead. `:not(.ftr-mark)` because
+     this rule is one class plus one element and outranks the mark's own
+     `display: grid`, which flattened the lockup onto a single line. */
+  .ftr a:not(.ftr-mark) { color: var(--surface-ink); text-decoration: none; display: inline-block; padding-block: 5px; }
+  @media (any-hover: hover) { .ftr a:not(.ftr-mark):hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+  @media (any-hover: hover) { .ftr-mark:hover .ftr-mark-name { text-decoration: underline; text-underline-offset: 0.12em; } }
+
+  /* --- the credentials ---------------------------------------------------- */
+  .ftr-legal {
+    display: grid; gap: var(--spacing-s2);
+    padding-top: var(--spacing-s5);
+    border-top: 1px solid var(--surface-line);
   }
-  .ftr-address > * { min-width: 0; }
-  .ftr-hours { color: var(--surface-ink-2); }
-  .ftr-rule { border-color: var(--surface-line); }
-  .ftr-legal { display: grid; gap: var(--spacing-s4); max-width: 72ch; }
-  .ftr-firm { font-family: var(--font-serif); font-size: var(--text-h4); color: var(--surface-ink); }
-  .ftr-note { font-size: var(--text-sm); color: var(--surface-ink-2); }
-  .ftr-note--strong { color: var(--surface-ink); }
-  .ftr-meta { display: flex; flex-wrap: wrap; gap: var(--spacing-s4); font-size: var(--text-eyebrow); }
+  .ftr-firm { margin: 0; font-family: var(--font-serif); font-size: var(--text-h4); color: var(--surface-ink); }
+  .ftr-note { margin: 0; color: var(--surface-ink-2); max-width: 72ch; font-size: var(--text-sm); }
 </style>

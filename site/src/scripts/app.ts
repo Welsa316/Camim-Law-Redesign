@@ -151,6 +151,22 @@ if (!reduced.matches && "IntersectionObserver" in window) {
   document.documentElement.classList.remove("js-reveal");
 }
 
+/* ------------------------------------------------------ language switch */
+/* A fixed pill sits on top of whatever scrolls under it. Over body copy that
+   is what a floating control does; over the footer's own brand link and its
+   navigation it is a control covering a control, which verify/widget-overlap.py
+   now catches at every scroll position. The switch therefore retracts once the
+   footer arrives — the page has ended, and the header's own pill is still the
+   way back up. */
+const langWidget = document.querySelector<HTMLElement>("[data-lang-widget]");
+const pageFooter = document.querySelector("footer");
+if (langWidget && pageFooter && "IntersectionObserver" in window) {
+  new IntersectionObserver(
+    ([entry]) => { langWidget.toggleAttribute("data-tucked", entry.isIntersecting); },
+    { threshold: 0 },
+  ).observe(pageFooter);
+}
+
 /* -------------------------------------------------------------------- form */
 const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
 if (form) {

@@ -228,6 +228,21 @@ export const ATTORNEY = {
    * outside the crop. Used on the about page on the client's instruction of
    * 2026-09-10.
    */
+  /**
+   * The current headshot, from the sister firm's team page
+   * (camulaw.com/JuanHeadshot.jpg, fetched 2026-09-20 and byte-checked against
+   * the copy here: the same photograph, re-encoded).
+   *
+   * 534x800 is the only size that exists — there is no larger original on the
+   * sister site, and several guessed paths for one return 404. It is therefore
+   * shown at a column narrow enough that it is not upscaled into softness. If
+   * the firm has the photographer's file, it should replace this.
+   * [CLIENT: the full-resolution original, if it exists.]
+   */
+  headshot: v(
+    { src: "/img/juan-campos-headshot.jpg", width: 534, height: 800 },
+    "camulaw.com/JuanHeadshot.jpg (team page, alt 'Juan Campos-Gutierrez, Esq.'); sister-site asset approved by the client",
+  ),
   recent: v(
     { src: "/img/juan-campos-cafe.jpg", width: 1100, height: 1527 },
     "camulaw.com home slideshow (Slideshow2-desktop.jpg), cropped; sister-site asset approved by the client",

@@ -21,7 +21,10 @@ const es = lang === "es";
 const media = MEDIA.filter((m) => m.verified);
 const rating = show(ORG.googleRating);
 const heroImg = ATTORNEY.hero.value;
-const portrait = ATTORNEY.recent.value;
+/* The sister firm's current headshot. The cafe photograph belongs to the
+   attorney page — running it here too put the same seated frame twice on a
+   two-page site, and the opening frame is already a chair. */
+const portrait = ATTORNEY.headshot.value;
 const address = ORG.address.value;
 const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address.street}, ${address.locality}, ${address.region} ${address.postalCode}`)}`;
 
@@ -596,7 +599,13 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
   /* No crop. The photograph is a 1100x1527 portrait and the column is sized
      to it, rather than a frame being imposed and his feet or his hair being
      cut to fit it. */
-  .intro-photo { overflow: hidden; border-radius: var(--radius-md); background: var(--color-navy-deep); }
+  /* A hairline and a paper ground: the headshot was shot against a cool grey
+     wall and this section is warm ivory, so without a frame the photograph's
+     own background reads as a mismatched rectangle rather than as a backdrop. */
+  .intro-photo {
+    overflow: hidden; border-radius: var(--radius-md);
+    background: var(--color-paper); border: 1px solid var(--surface-line);
+  }
   .intro-photo img { display: block; width: 100%; height: auto; }
   .intro-cap {
     display: grid; gap: 2px;
@@ -619,7 +628,10 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
        section and the text starts below it, so the two columns do not read as
        a pair of boxes set side by side. */
     .intro-copy { padding-top: clamp(20px, 3.4vw, 64px); }
-    .intro-portrait { justify-self: end; width: 100%; max-width: 440px; }
+    /* 380, not 440: the headshot is 534px wide and there is no larger original
+       on the sister site, so the column is sized to the asset rather than the
+       asset stretched to the column. */
+    .intro-portrait { justify-self: end; width: 100%; max-width: 380px; }
   }
 
   /* --- 02 the services ----------------------------------------------------- */

@@ -13,22 +13,29 @@ def ratio(a,b):
 # Measure the rects the GLYPHS occupy, via Range, not the block box. A short
 # line inside a full-width <p> otherwise samples background it never covers.
 RECTS = """() => {
-  const sel=['.stat-fig','.stat-label','.opener-display','.opener-lead','.opener-meta'];
+  // The overlay header is drawn ON the photograph, so its contrast is a
+  // pixel question like the rest of the frame. A computed-style scan reads
+  // its ground as the page's paper and reports 1.00 on every link.
+  const sel=['.stat-fig','.stat-label','.opener-display','.opener-lead','.opener-meta',
+             '.hdr-mark-name','.hdr-mark-rest','.hdr-link','.hdr-phone','.hdr-pay','.hdr-lang','.hdr-cta','.hdr-toggle'];
   const out=[];
   for(const s of sel){
-    const e=document.querySelector(s); if(!e) continue;
+    for(const e of document.querySelectorAll(s)){
     const cs=getComputedStyle(e);
     if(cs.display==='none'||cs.visibility==='hidden') continue;
     const rects=[]; const walk=document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let n;
     while((n=walk.nextNode())){
       if(!n.textContent.trim()) continue;
+      if(n.parentElement.closest('.sr-only')) continue;
       const r=document.createRange(); r.selectNodeContents(n);
       for(const b of r.getClientRects()) if(b.width>1&&b.height>1)
         rects.push({x:b.left,y:b.top,w:b.width,h:b.height});
     }
     if(!rects.length) continue;
-    out.push({sel:s, color:cs.color, size:parseFloat(cs.fontSize),
+    out.push({sel:s + (e.textContent.trim() ? ' ' + e.textContent.trim().slice(0,10) : ''),
+              color:cs.color, size:parseFloat(cs.fontSize),
               weight:parseInt(cs.fontWeight,10), rects});
+    }
   }
   return out;
 }"""
@@ -44,6 +51,12 @@ BLANK = """
   }
   .opener-pill { background: transparent !important; box-shadow: none !important; }
   .opener-rule { opacity: 0 !important; }
+  /* Glyphs only. The header's own call to action is an opaque pill and its
+     background is the ground its text really has, so backgrounds stay. */
+  .hdr, .hdr * {
+    color: transparent !important; text-shadow: none !important;
+    -webkit-text-fill-color: transparent !important;
+  }
 """
 
 async def main():
@@ -79,7 +92,7 @@ async def main():
                 need = 3.0 if large else 4.5
                 ok = cr>=need
                 if not ok: fails+=1
-                print(f"  {'OK ' if ok else 'FAIL'} {bl['sel']:<28} {bl['size']:>5.1f}px  worst-bg={worst}  ratio={cr:.2f} need={need}")
+                print(f"  {'OK ' if ok else 'FAIL'} {bl['sel']:<34} {bl['size']:>5.1f}px  worst-bg={worst}  ratio={cr:.2f} need={need}")
             await c.close()
         await b.close()
     print(f"\nHERO CONTRAST FAILURES: {fails}")

@@ -57,9 +57,22 @@ async def main() -> int:
                 await pg.evaluate("""async () => { const els=[...document.querySelectorAll('[data-split-lines]')];
                   for (const e of els) { e.scrollIntoView({block:'center'}); await new Promise(r=>setTimeout(r,250)); }
                   window.scrollTo(0,0); }""")
-                # past the 3s safety sweep in motion.ts, so a line still moving is a
-                # real defect and not a trigger that has not fired yet
-                await pg.wait_for_timeout(3400)
+                # Wait for the condition, not for a stopwatch. A fixed budget made
+                # this check flaky: on a loaded machine the dynamic GSAP import and
+                # the font wait push `onSplit` past it, and lines that were merely
+                # still arriving were reported as clipped. It reported 11 and then
+                # 0 on the same build. Poll until every line has settled, and only
+                # then measure; anything still moving after 15s is a real defect
+                # and the per-row check below names it.
+                try:
+                    await pg.wait_for_function(
+                        """() => { const ls = [...document.querySelectorAll('.line-mask .line')];
+                              return ls.every(l => { const t = getComputedStyle(l).transform;
+                                return t === 'none' || t === 'matrix(1, 0, 0, 1, 0, 0)'; }); }""",
+                        timeout=15000)
+                except Exception:
+                    pass
+                await pg.wait_for_timeout(300)
                 rows = await pg.evaluate(JS)
                 bad = []
                 for x in rows:

@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Section from "./Section.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
+import { demoAllows } from "../lib/site.js";
 import { ORG, ATTORNEY, show } from "../lib/org";
 import { graph, orgSchema, attorneySchema, breadcrumbSchema } from "../lib/seo";
 
@@ -45,6 +46,13 @@ const bio = (es
       "Over the course of his career, Juan has successfully represented hundreds of clients at the administrative level, appearing before the Immigration Courts, U.S. Citizenship and Immigration Services, and the U.S. Department of State — representing clients across jurisdictions nationwide.",
       "Juan is intimately familiar with the immigration process, and he brings genuine passion to every case he takes on. His practice spans most areas of immigration law, but at its core, it's about people: building real relationships with his clients and standing beside immigrants, minorities, and those facing disadvantage. Protecting immigrants' rights has become more than a profession for Juan — it's become his mission. As an immigrant himself, he understands his clients' concerns firsthand, and works to explain the complexities of immigration law in a way that's simple, clear, and easy to understand.",
     ]);
+/* camimlaw.com has a first-person line for the header; Campos Munos Law's
+   English does not, so the English header promotes the biography's own opening
+   paragraph and the biography below starts at the second. Placement, not new
+   words, and the paragraph is not left in both places. */
+const lead = camim?.h ?? bio[0];
+const bioBody = camim ? bio : bio.slice(1);
+
 const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.attorney"), url: path }];
 const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs)]);
 const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value} — ${ORG.name.value}`;
@@ -54,12 +62,21 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
     <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
   </nav>
 
-  <section class="ahead wrap" data-surface="paper">
-   <div class="ahead-inner">
+  <section class="ahead" data-surface="paper">
+   <div class="wrap-wide ahead-inner">
     <div class="ahead-text">
       <p class="eyebrow">{_("nav.attorney")}</p>
-      <h1 class="h1" data-split-lines="hero">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</h1>
-      {camim && <p class="lead">{camim.h}</p>}
+      <h1 class="ahead-name" data-split-lines="hero">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</h1>
+      <p class="ahead-lead">{lead}</p>
+      {/* The record: admissions, degrees, memberships. It used to be a section
+          of its own further down with an empty left margin beside it, which
+          gave the page a thin band and left this column with nothing under his
+          name to balance the photograph. On a biography page it belongs here. */}
+      <ul class="ahead-creds">
+        {admissions.map((a) => <li>{a}</li>)}
+        {education.map((e) => <li>{e.degree[lang]}, {e.school}, <span class="apparatus">{e.year}</span></li>)}
+        {memberships.map((m) => <li>{m}</li>)}
+      </ul>
     </div>
     <figure class="ahead-figure" data-reveal="portrait">
       <img src={portrait.src} width={portrait.width} height={portrait.height} alt={`${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}`} loading="eager" decoding="async" />
@@ -79,18 +96,7 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
   <Section surface="paper-2">
     <div class="editorial">
       <div></div>
-      <div class="prose">{bio.map((t) => <p>{t}</p>)}</div>
-    </div>
-  </Section>
-
-  <Section surface="paper">
-    <div class="editorial">
-      <div></div>
-      <ul class="creds">
-        {admissions.map((a) => <li>{a}</li>)}
-        {education.map((e) => <li>{e.degree[lang]}, {e.school}, <span class="apparatus">{e.year}</span></li>)}
-        {memberships.map((m) => <li>{m}</li>)}
-      </ul>
+      <div class="prose">{bioBody.map((t) => <p>{t}</p>)}</div>
     </div>
   </Section>
 
@@ -99,43 +105,53 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
       <div><p class="eyebrow">{_("home.questions")}</p></div>
       <div>
         <p class="lead">{_("contact.subtitle")}</p>
-        <p><a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a></p>
+        <p>{demoAllows("consulta")
+          ? <a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
+          : <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>}</p>
       </div>
     </div>
   </Section>
 </Base>
 
 <style>
-  .creds { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--spacing-s3); font-size: var(--text-lead); }
-  .creds li { padding-block: var(--spacing-s3); border-bottom: 1px solid var(--color-line); }
-
-  .ahead { padding-block: var(--spacing-s7) var(--spacing-s8); }
-  .ahead-inner { display: grid; gap: var(--spacing-s7); align-items: center; }
-  @media (min-width: 900px) { .ahead-inner { grid-template-columns: minmax(0,1fr) minmax(0,0.72fr); gap: var(--spacing-s9); align-items: center; } }
-  .ahead-text { display: grid; gap: var(--spacing-s4); }
-  .ahead-meta { color: var(--color-ink-2); }
-  .ahead-figure { margin: 0; }
-  .ahead-figure img {
-    width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover;
-    object-position: 50% 30%; border-radius: var(--radius-md);
-    background: var(--color-paper-2);
+  .ahead { padding-block: var(--spacing-s6) clamp(64px, 6vw, 104px); }
+  .ahead-inner { display: grid; gap: var(--spacing-s7); }
+  .ahead-text { display: grid; gap: var(--spacing-s5); align-content: start; min-width: 0; }
+  /* The same display rank as the home page's introduction, so the two pages
+     of the preview are one typographic system rather than two. */
+  .ahead-name {
+    margin: 0; font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(34px, 21px + 3.1vw, 62px);
+    line-height: 1.04; letter-spacing: -0.025em; text-wrap: balance;
   }
+  .ahead-lead { margin: 0; font-size: var(--text-lead); line-height: 1.58; max-width: var(--container-m-lead); }
+  .ahead-creds {
+    list-style: none; margin: var(--spacing-s2) 0 0; padding: 0;
+    display: grid; max-width: var(--container-m-read);
+    border-top: 1px solid var(--surface-line);
+  }
+  .ahead-creds li { padding-block: var(--spacing-s4); border-bottom: 1px solid var(--surface-line); }
+
+  .ahead-figure { margin: 0; }
+  /* Whole, at its own proportions. The 4/5 crop this used to carry cut through
+     the chair and his shin to fit a frame the photograph is not shaped like. */
+  .ahead-figure img {
+    display: block; width: 100%; height: auto;
+    border-radius: var(--radius-md); background: var(--color-paper-2);
+  }
+  @media (min-width: 900px) {
+    .ahead-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.62fr);
+      gap: clamp(48px, 5vw, 96px);
+      align-items: start;
+    }
+    .ahead-figure { justify-self: end; width: 100%; max-width: 400px; }
+  }
+  /* On a phone the photograph is the first thing, then his name under it. */
   @media (max-width: 899px) {
     .ahead-inner { grid-template-areas: "fig" "text"; }
     .ahead-figure { grid-area: fig; }
     .ahead-text { grid-area: text; }
-    .ahead-figure img { aspect-ratio: 3/2; max-height: 34vh; object-position: 50% 18%; }
+    .ahead-figure img { max-height: 58vh; width: auto; margin-inline: auto; }
   }
-  .words { display: grid; gap: var(--spacing-s7); }
-  .words-fig { margin: 0; display: grid; gap: var(--spacing-s3); max-width: var(--container-m-read); }
-  .words-fig img { width: 100%; height: auto; border-radius: var(--radius-md); background: var(--color-paper-2); }
-  .words-fig figcaption { color: var(--surface-ink-2); }
-  .creds { display: grid; gap: var(--spacing-s5); max-width: var(--container-m-read); }
-  .creds dd { margin: 0; }
-  .creds ul { list-style: none; display: grid; gap: var(--spacing-s1); }
-  .media { list-style: none; display: grid; gap: var(--spacing-s6); }
-  @media (min-width: 700px) { .media { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  .media img { width: 100%; height: auto; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-md); }
-  .acta { display: grid; gap: var(--spacing-s5); }
-  .acta-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
 </style>

@@ -147,11 +147,19 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
     }
     .ahead-figure { justify-self: end; width: 100%; max-width: 400px; }
   }
-  /* On a phone the photograph is the first thing, then his name under it. */
+  /* On a phone the photograph is the first thing, then his name under it —
+     but as a band, not a snapshot. Capped by height with `width: auto` it came
+     out 305px wide inside a 412px screen, floating between two margins, and it
+     filled the whole first screen so his name was below the fold on the page
+     that exists to say who he is. It fills the column now and is short enough
+     that the name and the summary line arrive with it. */
   @media (max-width: 899px) {
-    .ahead-inner { grid-template-areas: "fig" "text"; }
+    .ahead-inner { grid-template-areas: "fig" "text"; gap: var(--spacing-s6); }
     .ahead-figure { grid-area: fig; }
     .ahead-text { grid-area: text; }
-    .ahead-figure img { max-height: 58vh; width: auto; margin-inline: auto; }
+    .ahead-figure img {
+      width: 100%; height: clamp(230px, 40vh, 340px);
+      object-fit: cover; object-position: 50% 34%;
+    }
   }
 </style>

@@ -1,0 +1,379 @@
+<title>Campos Website Rebuild</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+  /* Tokens lifted from the site itself (site/src/styles/global.css), so the
+     proposal is set in the thing it is proposing. */
+  :root {
+    --paper:      #fcfcfa;
+    --paper-2:    #f7f4ee;
+    --ink:        #25282b;
+    --ink-2:      #656c74;
+    --line:       #d9d7d1;
+    --accent:     #7a1f2b;   /* oxblood — 9.93 on paper */
+    --navy:       #0b1f33;
+    --navy-ink:   #fcfcfa;
+    --navy-ink-2: #a8b6c6;
+    --navy-line:  rgb(252 252 250 / 0.16);
+    --brass:      #c9a063;
+    --done:       #1f5e46;
+
+    --serif: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
+    --sans:  "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1f33; --paper-2: #10273e; --ink: #fcfcfa; --ink-2: #a8b6c6;
+      --line: rgb(252 252 250 / 0.16); --accent: #c9a063;
+      --navy: #061524; --navy-ink: #fcfcfa; --navy-ink-2: #a8b6c6;
+      --navy-line: rgb(252 252 250 / 0.14); --brass: #c9a063; --done: #7fc3a3;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1f33; --paper-2: #10273e; --ink: #fcfcfa; --ink-2: #a8b6c6;
+    --line: rgb(252 252 250 / 0.16); --accent: #c9a063;
+    --navy: #061524; --navy-ink: #fcfcfa; --navy-ink-2: #a8b6c6;
+    --navy-line: rgb(252 252 250 / 0.14); --brass: #c9a063; --done: #7fc3a3;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet { width: 100%; max-width: 820px; margin-inline: auto; padding-inline: 20px; }
+
+  /* --- masthead ---------------------------------------------------------- */
+  .masthead { padding-block: clamp(40px, 7vw, 76px) clamp(28px, 4vw, 44px); }
+  .eyebrow {
+    margin: 0 0 18px; font-family: var(--mono); font-size: 12px;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2);
+  }
+  h1 {
+    margin: 0; font-family: var(--serif); font-weight: 400;
+    font-size: clamp(34px, 6.4vw, 56px); line-height: 1.04;
+    letter-spacing: -0.025em; text-wrap: balance;
+  }
+  .standfirst {
+    margin: 22px 0 0; max-width: 58ch; font-size: 17px; line-height: 1.62; color: var(--ink-2);
+  }
+  .byline {
+    display: flex; flex-wrap: wrap; gap: 8px 28px;
+    margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.04em; color: var(--ink-2);
+  }
+  .byline b { font-weight: 400; color: var(--ink); }
+
+  /* --- at a glance ------------------------------------------------------- */
+  .glance { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 8px; }
+  @media (min-width: 620px) { .glance { grid-template-columns: repeat(4, 1fr); } }
+  .g-cell { background: var(--paper); padding: 16px 18px; display: grid; gap: 6px; align-content: start; }
+  .g-n { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.14em; color: var(--ink-2); }
+  .g-name { font-family: var(--serif); font-size: 19px; line-height: 1.2; }
+  .g-state {
+    justify-self: start; margin-top: 4px; padding: 3px 9px; border-radius: 3px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .is-done { background: color-mix(in srgb, var(--done) 16%, transparent); color: var(--done); }
+  .is-next { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+  .is-plan { background: color-mix(in srgb, var(--ink-2) 14%, transparent); color: var(--ink-2); }
+
+  /* --- phases ------------------------------------------------------------ */
+  .phase { padding-block: clamp(34px, 5vw, 54px); border-top: 1px solid var(--line); }
+  .phase:first-of-type { border-top: 0; }
+  .p-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; margin-bottom: 6px; }
+  .p-num {
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.14em;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+  h2 {
+    margin: 0; font-family: var(--serif); font-weight: 400;
+    font-size: clamp(25px, 4.2vw, 34px); line-height: 1.14; letter-spacing: -0.02em;
+  }
+  .p-note { margin: 10px 0 24px; max-width: 60ch; color: var(--ink-2); }
+  .p-note strong { color: var(--ink); font-weight: 500; }
+
+  .items { list-style: none; margin: 0; padding: 0; display: grid; }
+  .items li {
+    display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 12px;
+    padding-block: 11px; border-bottom: 1px solid var(--line);
+  }
+  .items li:first-child { border-top: 1px solid var(--line); }
+  .tick { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+  .phase--done .tick { color: var(--done); }
+  .items b { font-weight: 500; }
+  .items span { display: block; color: var(--ink-2); font-size: 15px; }
+
+  /* Figures only phase 1 has, because only phase 1 is measured. */
+  .facts { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 26px; }
+  @media (min-width: 560px) { .facts { grid-template-columns: repeat(3, 1fr); } }
+  .fact { background: var(--paper-2); padding: 15px 18px; }
+  .fact-n {
+    font-family: var(--serif); font-size: 27px; line-height: 1.1;
+    font-variant-numeric: tabular-nums; display: block;
+  }
+  .fact-l { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+
+  /* --- the payment gate: a ledger line across the sequence --------------- */
+  .gate {
+    display: flex; align-items: center; gap: 16px;
+    padding-block: 20px; border-top: 2px solid var(--accent);
+  }
+  .gate-mark {
+    flex: 0 0 auto; font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+  }
+  .gate-text { margin: 0; font-size: 15px; color: var(--ink-2); }
+  .gate-text b { color: var(--ink); font-weight: 500; }
+
+  /* --- dark band --------------------------------------------------------- */
+  .band { background: var(--navy); color: var(--navy-ink); margin-top: clamp(34px, 5vw, 54px); }
+  .band .sheet { padding-block: clamp(38px, 6vw, 60px); }
+  .band h2 { color: var(--navy-ink); }
+  .band .p-note, .band .items span { color: var(--navy-ink-2); }
+  .band .p-num { color: var(--brass); }
+  .band .items li { border-color: var(--navy-line); }
+  .band .tick { color: var(--brass); }
+
+  /* --- schedule ---------------------------------------------------------- */
+  .sched { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 15px; }
+  /* The colour is stated, not inherited: a table does not inherit `color`
+     from an ancestor in quirks mode, and this page is also rendered to PDF
+     from the file itself, where there is no doctype to prevent that. The rows
+     came out charcoal on navy. */
+  .sched th, .sched td {
+    text-align: left; padding: 13px 14px 13px 0; vertical-align: top;
+    border-bottom: 1px solid var(--navy-line); color: var(--navy-ink);
+  }
+  .sched th {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--navy-ink-2); font-weight: 400;
+  }
+  .sched td:last-child, .sched th:last-child { text-align: right; padding-right: 0; }
+  .amount {
+    display: inline-block; min-width: 88px; padding: 3px 10px;
+    border: 1px dashed var(--brass); border-radius: 3px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+    color: var(--brass); text-align: center;
+  }
+  .paid {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--brass);
+  }
+
+  /* --- needed from the firm ---------------------------------------------- */
+  .asks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .asks li {
+    display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px;
+    padding-block: 13px; border-bottom: 1px solid var(--line);
+  }
+  .asks li:first-child { border-top: 1px solid var(--line); }
+  .box { width: 13px; height: 13px; margin-top: 5px; border: 1px solid var(--ink-2); border-radius: 2px; }
+  .asks b { font-weight: 500; }
+  .asks span { display: block; color: var(--ink-2); font-size: 15px; }
+
+  .closing { padding-block: clamp(32px, 5vw, 52px) clamp(44px, 7vw, 72px); }
+  .closing p { max-width: 60ch; color: var(--ink-2); }
+  .closing p:first-child { margin-top: 0; }
+  .fill {
+    display: inline-block; min-width: 190px; padding: 2px 10px;
+    border: 1px dashed var(--accent); border-radius: 3px;
+    font-family: var(--mono); font-size: 12px; color: var(--accent);
+  }
+  .sig { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line);
+         font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--ink-2); }
+</style>
+
+<header class="sheet masthead">
+  <p class="eyebrow">Proposal &middot; Website rebuild</p>
+  <h1>Campos Immigration Law</h1>
+  <p class="standfirst">
+    A bilingual rebuild of camimlaw.com in four phases, Spanish first. Phase one
+    is finished and ready to look at. This sets out what it contains, what the
+    three phases after it contain, and when each payment falls due.
+  </p>
+  <div class="byline">
+    <span>Prepared for <b>Juan Campos, Esq.</b></span>
+    <span>By <b>Walid</b></span>
+    <span>20 September 2026</span>
+  </div>
+</header>
+
+<section class="sheet" aria-label="The four phases at a glance">
+  <div class="glance">
+    <div class="g-cell">
+      <span class="g-n">01</span>
+      <span class="g-name">Foundation, home &amp; about</span>
+      <span class="g-state is-done">Complete</span>
+    </div>
+    <div class="g-cell">
+      <span class="g-n">02</span>
+      <span class="g-name">The rest of the site, and launch</span>
+      <span class="g-state is-next">Next</span>
+    </div>
+    <div class="g-cell">
+      <span class="g-n">03</span>
+      <span class="g-name">Video and reviews</span>
+      <span class="g-state is-plan">Planned</span>
+    </div>
+    <div class="g-cell">
+      <span class="g-n">04</span>
+      <span class="g-name">Conversation and handover</span>
+      <span class="g-state is-plan">Planned</span>
+    </div>
+  </div>
+</section>
+
+<main class="sheet">
+
+  <section class="phase phase--done">
+    <div class="p-head">
+      <span class="p-num">Phase 01</span>
+      <h2>Foundation, home page and about page</h2>
+    </div>
+    <p class="p-note">
+      <strong>Complete.</strong> Both pages exist in Spanish and in English, on
+      the design system and the publishing rules the rest of the site will be
+      built on. The preview link shows these two pages and nothing else.
+    </p>
+    <ul class="items">
+      <li><span class="tick">&#10003;</span><div><b>Spanish first, English complete</b><span>Every page in both languages, with a language switch in the bar, in the phone bar, and floating on the page.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>The design system</b><span>Palette, type scale, spacing and motion, set once so each new page is assembled rather than designed again.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>The home page</b><span>Opening frame, the firm's introduction, four featured practice areas, the television appearances, the Orlando office with a map, and the closing invitation.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>The about page</b><span>Your name and summary, the biography, and the record: admission, degrees and AILA membership.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>Bar, footer and phone bar</b><span>On a phone the bottom bar calls the office, opens WhatsApp, and switches language.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>Every word traced to a source</b><span>Nothing on the site was written for it. Each string comes from camimlaw.com, from Campos Mu&ntilde;os Law's published pages, or from a checked record, and an automated check fails the build if one cannot be traced.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>Ten checks that run before anything ships</b><span>Colour contrast on every page in both languages, accessibility structure, sideways overflow from 320 to 1920 pixels, and the framing of the photographs.</span></div></li>
+      <li><span class="tick">&#10003;</span><div><b>A private preview</b><span>A build that publishes only the reviewed pages, marked not to be indexed, so work in progress is never public.</span></div></li>
+    </ul>
+
+    <div class="facts">
+      <div class="fact"><span class="fact-n">644</span><span class="fact-l">strings checked</span></div>
+      <div class="fact"><span class="fact-n">0</span><span class="fact-l">written by us</span></div>
+      <div class="fact"><span class="fact-n">58</span><span class="fact-l">passages omitted, not reworded</span></div>
+    </div>
+  </section>
+
+  <div class="gate">
+    <span class="gate-mark">Deposit</span>
+    <p class="gate-text"><b>Received.</b> Phase one is delivered against it.</p>
+  </div>
+
+  <section class="phase">
+    <div class="p-head">
+      <span class="p-num">Phase 02</span>
+      <h2>The rest of the site, and launch</h2>
+    </div>
+    <p class="p-note">
+      The pages that turn two finished pages into a working firm website, and
+      putting it live on camimlaw.com. Most of this is built already and waiting
+      on your read of the wording.
+    </p>
+    <ul class="items">
+      <li><span class="tick">&mdash;</span><div><b>Fourteen practice-area pages</b><span>Green card, family petitions, citizenship, deportation defence, asylum, VAWA, DACA, U and T visas, fianc&eacute;(e) visas, TPS, work permits, consular processing and special immigrant juvenile status. Drawn from Campos Mu&ntilde;os Law's published descriptions and waiting on your read against Florida practice.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>The services index</b><span>One page listing all fourteen, and the route into each.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Consultation page and intake form</b><span>Name, phone, preferred language and topic &mdash; deliberately not case details &mdash; delivered to whichever inbox you name.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Payments page</b><span>The existing LawPay link, presented as a page rather than a loose link.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>The statements the Bar rules expect</b><span>The admission limitation and the accompanying notices, in wording you or your counsel supply. Nothing here will be drafted for you.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Search and existing links</b><span>Sitemap, structured data, titles and descriptions, and a redirect from every old Squarespace address so links already out in the world keep working.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Launch on camimlaw.com</b><span>Domain, hosting, certificates, and the switch itself.</span></div></li>
+    </ul>
+  </section>
+
+  <div class="gate">
+    <span class="gate-mark">Second payment</span>
+    <p class="gate-text">Due on completion of phase two, when the site is <b>live on camimlaw.com</b>.</p>
+  </div>
+
+  <section class="phase">
+    <div class="p-head">
+      <span class="p-num">Phase 03</span>
+      <h2>Video and reviews</h2>
+    </div>
+    <p class="p-note">
+      The two things the firm already owns that the current site does nothing
+      with: eleven Spanish explainer videos, and a five-star review record.
+    </p>
+    <ul class="items">
+      <li><span class="tick">&mdash;</span><div><b>The eleven Spanish videos</b><span>Hosting decided, poster frames, captions, and each video placed on the practice-area page it explains. They run from 17 to 64 MB, so where they are hosted is a decision before they ship.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>The broadcast segments</b><span>Telemundo, Univision and TVV made playable where the footage allows, rather than stills.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Google reviews on the site</b><span>The live rating and a selection of reviews, updating on their own rather than being retyped.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Transcripts</b><span>Each video's Spanish transcript on the page, which is readable for anyone who cannot play sound and is the part search engines can actually read.</span></div></li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="p-head">
+      <span class="p-num">Phase 04</span>
+      <h2>Conversation, reach and handover</h2>
+    </div>
+    <p class="p-note">
+      Ways for someone to start talking to the firm without filling in a form,
+      and everything needed to run the site after I hand it over.
+    </p>
+    <ul class="items">
+      <li><span class="tick">&mdash;</span><div><b>Live chat, Spanish first</b><span>A chat on the page that continues in WhatsApp, on the number the office already uses, so a conversation started at midnight is still there in the morning.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Instagram</b><span>The firm's feed on the site, updating on its own.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Analytics</b><span>Which pages bring enquiries, which language they arrive in, and where people stop &mdash; set up so it answers those questions rather than producing a dashboard nobody opens.</span></div></li>
+      <li><span class="tick">&mdash;</span><div><b>Handover</b><span>How to edit a page, how to publish, and what to check when something looks wrong. Written down, and walked through once.</span></div></li>
+    </ul>
+  </section>
+
+  <div class="gate">
+    <span class="gate-mark">Final payment</span>
+    <p class="gate-text">Due on completion of <b>all four phases</b>.</p>
+  </div>
+
+</main>
+
+<section class="band">
+  <div class="sheet">
+    <div class="p-head"><span class="p-num">Schedule</span><h2>Payments</h2></div>
+    <p class="p-note">Three payments across four phases.</p>
+    <div style="overflow-x: auto;">
+      <table class="sched">
+        <thead>
+          <tr><th scope="col">Payment</th><th scope="col">Falls due</th><th scope="col">Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Deposit</td><td>At the start &mdash; <span class="paid">Paid</span></td><td><span class="amount">$ &mdash;&mdash;</span></td></tr>
+          <tr><td>Second</td><td>On completion of phase two</td><td><span class="amount">$ &mdash;&mdash;</span></td></tr>
+          <tr><td>Final</td><td>On completion of phase four</td><td><span class="amount">$ &mdash;&mdash;</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sheet phase" style="border-top: 0;">
+  <div class="p-head"><span class="p-num">Before phase 02</span><h2>What I need from you</h2></div>
+  <p class="p-note">
+    Phase two can start as soon as these are settled. Four of the five are
+    readings or decisions rather than work.
+  </p>
+  <ul class="asks">
+    <li><span class="box" aria-hidden="true"></span><div><b>The admission wording</b><span>The site states your Louisiana admission because Campos Mu&ntilde;os Law publishes that sentence. It does not yet say that you are not admitted in Florida, or that immigration is federal practice, because no published source says it and nothing is written here. Those sentences need to come from you.</span></div></li>
+    <li><span class="box" aria-hidden="true"></span><div><b>Where enquiries should go</b><span>An inbox for the consultation form.</span></div></li>
+    <li><span class="box" aria-hidden="true"></span><div><b>The fourteen practice-area pages</b><span>They describe federal processes, so they carry over &mdash; but special immigrant juvenile status turns on state court practice, and that page in particular needs your read against Florida.</span></div></li>
+    <li><span class="box" aria-hidden="true"></span><div><b>The photographs</b><span>Confirmation that the portraits may be used, whether the photographer needs a credit, and the full-resolution original of the headshot if you have it.</span></div></li>
+    <li><span class="box" aria-hidden="true"></span><div><b>Where the videos will live</b><span>Needed before phase three, useful to decide early.</span></div></li>
+  </ul>
+</section>
+
+<section class="sheet closing">
+  <p>
+    The preview of phase one is at <span class="fill">preview link</span> &mdash;
+    the two finished pages, in both languages. Every other link on them is
+    deliberately inert, so nothing unreviewed is reachable.
+  </p>
+  <p>
+    Phases three and four are separated on purpose. Video and reviews are
+    evidence; chat and Instagram are conversation. Each is worth doing properly
+    on its own rather than shipping four integrations in one release.
+  </p>
+  <p class="sig">Walid &middot; 20 September 2026</p>
+</section>

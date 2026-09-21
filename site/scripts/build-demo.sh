@@ -9,6 +9,8 @@ cd "$(dirname "$0")/.."
 
 # Kept in step with DEMO_ROUTES by the check below, not by memory.
 ROUTES=("" "juan-campos")
+# English-only pages, outside the bilingual pairs above.
+SINGLE=("progress")
 
 PUBLIC_DEMO=1 npm run build
 
@@ -19,11 +21,13 @@ node -e '
   const src = fs.readFileSync("src/lib/site.js", "utf8");
   const m = src.match(/DEMO_ROUTES\s*=\s*\[([^\]]*)\]/);
   if (!m) { console.error("DEMO_ROUTES not found in src/lib/site.js"); process.exit(1); }
-  const inCode = m[1].split(",").map(s => s.trim().replace(/^["'"'"']|["'"'"']$/g, "")).filter(s => s.length || s === "");
+  const single = src.match(/DEMO_SINGLE_ROUTES\s*=\s*\[([^\]]*)\]/);
+  const parse = t => t.split(",").map(s => s.trim().replace(/^["'"'"']|["'"'"']$/g, "")).filter(s => s.length || s === "");
+  const inCode = parse(m[1]).concat(single ? parse(single[1]) : []);
   const inShell = process.argv.slice(1);
   const a = JSON.stringify(inCode.sort()), b = JSON.stringify(inShell.sort());
   if (a !== b) { console.error(`DEMO_ROUTES ${a} does not match build-demo.sh ${b}`); process.exit(1); }
-' "${ROUTES[@]}"
+' "${ROUTES[@]}" "${SINGLE[@]}"
 
 OUT="../demo"
 rm -rf "$OUT" && mkdir -p "$OUT/img"
@@ -33,6 +37,10 @@ for route in "${ROUTES[@]}"; do
     mkdir -p "$dir"
     cp "dist/client/${lang}${route:+$route/}index.html" "$dir/index.html"
   done
+done
+for route in "${SINGLE[@]}"; do
+  mkdir -p "$OUT/$route"
+  cp "dist/client/$route/index.html" "$OUT/$route/index.html"
 done
 cp -R dist/client/_astro "$OUT/_astro"
 cp -R dist/client/fonts "$OUT/fonts"
@@ -80,3 +88,10 @@ node -e '
 
 ( cd "$OUT/.." && rm -f demo.zip && zip -qr demo.zip demo )
 echo "demo/ ready: $(find "$OUT" -type f | wc -l | tr -d ' ') files, $(du -sh "$OUT" | cut -f1); demo.zip $(du -sh ../demo.zip | cut -f1)"
+
+# Put the real build back. dist/ is what every script in verify/ reads and what
+# the local server serves, and a demo build leaves it full of inert spans where
+# the links should be — so a check run after this script passes against a page
+# nobody will ever visit. That happened; this is the fix.
+PUBLIC_REVIEW_BUILD=1 npm run build >/dev/null
+echo "dist/ restored to the review build"

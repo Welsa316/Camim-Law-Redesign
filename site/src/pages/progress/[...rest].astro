@@ -1,0 +1,322 @@
+---
+/**
+ * The client progress page.
+ *
+ * Preview only. `getStaticPaths` returns nothing outside a demo build, so the
+ * route does not exist in production, `progress.json` never reaches a
+ * production bundle, and no page links to it.
+ *
+ * This is not part of the firm's site: it is Walid's page about Walid's work,
+ * in English, outside the bilingual system and outside the copy rule that
+ * governs everything the firm publishes. It carries its own tokens rather
+ * than the firm's, so the two never bleed into each other.
+ */
+import { IS_DEMO } from "../../lib/site.js";
+import progress from "../../../../progress.json";
+
+export function getStaticPaths() {
+  return IS_DEMO ? [{ params: { rest: undefined } }] : [];
+}
+
+type Status = "done" | "in_progress" | "next" | "planned" | "waiting";
+interface Item { id: string; name: string; desc: string; status: Status; doneOn?: string; note?: string }
+interface Phase { id: number; short: string; title: string; intro: string; items: Item[] }
+
+const phases = progress.phases as Phase[];
+const payments = progress.payments as { id: string; label: string; due: string; amount: number; status: string }[];
+
+/* Derived, never stored: a phase is what its items say it is. */
+function phaseState(p: Phase): "complete" | "in_progress" | "next" | "planned" {
+  if (p.items.every((i) => i.status === "done")) return "complete";
+  if (p.items.some((i) => i.status === "in_progress" || i.status === "waiting")) return "in_progress";
+  return "pending";
+}
+const states = phases.map(phaseState);
+const firstPending = states.findIndex((s) => s === "pending");
+const phaseStates = states.map((s, i) => (s === "pending" ? (i === firstPending ? "next" : "planned") : s));
+
+const nowItem = phases.flatMap((p) => p.items).find((i) => i.id === progress.now.item);
+const nowPhase = phases.find((p) => p.id === progress.now.phase);
+
+const total = payments.reduce((n, p) => n + p.amount, 0);
+const money = (n: number) => "$" + n.toLocaleString("en-US");
+const when = (d: string) =>
+  new Date(d + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+const BADGE: Record<string, string> = {
+  complete: "Complete", in_progress: "In progress", next: "Next", planned: "Planned",
+};
+const donePct = Math.round(
+  (phases.flatMap((p) => p.items).filter((i) => i.status === "done").length /
+    phases.flatMap((p) => p.items).length) * 100,
+);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Progress — Campos Immigration Law</title>
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body class="pg">
+    <main class="sheet">
+
+      <header class="masthead">
+        <p class="kicker">Website rebuild &middot; Progress</p>
+        <h1>Campos Immigration Law</h1>
+        <p class="standfirst">
+          The four phases of the written proposal, and where each item stands.
+          This page updates as the work does.
+        </p>
+        <p class="byline">
+          Prepared for <b>Juan Campos, Esq.</b> &middot; By <b>Walid Elsayed</b>{" "}
+          &middot; Last updated {when(progress.updated)}
+        </p>
+      </header>
+
+      <section class="now" aria-labelledby="now-h">
+        <p class="now-tag" id="now-h">Right now</p>
+        <p class="now-name">{nowItem?.name}</p>
+        <p class="now-where">Phase {progress.now.phase} &middot; {nowPhase?.title}</p>
+        <p class="now-note">{progress.now.note}</p>
+      </section>
+
+      <section class="grid" aria-label="The four phases">
+        {phases.map((p, i) => (
+          <div class={`cell is-${phaseStates[i]}`}>
+            <span class="cell-n">{String(p.id).padStart(2, "0")}</span>
+            <span class="cell-name">{p.short}</span>
+            <span class={`badge is-${phaseStates[i]}`}>{BADGE[phaseStates[i]]}</span>
+          </div>
+        ))}
+      </section>
+
+      <p class="tally">
+        <span class="bar" aria-hidden="true"><span style={`width:${donePct}%`}></span></span>
+        {phases.flatMap((p) => p.items).filter((i) => i.status === "done").length} of
+        {" "}{phases.flatMap((p) => p.items).length} items complete
+      </p>
+
+      {phases.map((p, i) => (
+        <section class="phase">
+          <div class="p-head">
+            <span class="p-num">Phase {String(p.id).padStart(2, "0")}</span>
+            <h2>{p.title}</h2>
+            <span class={`badge is-${phaseStates[i]}`}>{BADGE[phaseStates[i]]}</span>
+          </div>
+          <p class="p-intro">{p.intro}</p>
+          <ul class="items">
+            {p.items.map((it) => (
+              <li class={`item is-${it.status}`}>
+                <span class="mark" aria-hidden="true">
+                  {it.status === "done" ? "✓" : it.status === "planned" ? "—" : ""}
+                </span>
+                <div>
+                  <p class="i-name">
+                    {it.name}
+                    {it.status === "waiting" && <span class="waiting">waiting on you</span>}
+                    {it.status === "done" && it.doneOn && <span class="on">{when(it.doneOn)}</span>}
+                  </p>
+                  <p class="i-desc">{it.desc}</p>
+                  {it.note && <p class="i-note">{it.note}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      <section class="pay" aria-labelledby="pay-h">
+        <h2 id="pay-h">Payments</h2>
+        <table>
+          <thead>
+            <tr><th scope="col">Payment</th><th scope="col">Falls due</th><th scope="col">Amount</th><th scope="col"><span class="sr">Status</span></th></tr>
+          </thead>
+          <tbody>
+            {payments.map((p) => (
+              <tr>
+                <td>{p.label}</td>
+                <td class="dim">{p.due}</td>
+                <td class="num">{money(p.amount)}</td>
+                <td class="right"><span class={`tag is-${p.status}`}>{p.status === "paid" ? "Paid" : "Due"}</span></td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr><td colspan="2">{payments.length} payments</td><td class="num">{money(total)}</td><td></td></tr>
+          </tfoot>
+        </table>
+      </section>
+
+      <footer class="foot">
+        <span>Last updated {when(progress.updated)}</span>
+        <a href="/">The preview</a>
+      </footer>
+
+    </main>
+
+    <style is:global>
+      @font-face {
+        font-family: "Source Serif 4"; src: url("/fonts/source-serif-4-400.woff2") format("woff2");
+        font-weight: 400; font-style: normal; font-display: swap;
+      }
+      @font-face {
+        font-family: "Figtree"; src: url("/fonts/figtree-var.woff2") format("woff2");
+        font-weight: 300 800; font-style: normal; font-display: swap;
+      }
+
+      /* Scoped to .pg so none of this reaches the firm's own design system. */
+      .pg {
+        --page:   #ffffff;
+        --panel:  #f7f5f0;
+        --ink:    #25282b;
+        --ink-2:  #5d6570;
+        /* 5.0:1 on white. At #878d97 the kicker, the byline and every date
+           measured 3.1-3.3:1 — small type that the check refuses. */
+        --dim:    #696f78;
+        --line:   #e4e1da;
+        --line-2: #d3cfc6;
+        --accent: #7a1f2b;
+        --done:   #1f5e46;
+
+        --serif: "Source Serif 4", ui-serif, Georgia, serif;
+        --sans:  "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+        margin: 0; background: var(--page); color: var(--ink);
+        font-family: var(--sans); font-size: 16px; line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .pg * { box-sizing: border-box; }
+      .pg .sheet { width: 100%; max-width: 780px; margin-inline: auto; padding-inline: 20px; }
+      .pg .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+      .pg .masthead { padding-block: clamp(36px, 7vw, 68px) 0; }
+      .pg .kicker {
+        margin: 0 0 16px; font-family: var(--mono); font-size: 11.5px;
+        letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim);
+      }
+      .pg h1 {
+        margin: 0; font-family: var(--serif); font-weight: 400;
+        font-size: clamp(32px, 6vw, 50px); line-height: 1.05; letter-spacing: -0.025em;
+      }
+      .pg .standfirst { margin: 18px 0 0; max-width: 54ch; color: var(--ink-2); }
+      .pg .byline {
+        margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
+        font-family: var(--mono); font-size: 12px; letter-spacing: 0.03em; color: var(--dim);
+      }
+      .pg .byline b { font-weight: 400; color: var(--ink); }
+
+      /* The one thing Juan is here to see, so it is the one lifted surface. */
+      .pg .now {
+        margin-top: 28px; padding: 22px 24px;
+        background: var(--panel); border: 1px solid var(--line-2);
+        border-left: 3px solid var(--accent); border-radius: 3px;
+      }
+      .pg .now-tag {
+        margin: 0 0 10px; font-family: var(--mono); font-size: 11px;
+        letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+      }
+      .pg .now-name { margin: 0; font-family: var(--serif); font-size: clamp(21px, 3.4vw, 27px); line-height: 1.2; }
+      .pg .now-where { margin: 6px 0 0; font-family: var(--mono); font-size: 12px; color: var(--dim); }
+      .pg .now-note { margin: 12px 0 0; color: var(--ink-2); max-width: 56ch; }
+
+      .pg .grid { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 28px; }
+      @media (min-width: 620px) { .pg .grid { grid-template-columns: repeat(4, 1fr); } }
+      .pg .cell { background: var(--page); padding: 14px 16px; display: grid; gap: 5px; align-content: start; }
+      .pg .cell-n { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; color: var(--dim); }
+      .pg .cell-name { font-family: var(--serif); font-size: 17px; line-height: 1.22; }
+      .pg .badge {
+        justify-self: start; margin-top: 3px; padding: 3px 8px; border-radius: 3px;
+        font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+        background: #eceae5; color: var(--ink-2);
+      }
+      .pg .badge.is-complete { background: #e2efe9; color: var(--done); }
+      .pg .badge.is-in_progress { background: #f6e7e9; color: var(--accent); }
+
+      .pg .tally { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; font-family: var(--mono); font-size: 12px; color: var(--dim); }
+      .pg .bar { flex: 1 1 120px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+      .pg .bar > span { display: block; height: 100%; background: var(--done); }
+
+      .pg .phase { padding-block: clamp(30px, 4.6vw, 46px) 0; }
+      .pg .p-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+      .pg .p-num { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; color: var(--accent); }
+      .pg .p-head h2 {
+        margin: 0; font-family: var(--serif); font-weight: 400;
+        font-size: clamp(22px, 3.8vw, 30px); line-height: 1.16; letter-spacing: -0.02em;
+      }
+      .pg .p-intro { margin: 10px 0 18px; max-width: 58ch; color: var(--ink-2); }
+
+      .pg .items { list-style: none; margin: 0; padding: 0; }
+      .pg .item {
+        display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px;
+        padding-block: 12px; border-bottom: 1px solid var(--line);
+      }
+      .pg .item:first-child { border-top: 1px solid var(--line); }
+      .pg .mark {
+        font-family: var(--mono); font-size: 13px; line-height: 1.5;
+        color: var(--dim); text-align: center;
+      }
+      .pg .is-done .mark { color: var(--done); }
+      /* The dots are drawn, not typed: a filled one for the item being worked
+         on and an outline for the one after it. */
+      .pg .is-in_progress .mark::before,
+      .pg .is-waiting .mark::before,
+      .pg .is-next .mark::before {
+        content: ""; display: inline-block; width: 9px; height: 9px;
+        border-radius: 50%; vertical-align: 1px;
+      }
+      .pg .is-in_progress .mark::before, .pg .is-waiting .mark::before { background: var(--accent); }
+      .pg .is-next .mark::before { border: 1.5px solid var(--ink-2); }
+
+      .pg .i-name { margin: 0; font-weight: 500; }
+      .pg .is-planned .i-name, .pg .is-planned .i-desc { color: var(--ink-2); }
+      .pg .i-desc { margin: 3px 0 0; font-size: 15px; color: var(--ink-2); }
+      .pg .i-note { margin: 7px 0 0; font-size: 15px; color: var(--accent); }
+      .pg .on { margin-left: 10px; font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--dim); }
+      .pg .waiting {
+        margin-left: 10px; padding: 2px 7px; border-radius: 3px;
+        background: #f6e7e9; color: var(--accent);
+        font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+      }
+
+      .pg .pay { margin-top: clamp(32px, 5vw, 52px); padding: 24px; background: var(--panel); border-top: 3px solid var(--accent); border-radius: 3px; }
+      .pg .pay h2 { margin: 0 0 4px; font-family: var(--serif); font-weight: 400; font-size: 24px; }
+      .pg .pay table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 15px; }
+      .pg .pay th, .pg .pay td {
+        text-align: left; padding: 11px 12px 11px 0; color: var(--ink);
+        border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+      }
+      .pg .pay th {
+        font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
+        text-transform: uppercase; color: var(--dim); font-weight: 400;
+      }
+      .pg .pay .dim { color: var(--ink-2); }
+      .pg .pay .num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .pg .pay .right { text-align: right; padding-right: 0; }
+      .pg .pay tfoot td { border-bottom: 0; font-weight: 500; }
+      .pg .tag {
+        display: inline-block; padding: 3px 9px; border-radius: 3px;
+        font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      }
+      .pg .tag.is-paid { background: #e2efe9; color: var(--done); }
+      .pg .tag.is-pending { background: #eceae5; color: var(--ink-2); }
+
+      .pg .foot {
+        display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
+        margin-top: 36px; padding-block: 18px 40px; border-top: 1px solid var(--line);
+        font-family: var(--mono); font-size: 12px; color: var(--dim);
+      }
+      /* Padding, not a bigger font: 79x19 is under the 24px the check wants. */
+      .pg .foot a { color: var(--accent); display: inline-block; padding-block: 6px; }
+      .pg a:focus-visible, .pg .foot a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+      @media (max-width: 520px) {
+        .pg .pay { padding: 18px 16px; }
+        .pg .pay th, .pg .pay td { padding-right: 8px; }
+      }
+    </style>
+  </body>
+</html>

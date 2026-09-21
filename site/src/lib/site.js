@@ -9,8 +9,13 @@ export const SITE_URL = "https://www.camimlaw.com";
  */
 export const IS_DEMO = import.meta.env.PUBLIC_DEMO === "1" || import.meta.env.PUBLIC_DEMO === "true";
 
-/** Phase 1: the landing page and the attorney page. "" is the home page. */
+/**
+ * Phase 1: the landing page, the attorney page, and the client progress
+ * page. "" is the home page. `progress` is English-only and outside the
+ * bilingual system, so it is handled separately by the build script.
+ */
 export const DEMO_ROUTES = ["", "juan-campos"];
+export const DEMO_SINGLE_ROUTES = ["progress"];
 
 /**
  * Whether `slug` may be linked. Always true outside a demo build, so callers

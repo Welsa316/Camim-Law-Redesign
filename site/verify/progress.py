@@ -32,12 +32,14 @@ PROPOSAL = {
         "The statements the Bar rules expect", "Search and existing links",
         "Launch on camimlaw.com",
     ],
-    "Video and reviews": [
-        "The eleven Spanish videos", "The broadcast segments",
-        "Google reviews on the site", "Transcripts",
+    "Video, reviews and conversation": [
+        "The eleven Spanish videos", "The broadcast segments", "Transcripts",
+        "Google reviews on the site", "Live chat, Spanish first", "Instagram",
     ],
-    "Conversation, reach and handover": [
-        "Live chat, Spanish first", "Instagram", "Analytics", "Handover",
+    "Measurement, review and handover": [
+        "Analytics", "Search, after launch", "The checks across every page",
+        "Every imported fact confirmed", "A design review of the whole site",
+        "Handover",
     ],
 }
 

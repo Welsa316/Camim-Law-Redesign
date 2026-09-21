@@ -10,5 +10,8 @@ dist/
 .vercel
 .netlify
 docs/.parts/
-demo/
+# The phase 1 preview is tracked, not ignored: Vercel deploys it straight from
+# the repository with the project's Root Directory set to demo/ and no build
+# step, which is what keeps the deployed surface to the two reviewed pages.
+# Rebuild it with site/scripts/build-demo.sh, which recreates the folder.
 demo.zip

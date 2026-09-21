@@ -176,6 +176,16 @@ and the button keeps the language name alone. The flag artwork is the
 `flag-icons` package (MIT), not a photograph; the ban on flags elsewhere on
 the site is about hero imagery, and this is a 20px control.
 
+**The client progress page is outside the copy rule, deliberately.** `/progress`
+in the preview build is Walid's page about Walid's work — the four phases of
+the written proposal and where each item stands, read from `progress.json`. It
+is English only, it is not part of the firm's site, it says nothing on the
+firm's behalf, and it carries its own palette so the two never mix. It is
+therefore not held to the rule that every string trace to camimlaw.com or the
+sister firm, and the gate never sees it: the route is generated only when
+`PUBLIC_DEMO` is set, so it does not exist in the production build the gate
+reads. Nothing about the firm's own pages changes.
+
 **The preview build.** `site/scripts/build-demo.sh` produces `demo/` and
 `demo.zip` at the repository root. Phase 1 is the landing page and the
 attorney page, in both languages — four files and their assets, and nothing

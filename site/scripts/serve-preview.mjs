@@ -24,17 +24,29 @@ const TYPES = {
 
 createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");
-  let path = decodeURIComponent(url.pathname);
-  if (path.endsWith("/")) path += "index.html";
+  const path = decodeURIComponent(url.pathname);
+
+  // Both forms of a page address. The site is built with trailingSlash
+  // "ignore", and a browser does not add the slash — /progress and /progress/
+  // are the same page, and serving only the slashed one 404s the link a
+  // person actually types.
+  const candidates = extname(path)
+    ? [path]
+    : [join(path, "index.html"), path.replace(/\/$/, "") + ".html"];
+
   // resolve() collapses any ../ before the prefix test, so a traversal
   // attempt lands outside ROOT and is refused rather than served.
-  const file = resolve(join(ROOT, path));
-  if (file !== ROOT && !file.startsWith(ROOT + sep)) {
+  const files = candidates.map((c) => resolve(join(ROOT, c)));
+  if (files.some((f) => f !== ROOT && !f.startsWith(ROOT + sep))) {
     res.writeHead(403).end("Forbidden");
     return;
   }
   try {
-    const body = await readFile(file);
+    let body, file;
+    for (const f of files) {
+      try { body = await readFile(f); file = f; break; } catch { /* try the next form */ }
+    }
+    if (body === undefined) throw new Error("not found");
     res.writeHead(200, {
       "Content-Type": TYPES[extname(file)] ?? "application/octet-stream",
       "Cache-Control": extname(file) === ".html" ? "no-cache" : "public, max-age=3600",

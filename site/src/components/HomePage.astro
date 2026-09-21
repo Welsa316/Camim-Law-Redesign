@@ -411,10 +411,29 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
        the bright part of the frame. Measured, not assumed: in the top corner
        the figures' labels read 3.1:1 against the wall behind him, and
        darkening the veil enough to fix that put his face in shadow. */
-    /* The floating language switch sits above the phone bar at the right,
-       44px tall; the frame's last line has to end above it. */
-    .opener-frame { grid-template-rows: 1fr auto auto; padding-block: var(--spacing-s6) calc(var(--spacing-s6) + 60px); }
-    .opener-top { grid-row: 2; gap: var(--spacing-s4); }
+    /* The photograph gets a floor, not the leftovers. As `1fr` the top row was
+       whatever the type did not use — 131px on a 412x730 phone — and the
+       scrim's own 150px ramp then started above his head, which is why he
+       rendered as a face dissolving into navy with the chair gone entirely.
+       `minmax()` gives the band a minimum and lets it take any surplus.
+
+       The reserve at the bottom is the phone bar's own height, stated as the
+       token rather than as the 60px that used to be there under a comment
+       about the floating language switch — the switch is display:none below
+       1024 and lives inside that bar. Reading it as decoration and removing
+       it put the admitted line behind the bar. */
+    .opener-frame {
+      /* Declared on the rule, not bare inside the media block: a custom
+         property needs a selector, and without one this was dropped, which
+         invalidated the whole grid-template-rows and silently fell back. */
+      --band: clamp(150px, 26vh, 300px);
+      grid-template-rows: minmax(var(--band), 1fr) auto auto;
+      padding-block: 0 calc(var(--mbar-h) + var(--spacing-s5));
+    }
+    .opener-top { grid-row: 2; gap: var(--spacing-s4); padding-top: 0; }
+    /* Framed for the band: his head clear of the bar, the chair's arms and his
+       crossed leg still in shot, rather than a head floating in the dark. */
+    .opener-img { object-position: 50% 28%; }
     .opener-bottom { grid-row: 3; gap: var(--spacing-s4); }
     .opener-lead { display: none; }
 
@@ -433,14 +452,16 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
       position: absolute;
       left: calc(var(--gutter) * -1);
       right: calc(var(--gutter) * -1);
-      top: -150px;
+      top: -116px;
       bottom: -2400px;
       z-index: -1;
+      /* 116px, not 150: the ramp is the seam between the photograph and the
+         ground the words sit on, and every pixel of it is a pixel of him. */
       background: linear-gradient(180deg,
         rgb(11 31 51 / 0) 0px,
-        rgb(11 31 51 / 0.62) 96px,
-        rgb(11 31 51 / 0.93) 150px,
-        rgb(11 31 51 / 0.97) 300px,
+        rgb(11 31 51 / 0.58) 74px,
+        rgb(11 31 51 / 0.93) 116px,
+        rgb(11 31 51 / 0.97) 240px,
         rgb(11 31 51 / 0.97) 100%);
     }
   }
@@ -483,7 +504,18 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
      through the middle, which is where they crossed his face. */
   @media (max-height: 560px) and (orientation: landscape) {
     .opener { min-height: auto; }
-    .opener-frame { padding-block: var(--spacing-s5); }
+    /* The bar is 76px here too, and this block used to override the reserve
+       with a flat 24px, which put the headline and the button 97 and 111px
+       behind it. Landscape is short enough that the frame may outgrow the
+       viewport; scrolling to the button is fine, not reaching it is not. */
+    .opener-frame {
+      /* No band. A landscape phone is 390px tall and this block is also inside
+         the max-width:899px one, so the portrait band's 150px floor applied
+         here too and squeezed the rows until the headline was drawn on top of
+         the white pill at 1.00:1. */
+      --band: 0px;
+      padding-block: var(--spacing-s5) calc(var(--mbar-h) + var(--spacing-s4));
+    }
     .opener-display { font-size: clamp(2rem, 4.6vw, 3rem); line-height: 1.04; max-width: min(12ch, 32vw); }
     .opener-bottom { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.6fr); gap: var(--spacing-s7); }
     .opener-side { justify-items: end; text-align: right; }

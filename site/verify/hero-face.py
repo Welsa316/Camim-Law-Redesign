@@ -1,5 +1,5 @@
 """
-Two assertions about his face in the opening frame, at every width.
+Three assertions about the opening frame, at every width.
 
 1. No type crosses it. The face box is projected through object-fit and
    object-position and every glyph rect is tested against it.
@@ -61,8 +61,27 @@ JS = """(face) => {
       }
     }
   }
+  // Nothing in the frame may sit under the fixed phone bar. The bar is not
+  // part of the frame and does not push it, so a frame that grows past the
+  // viewport hides its own last line behind it — which is exactly what
+  // happened when the bar's reserve was mistaken for decoration and removed.
+  const bar=document.querySelector('.mbar');
+  const barTop=(bar && getComputedStyle(bar).display!=='none') ? bar.getBoundingClientRect().top : Infinity;
+  // Portrait only. A landscape phone sets min-height:auto and lets the frame
+  // run past the fold on purpose, and everything there is reachable by
+  // scrolling. Gating on whether the frame happens to fit the screen was the
+  // wrong test: the frame outgrowing its reserve is the defect, so that
+  // condition exempted precisely the case it was written to catch.
+  const covered=[];
+  if (innerHeight >= innerWidth) {
+    for(const sel of ['.opener-display','.stat-fig','.stat-label','.opener-meta','.opener-pill','.opener-rule']){
+      const e=document.querySelector(sel); if(!e) continue;
+      const g=e.getBoundingClientRect();
+      if(g.height>1 && g.bottom > barTop + 1) covered.push(sel+' by '+Math.round(g.bottom-barTop)+'px');
+    }
+  }
   const hero=document.querySelector('.opener').getBoundingClientRect();
-  return {img:name, box, hits, heroH: hero.height,
+  return {img:name, box, hits, heroH: hero.height, covered,
           face:{x:Math.round(box.x),y:Math.round(box.y),r:Math.round(box.r),b:Math.round(box.b)},
           faceTop:(box.y-hero.top)/hero.height};
 }"""
@@ -82,6 +101,7 @@ async def main():
             for x in hits: merged[x['sel']]=merged.get(x['sel'],0)+x['overlapPx']
             bad=[]
             if merged: bad.append(f"type over face: {merged}")
+            if r.get('covered'): bad.append("behind the phone bar: " + ", ".join(r['covered']))
             # A landscape phone gives a frame under 600px tall, sized to its content,
             # where the bar is a larger share of the height; the ceiling moves with it.
             limit = MAX_FACE_TOP if r['heroH'] >= 600 else 0.40

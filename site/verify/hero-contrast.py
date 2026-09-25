@@ -59,6 +59,40 @@ BLANK = """
   }
 """
 
+HOLD = "(i) => { document.querySelectorAll('[data-slide]').forEach((el, n) => { el.style.transition = 'none'; el.toggleAttribute('data-on', n === i); }); }"
+NAMED = "(i) => (document.querySelectorAll('[data-slide] img')[i].getAttribute('src') || '').split('/').pop()"
+
+
+def measure(blocks, im, w, h):
+    """Each block of type against the pixels actually behind its glyphs."""
+    bad = 0
+    for bl in blocks:
+        # Composite the foreground's own alpha over the pixel behind it. Taking
+        # the first three components and dropping the fourth treated
+        # rgba(252,252,250,0.66) as solid white, which is the flattering
+        # reading: translucent white on a light ground loses contrast faster
+        # than the scrim behind it gains it.
+        parts=[float(v) for v in bl['color'].replace('rgb(','').replace('rgba(','').replace(')','').split(',')]
+        fa = parts[3] if len(parts) > 3 else 1.0
+        worst=None; worstL=-1
+        for r in bl['rects']:
+            x0=max(0,int(r['x'])); y0=max(0,int(r['y']))
+            x1=min(w,int(r['x']+r['w'])); y1=min(h,int(r['y']+r['h']))
+            if x1<=x0 or y1<=y0: continue
+            for px in im.crop((x0,y0,x1,y1)).getdata():
+                L=lum(px)
+                if L>worstL: worstL=L; worst=px
+        if worst is None: continue
+        fg=[parts[i]*fa + worst[i]*(1-fa) for i in range(3)]
+        cr=ratio(fg,list(worst))
+        large = bl['size']>=24 or (bl['size']>=18.66 and bl['weight']>=700)
+        need = 3.0 if large else 4.5
+        ok = cr>=need
+        if not ok: bad += 1
+        print(f"    {'OK ' if ok else 'FAIL'} {bl['sel']:<34} {bl['size']:>5.1f}px  worst-bg={worst}  ratio={cr:.2f} need={need}")
+    return bad
+
+
 async def main():
     fails=0
     async with async_playwright() as p:
@@ -73,26 +107,19 @@ async def main():
             blocks=await pg.evaluate(RECTS)
             await pg.add_style_tag(content=BLANK)
             await pg.wait_for_timeout(250)
-            png=await pg.screenshot(clip={"x":0,"y":0,"width":w,"height":h})
-            im=Image.open(io.BytesIO(png)).convert("RGB")
             print(f"--- {name} ({w}x{h}) ---")
-            for bl in blocks:
-                fg=[int(v) for v in bl['color'].replace('rgb(','').replace('rgba(','').replace(')','').split(',')[:3]]
-                worst=None; worstL=-1
-                for r in bl['rects']:
-                    x0=max(0,int(r['x'])); y0=max(0,int(r['y']))
-                    x1=min(w,int(r['x']+r['w'])); y1=min(h,int(r['y']+r['h']))
-                    if x1<=x0 or y1<=y0: continue
-                    for px in im.crop((x0,y0,x1,y1)).getdata():
-                        L=lum(px)
-                        if L>worstL: worstL=L; worst=px
-                if worst is None: continue
-                cr=ratio(fg,list(worst))
-                large = bl['size']>=24 or (bl['size']>=18.66 and bl['weight']>=700)
-                need = 3.0 if large else 4.5
-                ok = cr>=need
-                if not ok: fails+=1
-                print(f"  {'OK ' if ok else 'FAIL'} {bl['sel']:<34} {bl['size']:>5.1f}px  worst-bg={worst}  ratio={cr:.2f} need={need}")
+            # The frame cycles photographs. The type has to clear its threshold
+            # over every one of them, not over whichever was showing when the
+            # page happened to load, so each slide is held in turn.
+            n = await pg.evaluate("() => document.querySelectorAll('[data-slide]').length") or 1
+            for i in range(n):
+                if n > 1:
+                    await pg.evaluate(HOLD, i)
+                    await pg.wait_for_timeout(300)
+                    print(f"  slide {i+1}/{n}: {await pg.evaluate(NAMED, i)}")
+                png=await pg.screenshot(clip={"x":0,"y":0,"width":w,"height":h})
+                im=Image.open(io.BytesIO(png)).convert("RGB")
+                fails += measure(blocks, im, w, h)
             await c.close()
         await b.close()
     print(f"\nHERO CONTRAST FAILURES: {fails}")

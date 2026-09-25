@@ -32,10 +32,10 @@ FACE = {"juan-campos-hero-wide.jpg": (0.416, 0.160, 0.519, 0.418),
 
 JS = """(face) => {
   const img=document.querySelector('.opener-img');
-  const name=img.currentSrc.split('/').pop();
-  const f=face[name]; if(!f) return {err:'no face box for '+name};
+  const name=(img.currentSrc||img.src).split('/').pop();
+  const f=face[name];
   const r=img.getBoundingClientRect();
-  const nw=img.naturalWidth, nh=img.naturalHeight;
+  const nw=img.naturalWidth||1, nh=img.naturalHeight||1;
   // replicate object-fit (cover or contain) + object-position
   const fit=getComputedStyle(img).objectFit;
   const scale=(fit==='contain'?Math.min:Math.max)(r.width/nw, r.height/nh);
@@ -43,10 +43,10 @@ JS = """(face) => {
   const cs=getComputedStyle(img);
   const [px,py]=cs.objectPosition.split(' ').map(v=>parseFloat(v)/100);
   const offX=(r.width-dw)*px, offY=(r.height-dh)*py;
-  const box={ x:r.left+offX+f[0]*dw, y:r.top+offY+f[1]*dh,
-              r:r.left+offX+f[2]*dw, b:r.top+offY+f[3]*dh };
+  const box=f ? { x:r.left+offX+f[0]*dw, y:r.top+offY+f[1]*dh,
+              r:r.left+offX+f[2]*dw, b:r.top+offY+f[3]*dh } : null;
   const hits=[];
-  for(const sel of ['.opener-display','.opener-lead','.stat-fig','.stat-label','.opener-meta','.opener-pill']){
+  if (f) for(const sel of ['.opener-display','.opener-lead','.stat-fig','.stat-label','.opener-meta','.opener-pill']){
     const e=document.querySelector(sel); if(!e) continue;
     const w=document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let n;
     while((n=w.nextNode())){
@@ -81,6 +81,7 @@ JS = """(face) => {
     }
   }
   const hero=document.querySelector('.opener').getBoundingClientRect();
+  if(!f) return {img:name, noFace:true, hits:[], covered, heroH:hero.height, faceTop:0, box:null};
   return {img:name, box, hits, heroH: hero.height, covered,
           face:{x:Math.round(box.x),y:Math.round(box.y),r:Math.round(box.r),b:Math.round(box.b)},
           faceTop:(box.y-hero.top)/hero.height};
@@ -96,6 +97,17 @@ async def main():
             await pg.goto("http://localhost:4321/", wait_until="networkidle")
             await pg.wait_for_timeout(2200)
             r=await pg.evaluate(JS, FACE)
+            # The opening frame is a slideshow of places now, not a portrait.
+            # The two face assertions have nothing to measure; the one about
+            # the phone bar is about layout and still does.
+            if r.get('noFace'):
+                bad=[]
+                if r.get('covered'): bad.append("behind the phone bar: " + ", ".join(r['covered']))
+                if bad:
+                    bad_count+=1; print(f"  FAIL {w}x{h} {r['img']:<26} " + "; ".join(bad))
+                else:
+                    print(f"  OK   {w}x{h} {r['img']:<26} no portrait in the frame; layout clear of the bar")
+                await c.close(); continue
             hits=r.get('hits',[])
             merged={}
             for x in hits: merged[x['sel']]=merged.get(x['sel'],0)+x['overlapPx']

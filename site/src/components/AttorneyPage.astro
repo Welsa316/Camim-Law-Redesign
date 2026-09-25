@@ -58,7 +58,7 @@ const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs
 const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value} — ${ORG.name.value}`;
 ---
 <Base lang={lang} title={title} description={es ? camim!.h : bio[0]} path={path} alternates={alternates} schema={schema}>
-  <nav class="crumbs wrap">
+  <nav class="crumbs wrap-wide">
     <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
   </nav>
 
@@ -85,22 +85,20 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
   </section>
 
   {camim && (
-    <Section surface="paper">
-      <div class="editorial">
-        <div></div>
+    <Section surface="paper" wide class="tight">
+      <div class="reading">
         <div class="prose">{camim.p.map((t) => <p>{t}</p>)}</div>
       </div>
     </Section>
   )}
 
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div></div>
+  <Section surface="paper-2" wide class="tight">
+    <div class="reading">
       <div class="prose">{bioBody.map((t) => <p>{t}</p>)}</div>
     </div>
   </Section>
 
-  <Section surface="paper-2">
+  <Section surface="paper-2" wide>
     <div class="editorial">
       <div><p class="eyebrow">{_("home.questions")}</p></div>
       <div>
@@ -114,7 +112,22 @@ const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}
 </Base>
 
 <style>
-  .ahead { padding-block: var(--spacing-s6) clamp(64px, 6vw, 104px); }
+  /* One reading column, at the page's own left edge. These two sections sat
+     in the editorial grid with an empty 12rem label column and a 64px gap
+     beside them, so the prose began 376px in while the header above it began
+     at the gutter — two left edges and a margin holding nothing. The grid is
+     for sections that have a label; these do not. */
+  .reading { max-width: var(--container-m-read); }
+  /* The page is one article, not a stack of separate sections. At the site's
+     --section-y of 160px top and bottom there were 264px between his
+     credentials and the first sentence about him, and another 264 before the
+     biography — a third of the page was the gaps between its own paragraphs. */
+  :global(.section.tight) { padding-block: clamp(44px, 4.4vw, 72px); }
+
+  /* No bottom padding: the section below carries its own top padding and it
+     is the same surface, so both together read as one hole rather than as a
+     seam between two things. */
+  .ahead { padding-block: var(--spacing-s6) 0; }
   .ahead-inner { display: grid; gap: var(--spacing-s7); }
   .ahead-text { display: grid; gap: var(--spacing-s5); align-content: start; min-width: 0; }
   /* The same display rank as the home page's introduction, so the two pages

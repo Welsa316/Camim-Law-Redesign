@@ -20,7 +20,7 @@ const _ = t(lang);
 const es = lang === "es";
 const media = MEDIA.filter((m) => m.verified);
 const rating = show(ORG.googleRating);
-const heroImg = ATTORNEY.hero.value;
+const slides = ATTORNEY.heroSlides.value;
 /* The sister firm's current headshot. The cafe photograph belongs to the
    attorney page — running it here too put the same seated frame twice on a
    two-page site, and the opening frame is already a chair. */
@@ -98,20 +98,35 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
 <Base lang={lang} title={src.title} description={src.description} path={es ? "/" : "/en/"} alternates={alternates} schema={schema} overHero landing>
 
   <section class="opener" data-surface="navy-deep" data-hero>
-    <picture>
-      <source media="(min-aspect-ratio: 1/1)" srcset={heroImg.wide.src} width={heroImg.wide.width} height={heroImg.wide.height} />
-      <img
-        class="opener-img"
-        src={heroImg.tall.src}
-        width={heroImg.tall.width}
-        height={heroImg.tall.height}
-        alt={`${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value}`}
-        fetchpriority="high"
-        decoding="async"
-        data-scrub-portrait-img
-      />
-    </picture>
+    {/* Three photographs, cross-faded. Decorative: the frame's meaning is in
+        its words, so every slide carries an empty alt and the whole strip is
+        hidden from assistive technology. The dots are the control WCAG 2.2.2
+        wants for anything that moves on its own. */}
+    <div class="slides" aria-hidden="true">
+      {slides.map((sl, i) => (
+        <div class="slide" data-slide data-on={i === 0 ? "" : undefined}>
+          <img
+            class="opener-img"
+            src={sl.src}
+            width="2400"
+            height="1600"
+            alt=""
+            style={`object-position:${sl.focus}`}
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchpriority={i === 0 ? "high" : undefined}
+            decoding="async"
+          />
+        </div>
+      ))}
+    </div>
     <div class="opener-veil" aria-hidden="true"></div>
+    {slides.length > 1 && (
+      <div class="dots" data-dots>
+        {slides.map((_, i) => (
+          <button type="button" class="dot" data-dot aria-label={String(i + 1)} aria-current={i === 0 ? "true" : undefined}></button>
+        ))}
+      </div>
+    )}
 
     <div class="opener-frame wrap-wide">
       <div class="opener-top">
@@ -269,6 +284,10 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
 <style>
   /* --- opening frame --- */
   .opener {
+    /* Declared here, not inside the media block, because both the frame (which
+       reserves the row) and the slides (which fill it) have to read it, and a
+       custom property needs a selector to live on. */
+    --band: clamp(150px, 26vh, 300px);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -280,14 +299,62 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     /* The fixed call bar sits over the last 76px of the viewport below 1024px. */
     min-height: calc(100svh - var(--mbar-h));
   }
+  /* --- the slideshow ------------------------------------------------------
+     Three photographs cross-faded on a timer, with a slow drift on whichever
+     one is showing. Each slide carries its own focal point, so the framing is
+     a property of the photograph rather than one object-position imposed on
+     all of them. */
+  .slides { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
+  .slide {
+    position: absolute; inset: 0; opacity: 0;
+    transition: opacity 1.1s var(--ease-image);
+  }
+  .slide[data-on] { opacity: 1; }
   .opener-img {
-    position: absolute; inset: 0; z-index: -2;
+    position: absolute; inset: 0;
     width: 100%; height: 100%;
-    object-fit: cover; object-position: 50% 22%;
+    object-fit: cover;
     will-change: transform;
   }
-  @media (min-aspect-ratio: 1/1) {
-    .opener-img { object-position: 50% 0%; }
+  /* Only the visible slide drifts; the others are parked so three animations
+     are not running against each other off-screen. */
+  @keyframes hero-drift {
+    0%   { transform: scale(1.04); }
+    50%  { transform: scale(1.13) translate(-1%, -1%); }
+    100% { transform: scale(1.04); }
+  }
+  .slide[data-on] .opener-img { animation: hero-drift 24s ease-in-out infinite; }
+
+  .dots {
+    position: absolute; z-index: 2; display: grid; gap: 12px;
+    right: clamp(14px, 2.2vw, 30px); top: 50%; transform: translateY(-50%);
+  }
+  .dot {
+    width: 26px; height: 26px; padding: 0; display: grid; place-items: center;
+    background: none; border: 0; cursor: pointer; border-radius: 50%;
+  }
+  .dot::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%;
+    background: rgb(252 252 250 / 0.42);
+    transition: background-color var(--d-state) var(--ease-state), transform var(--d-state) var(--ease-state);
+  }
+  .dot[aria-current]::before { background: var(--color-paper); transform: scale(1.45); }
+  @media (any-hover: hover) { .dot:hover::before { background: rgb(252 252 250 / 0.8); } }
+  .dot:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 1px; }
+  /* Top right, under the bar. Putting them bottom left sat them on the
+     headline and the admitted line — measured at 1.00:1 and 1.74:1, white
+     dots behind white type. The band at the top of a phone frame is the one
+     part of it the words do not use. */
+  @media (max-width: 899px) {
+    .dots {
+      top: calc(var(--header-h) + 14px); bottom: auto; transform: none;
+      right: var(--gutter);
+      grid-auto-flow: column;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: none; }
+    .slide[data-on] .opener-img { animation: none; }
   }
 
   /* Four layers, each doing one job.
@@ -313,12 +380,18 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
       radial-gradient(62% 50% at 100% 20%, rgb(11 31 51 / 0.94) 0%, rgb(11 31 51 / 0.80) 38%, rgb(11 31 51 / 0.46) 62%, rgb(11 31 51 / 0) 84%),
       radial-gradient(110% 80% at 6% 100%, rgb(11 31 51 / 0.86) 0%, rgb(11 31 51 / 0) 60%),
       radial-gradient(60% 50% at 100% 100%, rgb(11 31 51 / 0.60) 0%, rgb(11 31 51 / 0) 66%),
+      /* The floor across the middle was 0.05, which worked because the frame
+         held one photograph and it was already dark. Three photographs that
+         change every eight seconds cannot be tuned to individually, so the
+         wash carries a real minimum everywhere and the type's contrast stops
+         depending on which slide is showing. This is also the heavier
+         gradient the client asked for. */
       linear-gradient(180deg,
-        rgb(11 31 51 / 0.62) 0%,
-        rgb(11 31 51 / 0.28) 9%,
-        rgb(11 31 51 / 0.05) 16%,
-        rgb(11 31 51 / 0.05) 60%,
-        rgb(11 31 51 / 0.40) 74%,
+        rgb(11 31 51 / 0.74) 0%,
+        rgb(11 31 51 / 0.48) 12%,
+        rgb(11 31 51 / 0.38) 28%,
+        rgb(11 31 51 / 0.38) 58%,
+        rgb(11 31 51 / 0.56) 74%,
         rgb(11 31 51 / 0.88) 88%,
         rgb(11 31 51 / 0.96) 100%),
       linear-gradient(90deg,
@@ -423,17 +496,10 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
        1024 and lives inside that bar. Reading it as decoration and removing
        it put the admitted line behind the bar. */
     .opener-frame {
-      /* Declared on the rule, not bare inside the media block: a custom
-         property needs a selector, and without one this was dropped, which
-         invalidated the whole grid-template-rows and silently fell back. */
-      --band: clamp(150px, 26vh, 300px);
       grid-template-rows: minmax(var(--band), 1fr) auto auto;
       padding-block: 0 calc(var(--mbar-h) + var(--spacing-s5));
     }
     .opener-top { grid-row: 2; gap: var(--spacing-s4); padding-top: 0; }
-    /* Framed for the band: his head clear of the bar, the chair's arms and his
-       crossed leg still in shot, rather than a head floating in the dark. */
-    .opener-img { object-position: 50% 28%; }
     .opener-bottom { grid-row: 3; gap: var(--spacing-s4); }
     .opener-lead { display: none; }
 
@@ -446,6 +512,30 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
        in the grid as a row-spanning item, because placed in the grid it
        resolved to a zero-width track and rendered 40px wide. The stops are
        absolute lengths, so the dissolve is the same 150px everywhere. */
+    /* The photograph is a band, not the whole frame. Left filling the section
+       it showed a narrow vertical slice of a landscape panorama — on a phone
+       that slice was sky. Clipped to the band it shows the whole photograph
+       instead, and the navy below it is the section's own ground. */
+    .slides { height: calc(var(--header-h) + var(--band)); bottom: auto; }
+    .opener-veil { height: calc(var(--header-h) + var(--band)); bottom: auto; }
+
+    /* The frame's wash is heaviest at the top, where the bar sits over it. On
+       a phone the top IS the photograph — the band is the first 26% of the
+       frame — so that same wash rendered it almost black. Here the bar has
+       its own scrim and the type below has the content scrim, so the band
+       only needs enough to keep the photograph from competing. */
+    .opener-veil {
+      background:
+        radial-gradient(70% 40% at 50% 0%, rgb(11 31 51 / 0.44) 0%, rgb(11 31 51 / 0) 100%),
+        linear-gradient(180deg,
+          rgb(11 31 51 / 0.30) 0%,
+          rgb(11 31 51 / 0.16) 26%,
+          rgb(11 31 51 / 0.14) 52%,
+          rgb(11 31 51 / 0.44) 78%,
+          rgb(11 31 51 / 0.88) 94%,
+          rgb(11 31 51 / 1) 100%);
+    }
+
     .opener-top { position: relative; }
     .opener-top::after {
       content: "";

@@ -46,5 +46,41 @@
   "license": "Unsplash License (free to use, as shown on the photo page 2026-09-10)",
   "unsplashPlus": false,
   "size_kb": 295
+ },
+ {
+  "use": "hero slide 1",
+  "file": "/img/hero/orlando-night.jpg",
+  "width": 2400,
+  "height": 1600,
+  "focus": "50% 55%",
+  "photographer": "Mick Haupt",
+  "page": "https://unsplash.com/photos/a-view-of-a-city-at-night-from-across-a-lake-Ci8vCyxLXsQ",
+  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-25)",
+  "unsplashPlus": false,
+  "why": "Orlando's own skyline across Lake Eola — the firm's city, not a generic one"
+ },
+ {
+  "use": "hero slide 2",
+  "file": "/img/hero/courthouse.jpg",
+  "width": 2400,
+  "height": 1600,
+  "focus": "50% 45%",
+  "photographer": "Colin Lloyd",
+  "page": "https://unsplash.com/photos/a-large-building-with-columns-and-a-clock-on-the-front-of-it-_JEiyOfC2y8",
+  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-25)",
+  "unsplashPlus": false,
+  "why": "A civic building, which is where these cases are decided. No gavel, no scales, no flag on it"
+ },
+ {
+  "use": "hero slide 3",
+  "file": "/img/hero/airport-gate.jpg",
+  "width": 2400,
+  "height": 1600,
+  "focus": "50% 50%",
+  "photographer": "Kenjy Minamori",
+  "page": "https://unsplash.com/photos/a-room-with-rows-of-chairs-and-a-large-window-L9oT7Ow3TEo",
+  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-25)",
+  "unsplashPlus": false,
+  "why": "An empty departure gate: arrival and departure without staging anybody as a client"
  }
 ]

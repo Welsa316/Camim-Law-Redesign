@@ -230,7 +230,10 @@ const nav = [
      pseudo-element so the state change stays a fade rather than a snap. */
   .hdr::before {
     content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: linear-gradient(180deg, rgb(11 31 51 / 0.58) 0%, rgb(11 31 51 / 0.30) 64%, rgb(11 31 51 / 0) 100%);
+    /* Heavier since the frame became a slideshow: it used to sit over one
+       dark photograph, and now a bright courthouse or a lit skyline can be
+       under it. Measured, the wordmark fell to 3.79:1 at the old weight. */
+    background: linear-gradient(180deg, rgb(11 31 51 / 0.82) 0%, rgb(11 31 51 / 0.60) 64%, rgb(11 31 51 / 0) 100%);
     opacity: 0; transition: opacity var(--d-state) var(--ease-state);
   }
   :global(html.js-on) .hdr[data-over]::before { opacity: 1; }
@@ -253,7 +256,11 @@ const nav = [
   :global(html.js-on) .hdr[data-over] .hdr-mark,
   :global(html.js-on) .hdr[data-over] .hdr-link,
   :global(html.js-on) .hdr[data-over] .hdr-phone { color: var(--color-paper); }
-  :global(html.js-on) .hdr[data-over] .hdr-mark-rest { color: rgb(252 252 250 / 0.66); }
+  /* Opaque over the frame. A translucent white loses contrast faster than
+     the scrim behind it gains it, and at 9.9px over the brightest slide the
+     descriptor measured 4.37:1. The lightness it was buying is already in the
+     size and the letter-spacing; it does not need to come out of the colour. */
+  :global(html.js-on) .hdr[data-over] .hdr-mark-rest { color: var(--color-paper); }
   :global(html.js-on) .hdr[data-over] .hdr-pay { color: rgb(252 252 250 / 0.72); }
   :global(html.js-on) .hdr[data-over] .hdr-toggle-bars i { background: var(--color-paper); }
   @media (any-hover: hover) {

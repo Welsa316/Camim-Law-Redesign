@@ -151,6 +151,36 @@ if (!reduced.matches && "IntersectionObserver" in window) {
   document.documentElement.classList.remove("js-reveal");
 }
 
+/* --------------------------------------------------------- hero slideshow */
+/* Cross-fades the opening frame's photographs. The dots are the control WCAG
+   2.2.2 asks for on anything that moves by itself, and using one stops the
+   timer: a reader who has taken hold of it should not have it taken back. */
+const slides = [...document.querySelectorAll<HTMLElement>("[data-slide]")];
+const dots = [...document.querySelectorAll<HTMLElement>("[data-dot]")];
+if (slides.length > 1) {
+  const SLIDE_MS = 8000;
+  let at = 0;
+  let timer = 0;
+
+  const show = (i: number) => {
+    at = (i + slides.length) % slides.length;
+    slides.forEach((el, n) => el.toggleAttribute("data-on", n === at));
+    dots.forEach((el, n) =>
+      n === at ? el.setAttribute("aria-current", "true") : el.removeAttribute("aria-current"));
+  };
+  const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
+  const start = () => {
+    if (!timer && !reduced.matches) timer = window.setInterval(() => show(at + 1), SLIDE_MS);
+  };
+
+  dots.forEach((el, n) => el.addEventListener("click", () => { stop(); show(n); }));
+  // Nothing advances while the tab is in the background; coming back should
+  // not dump four transitions at once.
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  reduced.addEventListener("change", () => (reduced.matches ? stop() : start()));
+  start();
+}
+
 /* ------------------------------------------------------ language switch */
 /* A fixed pill sits on top of whatever scrolls under it. Over body copy that
    is what a floating control does; over the footer's own brand link and its

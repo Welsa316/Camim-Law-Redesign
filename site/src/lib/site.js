@@ -10,11 +10,28 @@ export const SITE_URL = "https://www.camimlaw.com";
 export const IS_DEMO = import.meta.env.PUBLIC_DEMO === "1" || import.meta.env.PUBLIC_DEMO === "true";
 
 /**
- * Phase 1: the landing page, the attorney page, and the client progress
+ * The landing page, the attorney page, the fourteen practice-area pages
+ * (added 2026-09-27, after their design review), and the client progress
  * page. "" is the home page. `progress` is English-only and outside the
  * bilingual system, so it is handled separately by the build script.
  */
-export const DEMO_ROUTES = ["", "juan-campos"];
+export const DEMO_ROUTES = [
+  "", "juan-campos",
+  "green-card",
+  "peticiones-familiares",
+  "ciudadania",
+  "defensa-contra-la-deportacion",
+  "visas-especial-para-jovenes",
+  "visas-de-prometido",
+  "asilo",
+  "vawa",
+  "daca",
+  "tramite-consular",
+  "ead",
+  "estatus-de-proteccion-temporal",
+  "visa-u",
+  "visa-t"
+];
 export const DEMO_SINGLE_ROUTES = ["progress"];
 
 /**

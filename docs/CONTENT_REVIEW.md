@@ -2,7 +2,7 @@
 
 Everything on the site that needs the attorney's confirmation, in the order it blocks work. Each item says where it lives in the code, so a yes or no is a one-line change.
 
-Nothing marked here is currently asserted on the site as fact. Unverified values do not render at all; the mechanism is the `verified` flag in `site/src/lib/org.ts`. The fourteen service pages are the exception: they render in the review build and are kept out of the preview the client sees (`DEMO_ROUTES` in `site/src/lib/site.js`) until he has confirmed them (§1.2).
+Nothing marked here is currently asserted on the site as fact. Unverified values do not render at all; the mechanism is the `verified` flag in `site/src/lib/org.ts`. The fourteen service pages are the exception: they render in the review build and, since 2026-09-27, in the preview the client sees (`DEMO_ROUTES` in `site/src/lib/site.js`), so he can confirm them there (§1.2).
 
 ---
 
@@ -251,9 +251,10 @@ Fourteen practice areas, on the client's instruction of 2026-09-10 that this
 firm's services are the same as Campos Muños Law's: green card, family
 petitions, citizenship, deportation defense, special immigrant juvenile
 status, fiancé(e) visas, asylum, VAWA, DACA, consular processing, work
-permits, TPS, U visas and T visas. All fourteen render in the review build.
-None is in the preview the client sees, which carries only the home and
-attorney pages.
+permits, TPS, U visas and T visas. All fourteen render in the review build,
+and since 2026-09-27 in the private preview, after a design review of the
+template (one left edge, an in-page index on the four long pages, marked
+lists, and the home page's closing statement).
 
 **Confirm each: yes or no**, and for each yes, read §1.2e before it ships.
 

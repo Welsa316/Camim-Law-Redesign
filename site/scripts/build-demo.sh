@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Builds the phase 1 preview into ../demo/: the landing page and the attorney
-# page, in both languages, and nothing else. The routes are listed once, in
+# Builds the preview into ../demo/: the landing page, the attorney page and the
+# fourteen practice-area pages, in both languages, and nothing else. The routes are listed once, in
 # DEMO_ROUTES in src/lib/site.js, which is what makes every link to anything
 # else render as inert text; this script copies the matching files, so no other
 # route exists at the preview URL even if someone types it.
@@ -8,7 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Kept in step with DEMO_ROUTES by the check below, not by memory.
-ROUTES=("" "juan-campos")
+ROUTES=("" "juan-campos" "green-card" "peticiones-familiares" "ciudadania" "defensa-contra-la-deportacion" "visas-especial-para-jovenes" "visas-de-prometido" "asilo" "vawa" "daca" "tramite-consular" "ead" "estatus-de-proteccion-temporal" "visa-u" "visa-t")
 # English-only pages, outside the bilingual pairs above.
 SINGLE=("progress")
 
@@ -45,7 +45,7 @@ done
 cp -R dist/client/_astro "$OUT/_astro"
 cp -R dist/client/fonts "$OUT/fonts"
 
-# Only the images these two pages actually reference. Copying img/ wholesale
+# Only the images these pages actually reference. Copying img/ wholesale
 # put five unused photographs of the client into a package addressed to him.
 node -e '
   const fs = require("fs"), path = require("path");

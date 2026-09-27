@@ -287,7 +287,7 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     /* Declared here, not inside the media block, because both the frame (which
        reserves the row) and the slides (which fill it) have to read it, and a
        custom property needs a selector to live on. */
-    --band: clamp(150px, 26vh, 300px);
+    --band: clamp(176px, 29vh, 330px);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -478,12 +478,6 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
   .opener-meta { color: #b6c3d1; margin: 0; }
 
   @media (max-width: 899px) {
-    /* The phone frame is the tall crop, so he reads head to shoe and his face
-       lands in the upper third. The whole apparatus therefore moves down and
-       shares one dark ground with the statement, rather than sitting across
-       the bright part of the frame. Measured, not assumed: in the top corner
-       the figures' labels read 3.1:1 against the wall behind him, and
-       darkening the veil enough to fix that put his face in shadow. */
     /* The photograph gets a floor, not the leftovers. As `1fr` the top row was
        whatever the type did not use — 131px on a 412x730 phone — and the
        scrim's own 150px ramp then started above his head, which is why he
@@ -503,27 +497,27 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     .opener-bottom { grid-row: 3; gap: var(--spacing-s4); }
     .opener-lead { display: none; }
 
-    /* The scrim is anchored to the first row of type, not to a percentage of
-       the frame. The type block is a fixed height while the frame is a
-       viewport height, so the words begin at 42% of the frame on a 390x844
-       phone and at 21% on a 320x720 one; no single set of gradient stops
-       serves both, and chasing it with stops is what left the labels at
-       1.4:1. It hangs off .opener-top as a pseudo-element rather than sitting
-       in the grid as a row-spanning item, because placed in the grid it
-       resolved to a zero-width track and rendered 40px wide. The stops are
-       absolute lengths, so the dissolve is the same 150px everywhere. */
-    /* The photograph is a band, not the whole frame. Left filling the section
-       it showed a narrow vertical slice of a landscape panorama — on a phone
-       that slice was sky. Clipped to the band it shows the whole photograph
-       instead, and the navy below it is the section's own ground. */
-    .slides { height: calc(var(--header-h) + var(--band)); bottom: auto; }
-    .opener-veil { height: calc(var(--header-h) + var(--band)); bottom: auto; }
+    /* The content scrim is gone. It existed to darken the photograph behind
+       the words, back when the photograph filled the section. The slides are
+       clipped to the band now, so below the band the ground is the section's
+       own navy and the scrim was painting navy onto navy — while its 116px
+       ramp ate the band from underneath. Measured: 50px of unobstructed
+       photograph on a 360x640 phone, out of a 166px band. */
+    .opener-top { position: relative; }
+    .opener-top::after { content: none; }
+  }
 
-    /* The frame's wash is heaviest at the top, where the bar sits over it. On
-       a phone the top IS the photograph — the band is the first 26% of the
-       frame — so that same wash rendered it almost black. Here the bar has
-       its own scrim and the type below has the content scrim, so the band
-       only needs enough to keep the photograph from competing. */
+  /* Portrait only. The band is what lets the photograph be visible and the
+     words sit on the section's own ground instead of on a photograph — but a
+     landscape phone is 390px tall with no room for a band, so it keeps the
+     full-height frame and the heavier wash that goes with it. Scoping this by
+     width alone put the type back on the photograph at 844x390, at 1.11:1. */
+  @media (max-width: 899px) and (orientation: portrait) {
+    .slides, .opener-veil { height: calc(var(--header-h) + var(--band)); bottom: auto; }
+    /* Light over the band: the bar carries its own scrim and the words below
+       sit on navy, so this only has to stop the photograph competing. It
+       closes to solid at the bottom edge so the band dissolves rather than
+       cutting. */
     .opener-veil {
       background:
         radial-gradient(70% 40% at 50% 0%, rgb(11 31 51 / 0.44) 0%, rgb(11 31 51 / 0) 100%),
@@ -534,25 +528,6 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
           rgb(11 31 51 / 0.44) 78%,
           rgb(11 31 51 / 0.88) 94%,
           rgb(11 31 51 / 1) 100%);
-    }
-
-    .opener-top { position: relative; }
-    .opener-top::after {
-      content: "";
-      position: absolute;
-      left: calc(var(--gutter) * -1);
-      right: calc(var(--gutter) * -1);
-      top: -116px;
-      bottom: -2400px;
-      z-index: -1;
-      /* 116px, not 150: the ramp is the seam between the photograph and the
-         ground the words sit on, and every pixel of it is a pixel of him. */
-      background: linear-gradient(180deg,
-        rgb(11 31 51 / 0) 0px,
-        rgb(11 31 51 / 0.58) 74px,
-        rgb(11 31 51 / 0.93) 116px,
-        rgb(11 31 51 / 0.97) 240px,
-        rgb(11 31 51 / 0.97) 100%);
     }
   }
 
@@ -610,6 +585,19 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     .opener-bottom { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.6fr); gap: var(--spacing-s7); }
     .opener-side { justify-items: end; text-align: right; }
     .opener-rule, .opener-meta { display: none; }
+    /* No band here, so every word sits on the photograph, and on a 390px-tall
+       frame the figures reach into the lit middle of it. A real floor under
+       the whole frame, rather than the desktop wash that relies on the type
+       keeping to the corners. */
+    /* Heavier than it looks like it needs to be. Replacing the desktop wash
+       dropped its top-left radial, which was the layer specifically holding
+       the figures, so a uniform 0.62 through the middle measured 3.75:1 on
+       their labels — lighter than before, exactly where it mattered. This is
+       the one frame where legibility wins over the photograph outright. */
+    .opener-veil {
+      background: linear-gradient(180deg,
+        rgb(11 31 51 / 0.88) 0%, rgb(11 31 51 / 0.80) 45%, rgb(11 31 51 / 0.88) 100%);
+    }
   }
 
   /* Narrow phones. The type block is nearly as tall as the frame, so it climbs

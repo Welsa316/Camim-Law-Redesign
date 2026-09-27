@@ -118,7 +118,7 @@ export function serviceSchema(name: string, url: string, lang: Lang, description
     ...(description ? { description } : {}),
     url: abs(url),
     inLanguage: lang,
-    provider: { "@id": `${SITE_URL}/#organization` },
+    provider: { "@id": `${SITE_URL}/#firm` },
     areaServed: { "@type": "Country", name: "United States" },
     serviceType: name,
   };

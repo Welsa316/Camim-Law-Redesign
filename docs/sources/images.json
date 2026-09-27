@@ -72,15 +72,39 @@
   "why": "A civic building, which is where these cases are decided. No gavel, no scales, no flag on it"
  },
  {
-  "use": "hero slide 3",
-  "file": "/img/hero/airport-gate.jpg",
+  "use": "hero slide",
+  "file": "/img/hero/statue-of-liberty.jpg",
+  "width": 2400,
+  "height": 1350,
+  "focus": "16% 42%",
+  "photographer": "Pierre Blaché",
+  "page": "https://unsplash.com/photos/statue-of-liberty-and-manhattan-skyline-VMNG8BYFQfs",
+  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-26)",
+  "unsplashPlus": false,
+  "why": "The immigration symbol, on the client's instruction that the frame read as American"
+ },
+ {
+  "use": "hero slide",
+  "file": "/img/hero/capitol-night.jpg",
+  "width": 2400,
+  "height": 1601,
+  "focus": "52% 50%",
+  "photographer": "Pretty Pink",
+  "page": "https://unsplash.com/photos/us-capitol-hill-during-nighttime-L_U4jhwZ6hY",
+  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-26)",
+  "unsplashPlus": false,
+  "why": "Where immigration law is written"
+ },
+ {
+  "use": "hero slide",
+  "file": "/img/hero/flag.jpg",
   "width": 2400,
   "height": 1600,
-  "focus": "50% 50%",
-  "photographer": "Kenjy Minamori",
-  "page": "https://unsplash.com/photos/a-room-with-rows-of-chairs-and-a-large-window-L9oT7Ow3TEo",
-  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-25)",
+  "focus": "46% 50%",
+  "photographer": "Danny Burke",
+  "page": "https://unsplash.com/photos/an-american-flag-waving-in-the-wind-dNvIHg3Xf30",
+  "license": "Unsplash License (photo page reads 'Free Photo', checked 2026-09-26)",
   "unsplashPlus": false,
-  "why": "An empty departure gate: arrival and departure without staging anybody as a client"
+  "why": "The flag, on the client's instruction that the frame read as American"
  }
 ]

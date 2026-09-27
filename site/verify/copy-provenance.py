@@ -7,11 +7,21 @@ A string passes if it is, after normalising case, whitespace and punctuation:
     dictionaries and service content, docs/sources/camulaw.com.*.json), or
   - verbatim in one of the sister firm's source documents
     (docs/sources/camulaw-source-documents/*.txt), or
-  - a value from a checked record in src/lib/org.ts or src/lib/services.ts
-    (names, numbers, addresses, form numbers, dates), or
+  - a value from a checked record in src/lib/org.ts (names, numbers,
+    addresses, form numbers, dates), or a service name in src/lib/services.ts,
+    or
+  - a paraphrase: the 'to' of a record in docs/sources/paraphrases.json whose
+    every 'from' is itself sourced by the rules above. The client asked on
+    2026-09-26 for the service pages to be reworded rather than copied, with
+    the legal meaning kept; the record is what makes each reworded string
+    traceable to the text it restates, or
   - a fragment of one of the above at least 12 characters long, so a sentence
     the source splits across links, or a heading that quotes a source line,
     still passes.
+
+The check also fails if a paraphrase record cites a 'from' that is not
+sourced, or if src/lib/services.ts no longer matches paraphrases.json (run
+scripts/build-services.py).
 
 Anything else is text written for this site, and this site is not allowed to
 carry text written for it. The check prints every such string with the route
@@ -62,23 +72,61 @@ def load_corpus():
         blobs.append(norm(t))
     return lines, " | ".join(blobs)
 
+def load_services():
+    t = (ROOT / "src/lib/services.ts").read_text(encoding="utf-8")
+    body = t.split("export const SERVICES: Service[] = ", 1)[1].split("\n];\n", 1)[0] + "\n]"
+    return json.loads(body)
+
 def load_records():
     vals = set()
-    for f in ("src/lib/org.ts", "src/lib/services.ts"):
-        t = (ROOT / f).read_text(encoding="utf-8")
-        # only literal values on the right of a colon or inside arrays, not comments
-        t = re.sub(r"/\*.*?\*/", "", t, flags=re.S); t = re.sub(r"//[^\n]*", "", t)
-        for m in re.findall(r'"([^"\n]{1,120})"', t): vals.add(norm(m))
+    t = (ROOT / "src/lib/org.ts").read_text(encoding="utf-8")
+    # only literal values on the right of a colon or inside arrays, not comments
+    t = re.sub(r"/\*.*?\*/", "", t, flags=re.S); t = re.sub(r"//[^\n]*", "", t)
+    for m in re.findall(r'"([^"\n]{1,120})"', t): vals.add(norm(m))
+    # services.ts carries reworded page text now, so only its names count as
+    # records; everything else there has to pass as a paraphrase
+    for s in load_services():
+        for v in s["name"].values(): vals.add(norm(v))
     return vals
+
+def load_paraphrases(lines, blob, records):
+    """The reworded strings whose sources all check out, and the problems."""
+    d = json.load(open(DOCS / "sources" / "paraphrases.json"))["services"]
+    ok, bad, recs = set(), [], []
+    for sid, langs in d.items():
+        for lang, r in langs.items():
+            recs.append((sid, lang, "line", r["line"]))
+            for i, b in enumerate(r["blocks"]):
+                if b["type"] == "list":
+                    for j, it in enumerate(b["items"]): recs.append((sid, lang, f"block {i} item {j}", it))
+                else: recs.append((sid, lang, f"block {i}", b))
+    for sid, lang, where, rec in recs:
+        unsourced = [f["text"] for f in rec["from"] if not whole(norm(f["text"]), lines, blob, records)]
+        if not rec["from"]: bad.append(f"{sid} {lang} {where}: paraphrase with no source")
+        for u in unsourced: bad.append(f"{sid} {lang} {where}: paraphrase of unsourced text: {u[:80]}")
+        if not unsourced and rec["from"]: ok.add(norm(rec["to"]))
+    # services.ts must say exactly what the record says
+    written = {}
+    for s in load_services():
+        for lang in ("es", "en"):
+            written[(s["id"], lang)] = [s["line"][lang]] + [x for b in s["blocks"][lang] for x in (b["items"] if b["type"] == "list" else [b["text"]])]
+    for sid, langs in d.items():
+        for lang, r in langs.items():
+            want = [r["line"]["to"]] + [x for b in r["blocks"] for x in ([it["to"] for it in b["items"]] if b["type"] == "list" else [b["to"]])]
+            if written.get((sid, lang)) != want:
+                bad.append(f"{sid} {lang}: src/lib/services.ts does not match paraphrases.json; run scripts/build-services.py")
+    return ok, bad
 
 FORM_RE = re.compile(r"^(I|N|G|DS|K|EOIR)-?\d{1,4}[A-Z]?( / (I|N|DS|K)-?\d{1,4}[A-Z]?)?$")
 
+PARA, PBLOB = set(), ""
+
 def whole(n, lines, blob, records):
-    """A complete sourced line, a complete record value, or a sourced fragment of 12+ characters."""
+    """A complete sourced line, a complete record value, a checked paraphrase, or a sourced fragment of 12+ characters."""
     if not n: return False
-    if n in lines or n in records: return True
+    if n in lines or n in records or n in PARA: return True
     if FORM_RE.match(n) or re.fullmatch(r"[\d\s]+", n): return True
-    return len(n) >= 12 and n in blob
+    return len(n) >= 12 and (n in blob or n in PBLOB)
 
 def segmented(n, lines, blob, records, depth=0):
     """A string made of two or three WHOLE sourced parts set side by side, e.g. a
@@ -87,7 +135,7 @@ def segmented(n, lines, blob, records, depth=0):
     stitching words."""
     words = n.split()
     if len(words) < 2 or len(words) > 24: return False
-    def ok_part(part): return part in lines or part in records or bool(FORM_RE.match(part)) or bool(re.fullmatch(r"[\d\s]+", part))
+    def ok_part(part): return part in lines or part in records or part in PARA or bool(FORM_RE.match(part)) or bool(re.fullmatch(r"[\d\s]+", part))
     for i in range(1, len(words)):
         a, b = " ".join(words[:i]), " ".join(words[i:])
         if ok_part(a) and (ok_part(b) or (depth < 1 and segmented(b, lines, blob, records, depth + 1))): return True
@@ -99,6 +147,7 @@ def classify(s, lines, blob, records, parent=None):
     if n in lines: return "verbatim", ""
     if n in records or FORM_RE.match(s.strip()) or re.fullmatch(r"[\d.,:%\s()+\-–—·/]+", s.strip()): return "record", ""
     if len(n) >= 12 and n in blob: return "verbatim-fragment", ""
+    if n in PARA or (len(n) >= 12 and n in PBLOB): return "paraphrase", ""
     # compound nodes: parts joined by a separator, each a whole sourced thing
     for sep in (r"\s[·|]\s", r"\s[—–]\s", r"(?<=[.!?])\s+"):
         parts = [p for p in re.split(sep, s) if p.strip()]
@@ -109,7 +158,7 @@ def classify(s, lines, blob, records, parent=None):
     # a wordmark split across two spans, a headline split into lines by the reveal
     if parent:
         pn = norm(parent)
-        if pn != n and (pn in lines or pn in records or (len(pn) >= 12 and pn in blob) or segmented(pn, lines, blob, records)
+        if pn != n and (pn in lines or pn in records or pn in PARA or (len(pn) >= 12 and (pn in blob or pn in PBLOB)) or segmented(pn, lines, blob, records)
                         or any(len(parts := [p for p in re.split(sep, parent) if p.strip()]) > 1 and all(whole(norm(p), lines, blob, records) or segmented(norm(p), lines, blob, records) for p in parts) for sep in (r"\s[·|]\s", r"\s[—–]\s", r"(?<=[.!?])\s+"))):
             return "verbatim-part-of-element", ""
     return "unsourced", n
@@ -143,14 +192,19 @@ JS = """() => {
 }"""
 
 async def main() -> int:
+    global PARA, PBLOB
     lines, blob, records = *load_corpus(), load_records()
+    PARA, para_bad = load_paraphrases(lines, blob, records)
+    PBLOB = " | ".join(sorted(PARA))
+    for b in para_bad: print(f"  PARAPHRASE {b}")
     routes = sorted("/" + str(p.relative_to(ROOT / "dist/client")).replace("index.html", "") for p in (ROOT / "dist/client").rglob("index.html"))
-    seen, rows = {}, []
+    seen, rows, unloaded = {}, [], []
     async with async_playwright() as p:
         b = await p.chromium.launch(); c = await b.new_context(viewport={"width": 1440, "height": 900}); pg = await c.new_page()
         for route in routes:
             r = await pg.goto(f"{BASE}{route}", wait_until="domcontentloaded")
-            if not r or r.status != 200: continue
+            # a route that does not load would otherwise pass with nothing checked
+            if not r or r.status != 200: unloaded.append((route, r.status if r else None)); continue
             for s, parent in await pg.evaluate(JS):
                 if s in seen: continue
                 seen[s] = route
@@ -161,14 +215,16 @@ async def main() -> int:
     for r in rows: words[r[0]] += r[2]
     md = ["# Copy provenance", "", "Every visible string on the built site, checked by `verify/copy-provenance.py` against the sources under `docs/sources/`.", "",
           "| Category | Strings | Words |", "|---|---:|---:|"]
-    for k in ("verbatim", "verbatim-fragment", "verbatim-parts", "verbatim-part-of-element", "record", "unsourced"): md.append(f"| {k} | {cnt[k]} | {words[k]} |")
+    for k in ("verbatim", "verbatim-fragment", "verbatim-parts", "verbatim-part-of-element", "record", "paraphrase", "unsourced"): md.append(f"| {k} | {cnt[k]} | {words[k]} |")
     md += ["", "## Unsourced", "", "| First route | Words | String |", "|---|---:|---|"]
     for cat, route, wc, s in sorted(rows, key=lambda r: (r[1], -r[2])):
         if cat == "unsourced": md.append(f"| `{route}` | {wc} | {s.replace('|', chr(92)+'|')[:200]} |")
     (DOCS / "COPY_PROVENANCE.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     for cat, route, wc, s in sorted(rows, key=lambda r: (r[1], -r[2])):
         if cat == "unsourced": print(f"  UNSOURCED {route:<40} {s[:110]}")
-    print(f"\nstrings: {len(rows)}  unsourced: {cnt['unsourced']} ({words['unsourced']} words)  sourced: {len(rows)-cnt['unsourced']}")
-    return 1 if cnt["unsourced"] else 0
+    print(f"\nstrings: {len(rows)}  unsourced: {cnt['unsourced']} ({words['unsourced']} words)  sourced: {len(rows)-cnt['unsourced']}"
+          f"  (paraphrase: {cnt['paraphrase']})  paraphrase-record problems: {len(para_bad)}  routes: {len(routes) - len(unloaded)}/{len(routes)}")
+    for route, status in unloaded: print(f"  UNLOADED {route} ({status})")
+    return 1 if cnt["unsourced"] or para_bad or unloaded else 0
 
 sys.exit(asyncio.run(main()))

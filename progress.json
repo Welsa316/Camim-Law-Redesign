@@ -2,8 +2,8 @@
   "updated": "2026-09-26",
   "now": {
     "phase": 2,
-    "item": "practice-area-pages",
-    "note": "The fourteen pages are being reworded so they no longer copy Campos Muños Law's text, with the legal meaning kept the same and the Spanish and English checked against each other."
+    "item": "services-index",
+    "note": "The page that lists all fourteen areas is built in both languages and links to each one, and is being checked before it is marked finished."
   },
   "payments": [
     {
@@ -105,19 +105,20 @@
           "id": "practice-area-pages",
           "name": "Fourteen practice-area pages",
           "desc": "Green card, family petitions, citizenship, deportation defence, asylum, VAWA, DACA, U and T visas, fiancé(e) visas, TPS, work permits, consular processing and special immigrant juvenile status.",
-          "status": "in_progress"
+          "status": "done",
+          "doneOn": "2026-09-26"
         },
         {
           "id": "services-index",
           "name": "The services index",
           "desc": "One page listing all fourteen, and the route into each.",
-          "status": "next"
+          "status": "in_progress"
         },
         {
           "id": "intake",
           "name": "Consultation page and intake form",
           "desc": "Name, phone, preferred language and topic, delivered to whichever inbox you name.",
-          "status": "planned"
+          "status": "next"
         },
         {
           "id": "payments-page",

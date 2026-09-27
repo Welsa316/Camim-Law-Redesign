@@ -2,14 +2,16 @@
 
 Everything on the site that needs the attorney's confirmation, in the order it blocks work. Each item says where it lives in the code, so a yes or no is a one-line change.
 
-Nothing marked here is currently asserted on the site as fact. Unverified values do not render at all; the mechanism is the `verified` flag in `site/src/lib/org.ts` and the `status` field in `site/src/lib/services.ts`.
+Nothing marked here is currently asserted on the site as fact. Unverified values do not render at all; the mechanism is the `verified` flag in `site/src/lib/org.ts`. The fourteen service pages are the exception: they render in the review build and are kept out of the preview the client sees (`DEMO_ROUTES` in `site/src/lib/site.js`) until he has confirmed them (§1.2).
 
 ---
 
 ## 0. The copy rule, and how it is enforced
 
-**Nothing on this site was written for it.** On the client's instruction of
-2026-09-10, every visible string is one of:
+**Nothing on this site was written for it, except the rewording of the
+service pages, and every reworded string is traced to the text it restates.**
+On the client's instructions of 2026-09-10 and 2026-09-26, every visible
+string is one of:
 
 1. word-for-word from camimlaw.com (its home, about, services, contact and
    asylum pages, captured in `docs/sources/camimlaw.com.json` and `.blocks.json`);
@@ -18,14 +20,23 @@ Nothing marked here is currently asserted on the site as fact. Unverified values
    firm's own source documents and video transcripts
    (`docs/sources/camulaw-source-documents/`);
 3. a value from a checked record in `site/src/lib/org.ts` (a name, number,
-   address, date, admission, degree, form number).
+   address, date, admission, degree, form number);
+4. on the fourteen service pages only, a paraphrase of 1 or 2. On 2026-09-26
+   the client asked that those pages not match Campos Muños Law's text word for
+   word, and gave permission to reword them provided the legal meaning does not
+   change. Each reworded string is recorded in `docs/sources/paraphrases.json`
+   beside the verbatim source text it restates, and the gate accepts it only if
+   every one of those sources is itself sourced (§1.2e).
 
 `site/verify/copy-provenance.py` renders every route of the build in both
 languages, extracts every text node, alt, title, aria-label, page title and
 meta description, and fails unless each one is a whole sourced line, a whole
-record value, a sourced fragment of twelve or more characters, or a compound
-of whole sourced parts (a label beside a phone number; a headline the reveal
-has split into lines). It writes the result to `docs/COPY_PROVENANCE.md`.
+record value, a checked paraphrase, a sourced fragment of twelve or more
+characters, or a compound of whole sourced parts (a label beside a phone
+number; a headline the reveal has split into lines). It also fails if a
+paraphrase cites a source that is not sourced, if `site/src/lib/services.ts`
+has drifted from `paraphrases.json`, or if any route fails to load. It writes
+the result to `docs/COPY_PROVENANCE.md`.
 Run it after any change to copy. A failing gate is a string somebody wrote.
 
 **Fragments promoted to headings.** The gate accepts a sourced fragment of
@@ -236,32 +247,23 @@ drafted here.
 
 ### 1.2 The list of matters the firm handles
 
-Only asylum ships today, because it is the only service the current site publishes. Fifteen more are drafted or designed, and none renders until confirmed.
+Fourteen practice areas, on the client's instruction of 2026-09-10 that this
+firm's services are the same as Campos Muños Law's: green card, family
+petitions, citizenship, deportation defense, special immigrant juvenile
+status, fiancé(e) visas, asylum, VAWA, DACA, consular processing, work
+permits, TPS, U visas and T visas. All fourteen render in the review build.
+None is in the preview the client sees, which carries only the home and
+attorney pages.
 
-**Confirm each: yes or no.**
+**Confirm each: yes or no**, and for each yes, read §1.2e before it ships.
 
-| Matter | Status in code | Evidence |
-|---|---|---|
-| Asilo | live | Published on camimlaw.com today |
-| Peticiones familiares (I-130) | pending, drafted | Sister firm page; his own posts about I-130 approvals |
-| Residencia por matrimonio | pending | Instagram biography; the most-named matter in Google reviews |
-| Ajuste de estatus (I-485) | pending | Sister firm page; consultation form option |
-| Visa de prometido (K-1) | pending | Sister firm page |
-| Trámite consular | pending | Sister firm page; biography references the State Department |
-| Ciudadanía (N-400) | pending, drafted | Sister firm page; consultation form option |
-| Residencia permanente | pending | Sister firm page |
-| VAWA (I-360) | pending, drafted | Sister firm page; consultation form option |
-| Visa U (I-918) | pending, drafted | Sister firm page; consultation form option |
-| Visa T (I-914) | pending | Sister firm page |
-| Defensa contra la deportación | pending, drafted | Sister firm page; recurring court-procedure content |
-| Permiso de trabajo (I-765) | pending | Sister firm page |
-| DACA | pending | Sister firm page |
-| Fianza de inmigración | draft, no copy | Designed into the architecture only |
-| Perdón I-601A | draft, no copy | Not listed on either site, but he posts about waivers |
+**Where:** `site/src/lib/services.ts`, written from
+`docs/sources/paraphrases.json` by `site/scripts/build-services.py`. To take
+a service off the site, remove it from both.
 
-**Where:** the `status` field on each matter in `site/src/lib/services.ts`. Change `"pending"` to `"live"` to publish.
-
-**Why it matters:** Rule 4-7.13(b)(4) forbids advertising areas the firm does not practise.
+**Why it matters:** Rule 4-7.13 forbids advertising areas the firm does not
+practise, and a practice page states law, so every legal statement on it is a
+material statement under 4-7.13(a)(1).
 
 ### 1.1b Removed: the legal-notice page, the privacy page, and the copyright line
 
@@ -359,6 +361,11 @@ records the provenance.
 
 ### 1.2b Every legal statement on the asylum page, and where it came from
 
+> **Superseded.** This section audits an earlier asylum draft (the one that
+> named Forms I-589 and I-765 and the Orlando court address). That draft was
+> replaced on 2026-09-10 by camimlaw.com's own asylum text, and on 2026-09-26
+> by the reworded page described in §1.2e. It is kept for the record only.
+
 The asylum page is the only page on this site that states immigration law, and
 it is the only practice page that ships. Its substance was taken from what
 camimlaw.com already publishes, rewritten for plainer Spanish and shorter
@@ -403,6 +410,72 @@ footnote; the second and third are numbers that go stale.
 **Why it matters:** Rule 4-7.13(a)(1) — a material statement that is factually
 or legally inaccurate makes the whole advertisement deceptive. Form numbers and
 eligibility statements are exactly that kind of material statement.
+
+### 1.2e The fourteen service pages: reworded, and what to check
+
+On 2026-09-26 the client asked that the service pages not read word for word
+like Campos Muños Law's, and gave permission to paraphrase them provided the
+legal meaning does not change. The rules the rewording followed:
+
+- terms of art stay as the source has them (well-founded fear, cancellation
+  of removal, deferred action, adjustment of status, continuous residence,
+  inadmissible, Notice to Appear);
+- every claim keeps its scope and its hedging: *may* stays *may*, *generally*
+  stays *generally*;
+- no fact is added and no condition is dropped;
+- no sentence promises an outcome;
+- only structure and non-legal wording change.
+
+Each language was reworded from its own source, then audited twice: once
+string by string against the source, and once Spanish against English, block
+by block. Nine problems were found and fixed. The problems included "cooperates"
+narrowed to "is cooperating", "related court proceedings" narrowed to "the
+trial", "have access to" strengthened to "can receive", and the Spanish
+deportation page saying *cita de la corte* where the English says Notice to
+Appear.
+
+**Deliberate departures from the source**, each recorded in the `decisions`
+array of `paraphrases.json`:
+
+- **Asylum.** The Spanish page came from camimlaw.com and the English from
+  camulaw.com, and they did not say the same things. Both languages now carry
+  the same content in the same order: English gains the Spanish page's
+  frequently asked questions, the one-year wait for residence and the
+  port-of-entry sentences.
+- **DACA.** The English source ended with a line about "our immigration team"
+  and its "areas of specialization". This firm is one attorney, and Rule
+  4-7.14 restricts claims of specialization, so it is dropped. The source
+  also called DACA "a discretionary status" two paragraphs after saying it
+  "is not a legal status"; the page now says DACA is discretionary.
+- **Work permits.** "So you can work without worry" is dropped from the
+  summary line as an implied outcome.
+- **T visa.** The Spanish summary line said *tráfico humano*, which in legal
+  Spanish is smuggling; it now says *trata de personas*, as the page body does.
+
+**Points in the source text itself for the attorney to confirm.** The
+rewording kept the source's meaning, so these are on the page as the source
+had them. Each is a material statement under Rule 4-7.13(a)(1).
+
+| Page | What the page says | What to check |
+|---|---|---|
+| Asylum | An asylee may apply for residence one year after the grant | The rule is one year of physical presence after the grant, with other requirements |
+| Asylum | The affirmative process is for people who entered on a visa, or unaccompanied children, filing within a year | Anyone physically present may file affirmatively, whatever their status; and unaccompanied children are exempt from the one-year deadline the page applies to them |
+| Asylum | USCIS has *eleven* asylum offices; a work permit may be approved for *two years* | Numbers that go stale. USCIS has changed the maximum validity of these work permits more than once. Confirm both or drop them (the earlier draft dropped them) |
+| Asylum | The work permit "may be used for employment purposes only" | The source said "únicamente para buscar empleo" (only to look for work), read here as its evident meaning |
+| DACA | The policy protects "nearly one million" young people | Far fewer hold DACA today than have held it over the program's life. Confirm the figure or drop it |
+| TPS | Countries are designated "by Congress or by DHS" | Designation is the Secretary of Homeland Security's; Congress designated a country directly only in the 1990 statute |
+| TPS | The applicant "must not have committed a felony or two misdemeanors" | The bar is *conviction* of any felony or two or more misdemeanors committed in the United States |
+| TPS | Presence and residence are measured from the designation date | The dates are set country by country in each Federal Register notice |
+| TPS | The list of countries that "have received a designation" | Accurate as history, but reads as current. Several designations have ended or been litigated since it was written |
+| Work permits | A pending good-faith case is generally required | Eligibility is by category, and some categories come with a status rather than a pending case |
+| U visa | Victims of "serious crimes" who suffered "significant physical or psychological harm" | The statute's terms are *qualifying criminal activity* and *substantial physical or mental abuse* |
+| T visa | Extreme hardship involving "unusual or severe harm" | The statute says unusual *and* severe harm |
+| Family petitions | A citizen may petition for children "regardless of age or marital status" | In immigration law a *child* is unmarried and under 21; older or married children are *sons and daughters* |
+| VAWA | The process is "completely confidential"; "no one needs to find out" | The law bars disclosure and bars relying on the abuser's information, but the agencies deciding the case see it. Confirm he is comfortable with the absolute wording |
+| Juvenile status | Called a visa throughout | It is a classification that leads to a green card; the name is the sister firm's service name |
+
+**Where:** `docs/sources/paraphrases.json` for the wording and its sources;
+run `site/scripts/build-services.py` after any edit to it.
 
 ### 1.2c The byline does not claim he wrote or reviewed the page
 

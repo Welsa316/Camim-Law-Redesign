@@ -81,6 +81,13 @@ if (toggle && menu) {
     menu.hidden = !open;
     toggle.setAttribute("aria-expanded", String(open));
     document.body.style.overflow = open ? "hidden" : "";
+    // The open drawer covers the page, so everything outside the header is
+    // taken out of the tab order and the accessibility tree while it is open;
+    // otherwise Tab walks on into links the reader cannot see (WCAG 2.4.11).
+    const shell = toggle.closest("header");
+    for (const el of Array.from(document.body.children)) {
+      if (el !== shell && el instanceof HTMLElement) el.inert = open;
+    }
     if (menuLabel) menuLabel.textContent = open ? labels.close : labels.open;
     setHeaderMenuOpen(open);
   };
@@ -274,3 +281,4 @@ if (form) {
     }
   });
 }
+

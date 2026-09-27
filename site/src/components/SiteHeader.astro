@@ -24,7 +24,7 @@ const nav = [
       <span class="hdr-mark-rest">Immigration Law</span>
     </a>
 
-    <nav class="hdr-nav">
+    <nav class="hdr-nav" aria-label={_("a11y.menu")}>
       {nav.map((item) => demoAllows(item.slug)
         ? <a class="hdr-link" href={item.href} aria-current={Astro.url.pathname === item.href ? "page" : undefined}>{item.label}</a>
         : <span class="hdr-link">{item.label}</span>
@@ -34,8 +34,9 @@ const nav = [
     <div class="hdr-actions">
       <a class="hdr-phone apparatus" href={`tel:${ORG.phone.value}`}>{ORG.phoneDisplay.value}</a>
       {demoAllows("pagos") ? <a class="hdr-pay" href={langPath(lang, "pagos")}>{_("nav.payment")}</a> : <span class="hdr-pay">{_("nav.payment")}</span>}
-      <a class="hdr-lang" href={otherHref} lang={other} hreflang={other} aria-label={other === "en" ? _("lang.en") : _("lang.es")}>
-        <span aria-hidden="true">{lang === "es" ? "EN" : "ES"}</span>
+      <a class="hdr-lang" href={otherHref} lang={other} hreflang={other}>
+        {/* The visible "EN" is part of the name, so "click EN" works by voice (WCAG 2.5.3). */}
+        <span>{lang === "es" ? "EN" : "ES"}</span><span class="sr-only"> {other === "en" ? _("lang.en") : _("lang.es")}</span>
       </a>
       <a class="btn btn-primary hdr-cta" href={demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`}>
         {_("cta.book")}
@@ -49,7 +50,7 @@ const nav = [
 
   <!-- Mobile drawer: ruled rows, always labelled, never a grid of icons. -->
   <div class="drawer" id="site-menu" data-menu hidden>
-    <nav class="drawer-inner wrap">
+    <nav class="drawer-inner wrap" aria-label={_("a11y.menu")}>
       <ul class="drawer-list">
         <li class="drawer-group">
           <p class="drawer-group-name">{_("nav.services")}</p>

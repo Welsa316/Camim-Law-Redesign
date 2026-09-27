@@ -15,7 +15,7 @@ const whatsapp = show(ORG.whatsapp);
 -->
 <div class="mbar" data-mobile-bar>
   <a class="mbar-btn mbar-btn--primary" href={`tel:${ORG.phone.value}`}>
-    {_("cta.call")}
+    {_("cta.call")}{" "}
     <span class="mbar-num apparatus">{ORG.phoneDisplay.value}</span>
   </a>
   {whatsapp ? (
@@ -30,9 +30,9 @@ const whatsapp = show(ORG.whatsapp);
     <a class="mbar-btn" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
   )}
   {otherHref && (
-    <a class="mbar-btn mbar-btn--lang" href={otherHref} lang={other} hreflang={other} aria-label={other === "en" ? _("lang.en") : _("lang.es")}>
+    <a class="mbar-btn mbar-btn--lang" href={otherHref} lang={other} hreflang={other}>
       <img class="mbar-flag" src={other === "en" ? "/img/flags/us.svg" : "/img/flags/mx.svg"} width="20" height="15" alt="" aria-hidden="true" decoding="async" />
-      <span aria-hidden="true">{other === "en" ? "EN" : "ES"}</span>
+      <span>{other === "en" ? "EN" : "ES"}</span><span class="sr-only"> {other === "en" ? _("lang.en") : _("lang.es")}</span>
     </a>
   )}
 </div>

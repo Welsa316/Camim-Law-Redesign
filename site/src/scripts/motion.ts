@@ -141,12 +141,17 @@ if (!heads.length || reduced.matches || !capable) {
       else addEventListener("load", () => requestAnimationFrame(settle), { once: true });
 
       // Last resort: anything still parked outside its mask after 3s is put
-      // where it belongs, unconditionally. A held page is a broken page.
+      // where it belongs, unconditionally. A held page is a broken page. The
+      // tween is finished rather than the lines set: setting them left the
+      // scroll tween alive, and it replayed the reveal from below when the
+      // reader later scrolled to the heading.
       setTimeout(() => {
         document.querySelectorAll<HTMLElement>("[data-split-lines] .line").forEach((line) => {
           const t = getComputedStyle(line).transform;
           if (t && t !== "none" && !/matrix\(1, 0, 0, 1, 0, 0\)/.test(t)) {
-            gsap.set(line, { yPercent: 0, clearProps: "transform" });
+            const running = gsap.getTweensOf(line);
+            if (running.length) running.forEach((tw) => tw.progress(1));
+            else gsap.set(line, { yPercent: 0, clearProps: "transform" });
           }
         });
         revealPlainly();

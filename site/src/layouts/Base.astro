@@ -95,9 +95,15 @@ const alts = hreflang(alternates);
     <main id="main">
       <slot />
     </main>
-    <LangWidget lang={lang} href={lang === "es" ? alternates.en : alternates.es} />
     <SiteFooter lang={lang} flush={landing} />
-    <MobileBar lang={lang} otherHref={lang === "es" ? alternates.en : alternates.es} />
+    <!-- The floating language switch and the phone call bar, inside a landmark
+         so the site's main call action is reachable by landmark navigation.
+         Not in the header (its backdrop-filter re-anchors fixed children) and
+         not in the footer (its link rules would restyle the bar). -->
+    <aside class="fixed-controls">
+      <LangWidget lang={lang} href={lang === "es" ? alternates.en : alternates.es} />
+      <MobileBar lang={lang} otherHref={lang === "es" ? alternates.en : alternates.es} />
+    </aside>
     <script src="../scripts/app.ts"></script>
     <script src="../scripts/motion.ts"></script>
     <script src="../scripts/gallery.ts"></script>

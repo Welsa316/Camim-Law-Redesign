@@ -1,11 +1,17 @@
 ---
 import Base from "../layouts/Base.astro";
-import Section from "./Section.astro";
+import ClosingStatement from "./ClosingStatement.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG } from "../lib/org";
 import { SERVICES } from "../lib/services";
 import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
+import { demoAllows } from "../lib/site.js";
 
+/* The fourteen practice areas, each with its own summary line, which is what
+   lets a reader tell from here whether a page is about their situation. No
+   introduction: nothing on either firm's site introduces this list truthfully
+   (the sister site's line promises a video on most pages, and there are none
+   yet), and this site does not write its own. */
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
@@ -14,40 +20,58 @@ const alternates = { es: "/servicios/", en: "/en/servicios/" };
 const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.services"), url: path }];
 const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 ---
-<Base lang={lang} title={`${_("nav.services")} — ${ORG.name.value}`} description={_("nav.services")} path={path} alternates={alternates} schema={schema}>
-  <section class="head wrap" data-surface="paper">
+<Base lang={lang} title={`${_("nav.services")} — ${ORG.name.value}`} description={_("nav.services")} path={path} alternates={alternates} schema={schema} landing>
+
+  <nav class="crumbs wrap-wide">
+    <ol>
+      <li>{demoAllows("") ? <a href={langPath(lang)}>{_("nav.home")}</a> : <span>{_("nav.home")}</span>}</li>
+      <li><span aria-current="page">{_("nav.services")}</span></li>
+    </ol>
+  </nav>
+
+  <section class="shead wrap-wide" data-surface="paper">
     <h1 class="h1" data-split-lines="hero">{_("nav.services")}</h1>
   </section>
 
-  <Section surface="paper">
-    <div class="editorial">
-      <div></div>
-    <ul class="svc rows">
-      {SERVICES.map((m) => (
-        <li class="row-item">
-          <a class="row-link svc-link" href={langPath(lang, m.slug)}>
-            <span class="row-title svc-title">{m.name[lang]}</span>
-            <span class="svc-line">{m.line[lang]}</span>
-            <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>
-      ))}
-    </ul>
+  <section class="section sbody" data-surface="paper">
+    <div class="wrap-wide">
+      <ul class="rows svc">
+        {SERVICES.map((m) => (
+          <li class="row-item">
+            {demoAllows(m.slug) ? (
+              <a class="row-link" href={langPath(lang, m.slug)}>
+                <span class="row-title">{m.name[lang]}</span>
+                <span class="row-arrow" aria-hidden="true">&rarr;</span>
+                <span class="row-line">{m.line[lang]}</span>
+              </a>
+            ) : (
+              <span class="row-link">
+                <span class="row-title">{m.name[lang]}</span>
+                <span class="row-line">{m.line[lang]}</span>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
-  </Section>
+  </section>
+
+  <ClosingStatement lang={lang} />
 </Base>
 
 <style>
-  .svc { list-style: none; margin: 0; padding: 0; max-width: var(--container-m-lead, 72ch); }
-  .svc-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: var(--spacing-s4); row-gap: 4px; align-items: start; }
-  .svc-title { grid-column: 1; }
-  .svc-line { grid-column: 1; color: var(--color-ink-2); font-size: var(--text-base); line-height: 1.5; }
-  .svc-link .row-arrow { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  /* One left edge with the logo, as on the practice pages and the attorney page. */
+  .shead { padding-block: var(--spacing-s6) 0; }
+  .sbody { padding-block: clamp(44px, 4.4vw, 72px) clamp(64px, 6vw, 112px); }
+  .svc { max-width: 48rem; }
 
-  .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
-  .az { list-style: none; display: grid; gap: var(--spacing-s3); margin-top: var(--spacing-s5); }
-  @media (min-width: 700px) { .az { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacing-s8); } }
-  .az a { display: inline-flex; align-items: center; min-height: 44px;
-          color: var(--surface-ink); text-decoration: none; }
-  @media (any-hover: hover) { .az a:hover { color: var(--surface-accent-ink); text-decoration: underline; text-underline-offset: 0.2em; } }
+  /* On a desktop the fourteen sit in two ruled columns, so the whole list is
+     in view at once and a summary line is short enough to read at a glance. */
+  @media (min-width: 1024px) {
+    .svc {
+      max-width: none; border-top: 0;
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacing-s8);
+    }
+    .svc .row-item:nth-child(-n + 2) { border-top: 1px solid var(--surface-line); }
+  }
 </style>

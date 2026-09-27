@@ -1,131 +1,247 @@
 ---
 import Base from "../layouts/Base.astro";
-import Section from "./Section.astro";
+import ClosingStatement from "./ClosingStatement.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, ATTORNEY } from "../lib/org";
 import { serviceBySlug, type Service } from "../lib/services";
 import { graph, orgSchema, attorneySchema, breadcrumbSchema, serviceSchema } from "../lib/seo";
+import { demoAllows } from "../lib/site.js";
 
-/* Every string here is a sourced block from services.ts, a dictionary label,
-   or a record value. See services.ts for provenance and the omission log. */
+/* Every string here is a block from services.ts (reworded under
+   docs/sources/paraphrases.json), a dictionary label, or a record value.
+   Nothing is written for this page, including the in-page index, which is
+   made of the page's own section headings and carries no label of its own. */
 interface Props { lang: Lang; service: Service }
 const { lang, service } = Astro.props;
 const _ = t(lang);
-const es = lang === "es";
 const path = langPath(lang, service.slug);
-const related = service.related.map(serviceBySlug).filter((s): s is Service => !!s);
-const admitted = es
+const blocks = service.blocks[lang];
+const related = service.related.map(serviceBySlug).filter((s): s is Service => !!s && demoAllows(s.slug));
+const admitted = lang === "es"
   ? "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana" // camulaw bio, fragment
   : "Juan is admitted to practice law before the Louisiana Supreme Court";
 const alternates = { es: langPath("es", service.slug), en: langPath("en", service.slug) };
 const crumbs = [
-  { name: _("nav.home"), url: langPath(lang) },
-  { name: _("nav.services"), url: langPath(lang, "servicios") },
-  { name: service.name[lang], url: path },
+  { name: _("nav.home"), url: langPath(lang), live: demoAllows("") },
+  { name: _("nav.services"), url: langPath(lang, "servicios"), live: demoAllows("servicios") },
+  { name: service.name[lang], url: path, live: true },
 ];
+const book = demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`;
 const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs), serviceSchema(service.name[lang], path, lang, service.line[lang])]);
----
-<Base lang={lang} title={`${service.name[lang]} — ${ORG.name.value}`} description={service.line[lang]} path={path} alternates={alternates} schema={schema}>
 
-  <nav class="crumbs wrap">
+// Section headings get ids from their own words, so a section can be linked
+// to and the index can jump to it.
+const slugify = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").split("-").slice(0, 7).join("-");
+const used = new Set<string>();
+const ids = blocks.map((b) => {
+  if (b.type !== "heading") return undefined;
+  const base = slugify(b.text) || "seccion";
+  let id = base;
+  for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+  used.add(id);
+  return id;
+});
+// Only the long pages get an index; on a six-block page it would repeat the
+// page. Twelve blocks is where the page runs past three screens on a phone.
+const index = blocks.length >= 12
+  ? blocks.flatMap((b, i) => (b.type === "heading" ? [{ id: ids[i]!, text: b.text }] : []))
+  : [];
+// A list of short names (the TPS countries) reads as a register, not as
+// sentences: ruled cells in columns rather than one name per line.
+const isRegister = (items: string[]) => items.length >= 6 && items.every((i) => i.length <= 24);
+---
+<Base lang={lang} title={`${service.name[lang]} — ${ORG.name.value}`} description={service.line[lang]} path={path} alternates={alternates} schema={schema} landing>
+
+  <nav class="crumbs wrap-wide">
     <ol>
       {crumbs.map((c, i) => (
-        <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>
+        <li>{i === crumbs.length - 1 ? <span aria-current="page">{c.name}</span> : c.live ? <a href={c.url}>{c.name}</a> : <span>{c.name}</span>}</li>
       ))}
     </ol>
   </nav>
 
-  <section class="mhead wrap" data-surface="paper">
-    <p class="eyebrow">{_("nav.services")}</p>
-    <h1 class="h1 mhead-title">{service.name[lang]}</h1>
+  <section class="mhead wrap-wide" data-surface="paper">
+    <h1 class="h1 mhead-title" id="matter-title" data-split-lines="hero">{service.name[lang]}</h1>
     <p class="lead mhead-summary">{service.line[lang]}</p>
     <div class="mhead-actions">
-      <a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
-      <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+      <a class="btn btn-primary" href={book}>{_("cta.book")}</a>
+      <a class="btn btn-secondary mhead-call" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
     </div>
-    <p class="apparatus mhead-by">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value} &middot; {admitted}</p>
+    <p class="mhead-by">
+      {demoAllows("juan-campos")
+        ? <a class="mhead-name" href={langPath(lang, "juan-campos")}>{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</a>
+        : <span class="mhead-name">{ATTORNEY.displayName.value}, {ATTORNEY.credentialSuffix.value}</span>}
+      <span class="mhead-sep" aria-hidden="true">&middot;</span>
+      <span>{admitted}</span>
+    </p>
   </section>
 
-  <Section surface="paper">
-    <div class="editorial">
-      <div></div>
+  <section class="section mbody" data-surface="paper">
+    <div class:list={["wrap-wide", "mbody-inner", { "has-index": index.length > 0 }]}>
+      {index.length > 0 && (
+        <nav class="mindex" aria-labelledby="matter-title" data-index>
+          <ol>
+            {index.map((h) => (
+              <li><a href={`#${h.id}`}><span>{h.text}</span><span class="mindex-arrow" aria-hidden="true">&darr;</span></a></li>
+            ))}
+          </ol>
+        </nav>
+      )}
       <div class="prose blocks">
-        {service.blocks[lang].map((b) =>
-          b.type === "heading" ? <h2 class="h2" data-split-lines>{b.text}</h2>
-          : b.type === "subheading" ? <h3 class="h3">{b.text}</h3>
-          : b.type === "list" ? <ul>{b.items.map((i) => <li>{i}</li>)}</ul>
+        {blocks.map((b, i) =>
+          b.type === "heading" ? <h2 class="mh2" id={ids[i]}>{b.text}</h2>
+          : b.type === "subheading" ? <h3 class="mh3">{b.text}</h3>
+          : b.type === "list" ? <ul role="list" class={isRegister(b.items) ? "register" : "marked"}>{b.items.map((x) => <li>{x}</li>)}</ul>
           : <p>{b.text}</p>
         )}
       </div>
     </div>
-  </Section>
+  </section>
 
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("home.questions")}</p></div>
-      <div class="next">
-        <p class="lead">{_("contact.subtitle")}</p>
-        <div class="mhead-actions">
-          <a class="btn btn-primary" href={langPath(lang, "consulta")}>{_("cta.book")}</a>
-          <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+  {related.length > 0 && (
+    <section class="section mrel" data-surface="paper-2" aria-labelledby="related-title">
+      <div class="wrap-wide mrel-inner">
+        <div class="mrel-head">
+          <h2 class="eyebrow" id="related-title">{_("services.related")}</h2>
+          <p class="dim">{_("services.relatedSub")}</p>
         </div>
-        {related.length > 0 && (
-          <div class="rel">
-            <p class="eyebrow">{_("services.related")}</p>
-            <p class="dim">{_("services.relatedSub")}</p>
-            <ul class="rows">
-              {related.map((r) => (
-                <li class="row-item">
-                  <a class="row-link" href={langPath(lang, r.slug)}>
-                    <span class="row-title">{r.name[lang]}</span>
-                    <span class="row-arrow" aria-hidden="true">&rarr;</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <ul class="rows">
+          {related.map((r) => (
+            <li class="row-item">
+              <a class="row-link" href={langPath(lang, r.slug)}>
+                <span class="row-title">{r.name[lang]}</span>
+                <span class="row-arrow" aria-hidden="true">&rarr;</span>
+                <span class="row-line">{r.line[lang]}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        {demoAllows("servicios") && (
+          <a class="link-arrow mrel-all" href={langPath(lang, "servicios")}>{_("nav.allServices")} <span aria-hidden="true">&rarr;</span></a>
         )}
       </div>
-    </div>
-  </Section>
+    </section>
+  )}
+
+  <ClosingStatement lang={lang} />
 </Base>
 
 <style>
-  .blocks h2 { margin-top: var(--spacing-s7); }
-  .blocks h2:first-child { margin-top: 0; }
-  .blocks h3 { margin-top: var(--spacing-s5); }
-
-  /* Only ever visible in a review build. Deliberately loud. */
-  .reviewbar {
-    background: #3a2a12; color: #fdf6e8;
-    padding: var(--spacing-s4) var(--gutter);
-    font-size: var(--text-sm);
-  }
-  .reviewbar p { max-width: var(--container-content); margin-inline: auto; }
-  .reviewbar strong { color: #ffd79a; }
-
-  @media (any-hover: hover) { .crumbs a:hover { color: var(--color-accent-ink); } }
-
-  .mhead { padding-block: var(--spacing-s6) var(--spacing-s9); display: grid; gap: var(--spacing-s5); }
-  .mhead-title { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--spacing-s4); }
-  .mhead-form { font-family: var(--font-mono); font-size: var(--text-h4);
-                letter-spacing: 0.04em; font-variant-numeric: tabular-nums; color: var(--color-accent-ink); }
-  .mhead-summary { max-width: var(--container-m-read); }
+  /* --- the head: one left edge with the logo, as on the attorney page ----- */
+  .mhead { padding-block: var(--spacing-s6) 0; display: grid; gap: var(--spacing-s5); justify-items: start; }
+  .mhead-title { margin: 0; max-width: 18ch; }
+  .mhead-summary { margin: 0; max-width: var(--container-m-lead); }
   .mhead-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
-  .mhead-by { color: var(--color-ink-2); }
+  /* Below 1024px the call bar carries the same number at every scroll
+     position, so the page does not repeat it in the head. */
+  @media (max-width: 1023px) { .mhead-call { display: none; } }
 
-  .who { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
-  .who > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); font-size: var(--text-lead); }
-  .who > li::before { content: "\2014"; color: var(--surface-accent-ink); }
+  /* The admission disclosure, set as a line of text rather than as mono
+     apparatus: the face is for short strings, and this is a sentence. */
+  .mhead-by { margin: 0; max-width: 52em; font-size: var(--text-sm); line-height: 1.55; color: var(--surface-ink-2); }
+  .mhead-name {
+    font-family: var(--font-mono); letter-spacing: 0.04em; color: var(--surface-ink);
+    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.25em;
+    text-decoration-color: var(--surface-line-strong);
+  }
+  @media (any-hover: hover) { a.mhead-name:hover { text-decoration-color: currentColor; } }
+  .mhead-sep { margin-inline: var(--spacing-s2); }
 
-  .mstep { max-width: var(--container-m-read); }
-  .help { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
-  .help > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); }
-  .help > li::before { content: "\2014"; color: var(--surface-accent); }
-  .help-cta { margin-top: var(--spacing-s7); }
+  /* --- the body ------------------------------------------------------------ */
+  .mbody { padding-block: clamp(44px, 4.4vw, 72px) clamp(64px, 6vw, 112px); }
+  .mbody-inner { display: grid; gap: var(--spacing-s7); }
+  /* About seventy characters to the line; the shared 62ch measure ran to 90. */
+  .blocks { max-width: 34em; }
 
-  .faqs { max-width: var(--container-m-read); border-bottom: 1px solid var(--surface-line); }
-  .next { display: grid; gap: var(--spacing-s5); }
-  .rel { margin-top: var(--spacing-s5); display: grid; gap: var(--spacing-s3); }
-  .next-note { margin-top: var(--spacing-s5); }
+  .mh2 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(25px, 19px + 1.1vw, 34px); line-height: 1.15; letter-spacing: -0.016em;
+    color: var(--surface-ink);
+  }
+  .mh3 {
+    font-size: var(--text-h4); font-weight: var(--font-weight-semibold);
+    line-height: 1.3; letter-spacing: -0.006em; color: var(--surface-ink);
+  }
+  /* A rule above each section is the seam; a heading binds to what follows
+     it more tightly than to what precedes it. */
+  .blocks .mh2:not(:first-child) {
+    margin-top: var(--spacing-s8); padding-top: var(--spacing-s6);
+    border-top: 1px solid var(--surface-line);
+  }
+  .blocks .mh3:not(:first-child) { margin-top: var(--spacing-s7); }
+  .blocks .mh2 + .mh3 { margin-top: var(--spacing-s5); }
+  .blocks :is(.mh2, .mh3) + :not(.mh3) { margin-top: var(--spacing-s3); }
+
+  .blocks ul.marked { display: grid; gap: var(--spacing-s3); }
+  .blocks ul.marked > li {
+    display: grid; grid-template-columns: 1.25rem minmax(0, 1fr); column-gap: var(--spacing-s2);
+    text-wrap: pretty; hyphens: auto;
+  }
+  .blocks ul.marked > li::before { content: "\2014"; content: "\2014" / ""; color: var(--surface-accent-ink); }
+
+  .blocks ul.register {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacing-s5);
+    border-top: 1px solid var(--surface-line);
+  }
+  .blocks ul.register > li { padding-block: var(--spacing-s3); border-bottom: 1px solid var(--surface-line); }
+  @media (min-width: 640px) { .blocks ul.register { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  /* --- the index: a jump list on a phone, a pinned rail on a desktop ------- */
+  .mindex ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--surface-line); }
+  .mindex li { border-bottom: 1px solid var(--surface-line); }
+  .mindex a {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--spacing-s4);
+    min-height: 44px; padding-block: var(--spacing-s3);
+    font-size: var(--text-base); line-height: 1.4; color: var(--surface-ink); text-decoration: none;
+  }
+  .mindex-arrow { color: var(--surface-accent-ink); }
+
+  @media (min-width: 1024px) {
+    .mbody-inner.has-index {
+      grid-template-columns: minmax(0, 34em) minmax(13rem, 17rem);
+      column-gap: clamp(56px, 7vw, 128px); align-items: start;
+    }
+    .has-index .blocks { grid-column: 1; grid-row: 1; }
+    .has-index .mindex {
+      grid-column: 2; grid-row: 1;
+      position: sticky; top: calc(var(--header-h) + var(--spacing-s6));
+    }
+    .mindex ol { border-top: 0; display: grid; gap: var(--spacing-s1); }
+    .mindex li { border-bottom: 0; }
+    .mindex a {
+      display: block; min-height: 0; padding: var(--spacing-s2) 0 var(--spacing-s2) var(--spacing-s4);
+      border-left: 2px solid var(--surface-line);
+      font-size: var(--text-sm); line-height: 1.45; color: var(--surface-ink-2);
+      transition: color var(--d-quick) var(--ease-state), border-color var(--d-quick) var(--ease-state);
+    }
+    .mindex-arrow { display: none; }
+    .mindex a[aria-current="location"] { border-left-color: var(--surface-accent-ink); color: var(--surface-ink); }
+  }
+  @media (min-width: 1024px) and (any-hover: hover) {
+    .mindex a:hover { color: var(--surface-ink); border-left-color: var(--surface-line-strong); }
+  }
+
+  /* --- related services: their own band, before the closing invitation ---- */
+  .mrel { padding-block: clamp(56px, 5vw, 88px); }
+  .mrel-inner { display: grid; gap: var(--spacing-s6); }
+  .mrel-head { display: grid; gap: var(--spacing-s2); }
+  .mrel-head .eyebrow { margin: 0; }
+  .mrel-head .dim { margin: 0; }
+  .mrel .rows { max-width: 48rem; }
+  .mrel-all { justify-self: start; }
+  /* On a desktop the three sit side by side, each under its own rule, and the
+     way to all fourteen moves to the end of the heading row: at the left edge
+     the floating language switch covered it as the band scrolled past. */
+  @media (min-width: 1024px) {
+    .mrel-inner { grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--spacing-s6); align-items: end; }
+    .mrel-head { grid-column: 1; grid-row: 1; }
+    .mrel-all { grid-column: 2; grid-row: 1; justify-self: end; }
+    .mrel .rows { grid-column: 1 / -1; grid-row: 2; }
+    .mrel .rows {
+      max-width: none; border-top: 0;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--spacing-s7);
+    }
+    .mrel .row-item { border-top: 1px solid var(--surface-line); }
+  }
 </style>

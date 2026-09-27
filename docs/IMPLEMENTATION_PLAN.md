@@ -101,3 +101,33 @@ Every item in `LEGAL_REVIEW_CHECKLIST.md` checked against the built site. Anythi
 ## What blocks a real launch
 
 Not engineering. The attorney's credentials, the confirmed list of matters, and the consultation policy. The site is built so that each of those is one content file away from being correct.
+
+## Known future work
+
+Found in the design review of the practice-area pages (2026-09-27) and left
+for a decision or a later pass, each for the reason given.
+
+- **Steps and FAQs as components.** The fiancé(e) visa's "Paso 1 / 2 / 3" and
+  the asylum page's four questions render as headings and paragraphs. The
+  system already has `.steps` and `.qa`. Doing it needs a block kind in
+  `docs/sources/paraphrases.json`, and a decision on whether legal answers may
+  sit behind a tap on phones (the in-page index now covers findability).
+- **Touch sizing keyed to width, not pointer.** `global.css` sizes touch
+  targets under `@media (max-width: 899px)`; `(any-pointer: coarse)` is the
+  right test. Site-wide, so it needs every page re-measured.
+- **The floating language switch over reading text.** With body text now at
+  the page's left edge, the desktop pill passes over it as the page scrolls
+  (allowed by `verify/widget-overlap.py` as an opaque pill; it no longer
+  covers any control). Revisit its placement.
+- **The attorney page's closing band** still uses the small-eyebrow ending the
+  practice pages dropped; move it to `ClosingStatement.astro`.
+- **Two button shapes.** Page buttons are square-cornered `.btn`; the header
+  CTA and the closing pill are round. Pick one.
+- **A reviewed date on time-sensitive pages** (TPS says "at the time of
+  writing" above a country list). Needs the client's decision, and a record
+  value rather than a written label.
+- **"Consultation here"** (`cta.book` in English) reads awkwardly; it is the
+  sister firm's string, so it changes only on the client's word.
+- **The breadcrumb nav has no accessible name**; one would need a new word.
+- **The services index's meta description is just "Services"**; part of the
+  search item in phase two.

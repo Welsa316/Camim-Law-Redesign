@@ -500,9 +500,52 @@ a { color: inherit; }
   [data-surface="navy"] .btn-primary:hover,
   [data-surface="navy-deep"] .btn-primary:hover { background: #ffffff; }
   .btn-secondary:hover { background: var(--color-paper-2); border-color: var(--surface-ink); }
+  [data-surface="paper-2"] .btn-secondary:hover { background: var(--color-paper); }
 }
 .btn:active { transform: translateY(1px); }
 .btn[aria-disabled="true"] { background: var(--color-paper-2); color: var(--color-ink-2); pointer-events: none; }
+
+/* --- secondary text, one definition ------------------------------------- */
+.dim { color: var(--surface-ink-2); }
+
+/* --- shared ranks: the home page's title, chapter label and pill --------- */
+/* The missing rank: bigger than a heading in running text, smaller than the
+   opening frame's display. Stated with its own line-height and tracking,
+   because a custom class that sets only font-size inherits the body's 1.65. */
+.home-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 21px + 1.95vw, 50px);
+  font-weight: 400; line-height: 1.08; letter-spacing: -0.022em;
+  color: var(--surface-ink);
+  text-wrap: balance;
+}
+.chapter {
+  display: flex; align-items: baseline; gap: var(--spacing-s3);
+  margin: 0 0 var(--spacing-s5);
+  font-family: var(--font-mono); font-size: var(--text-eyebrow);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--surface-ink-2);
+}
+.opener-pill {
+  display: inline-flex; align-items: center; gap: var(--spacing-s3);
+  min-height: 48px;
+  padding: 0 var(--spacing-s5);
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-navy-deep);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-base);
+  text-decoration: none;
+  transition: background-color var(--d-state) var(--ease-state),
+              color var(--d-state) var(--ease-state);
+}
+.opener-pill-arrow { transition: transform var(--d-state) var(--ease-state); }
+@media (any-hover: hover) {
+  .opener-pill:hover { background: var(--color-brass-light); color: var(--color-navy-deep); }
+  .opener-pill:hover .opener-pill-arrow { transform: translateX(3px); }
+}
+.opener-pill:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 3px; }
 
 /* --- link with arrow ----------------------------------------------------- */
 .link-arrow {
@@ -531,18 +574,23 @@ a { color: inherit; }
   gap: var(--spacing-s3) var(--spacing-s5);
   padding: var(--spacing-s5) var(--spacing-s3) var(--spacing-s5) 0;
   text-decoration: none; color: inherit;
-  transition: background-color var(--d-quick) var(--ease-state),
-              padding-left var(--d-quick) var(--ease-state);
+  transition: background-color var(--d-quick) var(--ease-state);
 }
+/* The title moves, not the padding: animating padding reflows the row on
+   every hover. The lift is one step lighter or darker than the band the row
+   sits on, so it shows on paper-2 as well as on paper. */
+.row-title { transition: transform var(--d-quick) var(--ease-state); }
 @media (any-hover: hover) {
-  .row-link:hover { background: var(--color-paper-2); padding-left: var(--spacing-s3); }
+  .row-link:hover { background: var(--color-paper-2); }
+  .row-link:hover .row-title { transform: translateX(var(--spacing-s3)); }
   .row-link:hover .row-arrow { transform: translateX(4px); }
+  [data-surface="paper-2"] .row-link:hover { background: var(--color-paper); }
 }
 .row-link:active { background: var(--color-paper-2); }
+[data-surface="paper-2"] .row-link:active { background: var(--color-paper); }
+@media (prefers-reduced-motion: reduce) { .row-link:hover .row-title { transform: none; } }
 .row-title { font-size: var(--text-h4); font-weight: var(--font-weight-semibold);
              line-height: 1.3; letter-spacing: -0.006em; }
-.row-form { font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: 0.04em;
-            font-variant-numeric: tabular-nums; color: var(--surface-ink-2); margin-left: var(--spacing-s3); }
 .row-line { grid-column: 1 / -1; font-size: var(--text-sm); color: var(--surface-ink-2);
             max-width: var(--container-m-short); }
 .row-arrow { color: var(--surface-accent-ink); transition: transform var(--d-quick) var(--ease-state); }

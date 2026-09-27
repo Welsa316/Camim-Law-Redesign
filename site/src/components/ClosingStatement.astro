@@ -1,0 +1,52 @@
+---
+/**
+ * The closing invitation: the firm's own question, set as a statement on
+ * navy-deep, with the one action beside it. It closes the home page and every
+ * practice-area page, so the last thing a reader meets is the same question in
+ * the same composition wherever they finish. Pass `landing` to the page's Base
+ * so the navy runs straight into the footer's own.
+ */
+import { t, langPath, type Lang } from "../i18n/ui";
+import { ORG } from "../lib/org";
+import { demoAllows } from "../lib/site.js";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+// camulaw contact.title ("Agende Su Consulta Ahora"), fragment
+const book = lang === "es" ? "Agende su consulta" : "Schedule your consultation";
+---
+<section class="statement" data-surface="navy-deep" aria-labelledby="consult-title">
+  <div class="wrap-wide statement-inner">
+    <div class="statement-copy">
+      <p class="chapter statement-label">{_("nav.consultation")}</p>
+      <h2 class="home-title statement-line" id="consult-title" data-split-lines>{_("home.questions")}</h2>
+    </div>
+    <div class="statement-action">
+      <p class="statement-support">{_("contact.subtitle")}</p>
+      <a class="opener-pill" href={demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`}>{book}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
+      <p class="statement-meta apparatus">{_("contact.confidential")}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Shorter than it was, and no longer taller than the opening frame. A solid
+     navy carries the type better than a photograph at 3% opacity ever did. */
+  .statement { position: relative; padding-block: clamp(72px, 6.6vw, 112px) clamp(56px, 5vw, 88px); }
+  .statement-inner { display: grid; gap: var(--spacing-s7); }
+  .statement-copy { min-width: 0; }
+  .statement-label { color: var(--surface-ink-2); }
+  .statement-line { max-width: 15ch; color: var(--color-paper); font-size: clamp(32px, 21px + 2.5vw, 56px); }
+  .statement-action { display: grid; justify-items: start; gap: var(--spacing-s5); }
+  .statement-support { margin: 0; font-size: var(--text-lead); color: var(--surface-ink); max-width: 30ch; }
+  .statement-meta { margin: 0; color: var(--surface-ink-2); }
+
+  @media (min-width: 900px) {
+    .statement-inner {
+      grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+      gap: clamp(48px, 5vw, 96px);
+      align-items: end;
+    }
+  }
+</style>

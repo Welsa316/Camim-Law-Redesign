@@ -7,6 +7,7 @@ import { ORG, ATTORNEY, MEDIA, show, mapEmbedUrl } from "../lib/org";
 import { featured } from "../lib/services";
 import { graph, orgSchema, attorneySchema } from "../lib/seo";
 import { demoAllows } from "../lib/site.js";
+import ClosingStatement from "./ClosingStatement.astro";
 
 /*
   Every visible string on this page is copied from camimlaw.com, from Campos
@@ -266,19 +267,7 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
   </section>
 
   <!-- 05 — the closing invitation, flush against the footer's own navy -->
-  <section class="statement" data-surface="navy-deep" aria-labelledby="consult-title">
-    <div class="wrap-wide statement-inner">
-      <div class="statement-copy">
-        <p class="chapter statement-label">{_("nav.consultation")}</p>
-        <h2 class="home-title statement-line" id="consult-title" data-split-lines>{_("home.questions")}</h2>
-      </div>
-      <div class="statement-action">
-        <p class="statement-support">{_("contact.subtitle")}</p>
-        <a class="opener-pill" href={demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`}>{src.book}<span class="opener-pill-arrow" aria-hidden="true">&rarr;</span></a>
-        <p class="statement-meta apparatus">{_("contact.confidential")}</p>
-      </div>
-    </div>
-  </section>
+  <ClosingStatement lang={lang} />
 </Base>
 
 <style>
@@ -454,25 +443,6 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
   .opener-display { margin: 0; max-width: 13ch; color: var(--color-paper); }
 
   .opener-side { display: grid; justify-items: start; gap: var(--spacing-s4); }
-  .opener-pill {
-    display: inline-flex; align-items: center; gap: var(--spacing-s3);
-    min-height: 48px;
-    padding: 0 var(--spacing-s5);
-    border-radius: 999px;
-    background: var(--color-paper);
-    color: var(--color-navy-deep);
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--text-base);
-    text-decoration: none;
-    transition: background-color var(--d-state) var(--ease-state),
-                color var(--d-state) var(--ease-state);
-  }
-  .opener-pill-arrow { transition: transform var(--d-state) var(--ease-state); }
-  @media (any-hover: hover) {
-    .opener-pill:hover { background: var(--color-brass-light); color: var(--color-navy-deep); }
-    .opener-pill:hover .opener-pill-arrow { transform: translateX(3px); }
-  }
-  .opener-pill:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 3px; }
 
   .opener-rule { height: 1px; width: 100%; background: rgb(252 252 250 / 0.3); }
   .opener-meta { color: #b6c3d1; margin: 0; }
@@ -624,25 +594,6 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
 
   /* --- the shared apparatus of a chapter ---------------------------------- */
 
-  /* The missing rank: bigger than a heading in running text, smaller than the
-     opening frame's display. Stated with its own line-height and tracking,
-     because a custom class that sets only font-size inherits the body's 1.65. */
-  .home-title {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(30px, 21px + 1.95vw, 50px);
-    font-weight: 400; line-height: 1.08; letter-spacing: -0.022em;
-    color: var(--surface-ink);
-    text-wrap: balance;
-  }
-
-  .chapter {
-    display: flex; align-items: baseline; gap: var(--spacing-s3);
-    margin: 0 0 var(--spacing-s5);
-    font-family: var(--font-mono); font-size: var(--text-eyebrow);
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--surface-ink-2);
-  }
   .chapter-number {
     font-variant-numeric: tabular-nums;
     color: var(--surface-accent-ink);
@@ -689,7 +640,6 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
   .home-services { padding-block: clamp(72px, 7.2vw, 128px); }
   .home-press    { padding-block: clamp(64px, 6vw, 104px); }
   .home-office   { padding-block: clamp(56px, 5vw, 88px); }
-  .statement     { padding-block: clamp(72px, 6.6vw, 112px) clamp(56px, 5vw, 88px); }
 
   /* --- 01 the introduction ------------------------------------------------- */
   .intro-grid { display: grid; gap: var(--spacing-s7); }
@@ -846,25 +796,4 @@ const schema = graph([orgSchema(), attorneySchema(lang)]);
     }
   }
 
-  /* --- 05 the closing invitation -------------------------------------------
-     Shorter than it was, and no longer taller than the opening frame. The
-     texture behind it is gone: a solid navy carries the type better than a
-     photograph at 3% opacity ever did, and it removes an image from the page
-     that no reader could see. */
-  .statement { position: relative; }
-  .statement-inner { display: grid; gap: var(--spacing-s7); }
-  .statement-copy { min-width: 0; }
-  .statement-label { color: var(--surface-ink-2); }
-  .statement-line { max-width: 15ch; color: var(--color-paper); font-size: clamp(32px, 21px + 2.5vw, 56px); }
-  .statement-action { display: grid; justify-items: start; gap: var(--spacing-s5); }
-  .statement-support { margin: 0; font-size: var(--text-lead); color: var(--surface-ink); max-width: 30ch; }
-  .statement-meta { margin: 0; color: var(--surface-ink-2); }
-
-  @media (min-width: 900px) {
-    .statement-inner {
-      grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
-      gap: clamp(48px, 5vw, 96px);
-      align-items: end;
-    }
-  }
 </style>

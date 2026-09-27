@@ -282,3 +282,23 @@ if (form) {
   });
 }
 
+// In-page index on the long practice pages: mark the section being read, so
+// the pinned rail says where the reader is on a page eleven screens long.
+const pageIndex = document.querySelector<HTMLElement>("[data-index]");
+if (pageIndex) {
+  const links = Array.from(pageIndex.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+  const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
+  let queued = false;
+  const mark = () => {
+    queued = false;
+    const line = (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 100) + 48;
+    let current = -1;
+    targets.forEach((el, i) => { if (el && el.getBoundingClientRect().top <= line) current = i; });
+    links.forEach((a, i) => {
+      if (i === current) a.setAttribute("aria-current", "location");
+      else a.removeAttribute("aria-current");
+    });
+  };
+  addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(mark); } }, { passive: true });
+  mark();
+}

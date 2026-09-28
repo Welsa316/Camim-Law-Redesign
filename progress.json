@@ -1,9 +1,9 @@
 {
-  "updated": "2026-09-27",
+  "updated": "2026-09-28",
   "now": {
     "phase": 2,
-    "item": "services-index",
-    "note": "The fourteen practice-area pages are now in your preview, and the page that lists all of them has been redesigned to match and is next to join them."
+    "item": "intake",
+    "note": "The consultation page and form need the email address where you would like consultation requests to arrive."
   },
   "payments": [
     {
@@ -112,19 +112,21 @@
           "id": "services-index",
           "name": "The services index",
           "desc": "One page listing all fourteen, and the route into each.",
-          "status": "in_progress"
+          "status": "done",
+          "doneOn": "2026-09-28"
         },
         {
           "id": "intake",
           "name": "Consultation page and intake form",
           "desc": "Name, phone, preferred language and topic, delivered to whichever inbox you name.",
-          "status": "next"
+          "status": "waiting",
+          "note": "This needs the email address where you would like consultation requests to arrive."
         },
         {
           "id": "payments-page",
           "name": "Payments page",
           "desc": "The existing LawPay link, presented as a page rather than a loose link.",
-          "status": "planned"
+          "status": "next"
         },
         {
           "id": "bar-statements",

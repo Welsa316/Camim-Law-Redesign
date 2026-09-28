@@ -11,12 +11,12 @@ export const IS_DEMO = import.meta.env.PUBLIC_DEMO === "1" || import.meta.env.PU
 
 /**
  * The landing page, the attorney page, the fourteen practice-area pages
- * (added 2026-09-27, after their design review), and the client progress
- * page. "" is the home page. `progress` is English-only and outside the
+ * (added 2026-09-27, after their design review), the services index (added
+ * 2026-09-28), and the client progress page. "" is the home page. `progress` is English-only and outside the
  * bilingual system, so it is handled separately by the build script.
  */
 export const DEMO_ROUTES = [
-  "", "juan-campos",
+  "", "juan-campos", "servicios",
   "green-card",
   "peticiones-familiares",
   "ciudadania",

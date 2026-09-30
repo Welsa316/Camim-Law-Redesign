@@ -1,12 +1,16 @@
 ---
 import Base from "../layouts/Base.astro";
-import Section from "./Section.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, show, mapEmbedUrl } from "../lib/org";
 import { SERVICES } from "../lib/services";
 import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
+import { demoAllows } from "../lib/site.js";
 
-/* camulaw.com's consultation page strings and form labels; record values. */
+/* camulaw.com's consultation page strings, form labels and validation
+   messages; record values. The fields are the proposal's: name, phone,
+   preferred language and topic. No email field: the proposal does not ask
+   for one, and neither firm's site words an error for a mistyped address.
+   The form asks for no account of the case (Rule 4-1.18). */
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
@@ -15,131 +19,194 @@ const path = langPath(lang, "consulta");
 const alternates = { es: "/consulta/", en: "/en/consulta/" };
 const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.consultation"), url: path }];
 const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
+const addr = ORG.address.value;
 ---
 <Base lang={lang} title={`${_("contact.title")} — ${ORG.name.value}`} description={_("contact.subtitle")} path={path} alternates={alternates} schema={schema}>
-  <section class="head wrap" data-surface="paper">
-    <p class="eyebrow">{_("contact.confidential")}</p>
-    <h1 class="h1" data-split-lines="hero">{_("contact.title")}</h1>
-    <p class="lead">{_("contact.subtitle")}</p>
-    <p class="apparatus">{_("contact.virtual")}</p>
+
+  <nav class="crumbs wrap-wide">
+    <ol>
+      <li>{demoAllows("") ? <a href={langPath(lang)}>{_("nav.home")}</a> : <span>{_("nav.home")}</span>}</li>
+      <li><span aria-current="page">{_("nav.consultation")}</span></li>
+    </ol>
+  </nav>
+
+  <section class="chead wrap-wide" data-surface="paper">
+    <h1 class="h1 chead-title" data-split-lines="hero">{_("contact.title")}</h1>
+    <p class="lead chead-lead">{_("contact.subtitle")}</p>
+    <p class="apparatus chead-meta">{_("contact.confidential")} <span aria-hidden="true">&middot;</span> {_("contact.virtual")}</p>
   </section>
 
-  <Section surface="paper-2">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("form.type")}</p></div>
-      <div>
+  <section class="section cbody" data-surface="paper">
+    <div class="wrap-wide cbody-inner">
+      <div class="cform">
         <form
           class="form"
           method="post"
           action="/api/contact"
           data-contact-form
+          data-widget-clear
           data-phone={ORG.phone.value}
           data-phone-display={ORG.phoneDisplay.value}
           data-sending-label={_("form.sending")}
           data-success-message={_("form.success")}
           data-failure-message={_("form.failure")}
           data-ratelimit-message={_("form.rateLimit")}
+          data-required-message={_("form.required")}
+          data-phone-message={_("form.badPhone")}
         >
-          <div class="grid-2">
+          <p class="form-alert" data-form-alert role="alert" hidden></p>
+
+          <div class="form-row">
             <div class="field">
-              <label for="firstName">{_("form.firstName")}</label>
+              <label for="firstName">{_("form.firstName")} <span class="req" aria-hidden="true">*</span></label>
               <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
             </div>
             <div class="field">
               <label for="lastName">{_("form.lastName")}</label>
               <input id="lastName" name="lastName" type="text" autocomplete="family-name" />
             </div>
-            <div class="field">
-              <label for="phone">{_("form.phone")}</label>
-              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
-            </div>
-            <div class="field">
-              <label for="email">{_("form.email")}</label>
-              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" />
-            </div>
           </div>
+
           <div class="field">
-            <label for="topic">{_("form.type")}</label>
+            <label for="phone">{_("form.phone")} <span class="req" aria-hidden="true">*</span></label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="phone-err" />
+            <p class="field-err" id="phone-err" data-field-error></p>
+          </div>
+
+          <div class="form-row form-row--topic">
+          <div class="field">
+            <label for="topic">{_("form.type")} <span class="req" aria-hidden="true">*</span></label>
             <select id="topic" name="topic" required>
               <option value="">{_("form.selectType")}</option>
               {SERVICES.map((s) => <option value={s.slug}>{s.name[lang]}</option>)}
               <option value="otro">{_("form.notSure")}</option>
             </select>
           </div>
+
           <fieldset class="field field--radio">
             <legend>{_("lang.es")} / {_("lang.en")}</legend>
-            <label><input type="radio" name="preferredLanguage" value="es" checked /> {_("lang.es")}</label>
-            <label><input type="radio" name="preferredLanguage" value="en" /> {_("lang.en")}</label>
+            <label><input type="radio" name="preferredLanguage" value="es" checked={lang === "es"} /> {_("lang.es")}</label>
+            <label><input type="radio" name="preferredLanguage" value="en" checked={lang === "en"} /> {_("lang.en")}</label>
           </fieldset>
-          <button class="btn btn-primary" type="submit">{_("form.send")}</button>
-          <p class="form-status" data-form-status aria-live="polite"></p>
-        </form>
-      </div>
-    </div>
-  </Section>
+          </div>
 
-  <Section surface="paper">
-    <div class="editorial">
-      <div><p class="eyebrow">{_("contact.contact")}</p></div>
-      <div class="ways">
-        <p><a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a></p>
-        {whatsapp && <p><a class="btn btn-secondary" href={whatsapp} rel="noopener">WhatsApp</a></p>}
-        <address class="ways-addr">
-          <a href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a>
-          <span>{ORG.address.value.street}</span>
-          <span>{ORG.address.value.locality}, {ORG.address.value.region} {ORG.address.value.postalCode}</span>
-          <span class="apparatus">{_("contact.monFri")} · {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</span>
-        </address>
-        <iframe class="ways-map" src={mapEmbedUrl()} title={_("home.where")} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-        <p><a class="link-arrow" href={langPath(lang, "pagos")}>{_("contact.paymentQ")} <span aria-hidden="true">&rarr;</span></a></p>
+          <button class="btn btn-primary form-submit" type="submit">{_("form.send")}</button>
+        </form>
+        <!-- Outside the form: a successful send hides the form, and a status
+             inside it went with it, so the thanks was never seen. -->
+        <p class="form-status" data-form-status tabindex="-1" hidden></p>
       </div>
+
+      <aside class="cways" aria-labelledby="ways-title">
+        <h2 class="eyebrow" id="ways-title">{_("contact.contact")}</h2>
+        <div class="cways-actions">
+          <a class="btn btn-primary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
+          {whatsapp && <a class="btn btn-secondary" href={whatsapp} rel="noopener">{_("cta.whatsapp")}</a>}
+        </div>
+        <dl class="cways-list">
+          <div>
+            <dt class="eyebrow">{_("contact.address")}</dt>
+            <dd><address>{addr.street}<br />{addr.locality}, {addr.region} {addr.postalCode}</address></dd>
+          </div>
+          <div>
+            <dt class="eyebrow">{_("contact.hours")}</dt>
+            <dd>{_("contact.monFri")} <span class="apparatus">{ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</span></dd>
+          </div>
+          <div>
+            <dt class="eyebrow">{_("form.email")}</dt>
+            <dd><a class="cways-mail" href={`mailto:${ORG.email.value}`}>{ORG.email.value}</a></dd>
+          </div>
+        </dl>
+        <iframe class="cways-map" src={mapEmbedUrl()} title={_("home.where")} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        {demoAllows("pagos") && (
+          <a class="link-arrow" href={langPath(lang, "pagos")}>{_("contact.paymentQ")} <span aria-hidden="true">&rarr;</span></a>
+        )}
+      </aside>
     </div>
-  </Section>
+  </section>
 </Base>
 
 <style>
-  .head { padding-block: var(--spacing-s8) var(--spacing-s9); display: grid; gap: var(--spacing-s4); }
-  .formwrap { max-width: var(--container-m-read); display: grid; gap: var(--spacing-s5); }
-  .form-caution { border-left: 2px solid var(--surface-accent); padding-left: var(--spacing-s4); }
+  /* One left edge with the logo, as on every other inner page. */
+  .chead { padding-block: var(--spacing-s6) 0; display: grid; gap: var(--spacing-s4); justify-items: start; }
+  .chead-title { margin: 0; max-width: 16ch; }
+  .chead-lead { margin: 0; }
+  .chead-meta { margin: 0; color: var(--surface-ink-2); }
+  .chead-meta span { margin-inline: var(--spacing-s2); }
+
+  .cbody { padding-block: clamp(44px, 4.4vw, 72px) clamp(64px, 6vw, 112px); }
+  .cbody-inner { display: grid; gap: var(--spacing-s8); }
+  .cform { max-width: 34em; }
+  /* On a desktop the ways to reach the office sit beside the form rather than
+     under it, so calling is never further away than filling it in. */
+  @media (min-width: 1024px) {
+    .cbody-inner {
+      grid-template-columns: minmax(0, 34em) minmax(18rem, 26rem);
+      column-gap: clamp(56px, 7vw, 128px); align-items: start;
+    }
+  }
+
+  /* --- the form ------------------------------------------------------------ */
   .form { display: grid; gap: var(--spacing-s5); }
-  .form-grid { display: grid; gap: var(--spacing-s5); }
-  @media (min-width: 640px) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .field { display: grid; gap: var(--spacing-s2); margin: 0; }
+  .form-row { display: grid; gap: var(--spacing-s5); }
+  @media (min-width: 640px) { .form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  /* Topic and language share a row on wider screens: the language choice then
+     sits clear of the floating language switch in the bottom-left corner,
+     which covered its first radio button when the page opened at 1440x900. */
+  @media (min-width: 640px) { .form-row--topic { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; } }
+  .field { display: grid; gap: var(--spacing-s2); margin: 0; min-width: 0; }
   .field label { font-weight: var(--font-weight-medium); font-size: var(--text-sm); }
-  .req { color: var(--surface-ink-2); font-weight: 400; }
+  .req { color: var(--surface-accent-ink); font-weight: 400; }
   .field input, .field select {
     min-height: 48px; padding: var(--spacing-s3) var(--spacing-s4);
     font: inherit; font-size: var(--text-base); color: var(--color-ink);
     background: var(--color-paper); border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-sm); width: 100%;
+    transition: border-color var(--d-quick) var(--ease-state);
   }
+  @media (any-hover: hover) { .field input:hover, .field select:hover { border-color: var(--surface-ink-2); } }
   .field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .field input[aria-invalid="true"], .field select[aria-invalid="true"] { border-color: var(--color-accent-ink); border-width: 2px; }
-  .field-err:not(:empty) { font-size: var(--text-sm); color: var(--color-accent-ink); }
-  .field--radio { border: 0; padding: 0; display: grid; gap: var(--spacing-s2); }
-  .field--radio legend { font-weight: var(--font-weight-medium); font-size: var(--text-sm); padding: 0; margin-bottom: var(--spacing-s2); }
-  .field--radio { display: flex; flex-wrap: wrap; gap: var(--spacing-s3) var(--spacing-s6); align-items: center; }
-  .field--radio legend { flex: 1 0 100%; }
+  .field input[aria-invalid="true"], .field select[aria-invalid="true"] {
+    border-color: var(--color-accent-ink); box-shadow: inset 0 0 0 1px var(--color-accent-ink);
+  }
+  .field-err { margin: 0; font-size: var(--text-sm); color: var(--color-accent-ink); }
+  .field-err:empty { display: none; }
+
+  .field--radio { border: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--spacing-s2) var(--spacing-s6); align-items: center; }
+  .field--radio legend { flex: 1 0 100%; padding: 0; margin-bottom: var(--spacing-s2); font-weight: var(--font-weight-medium); font-size: var(--text-sm); }
   .field--radio label {
     display: inline-flex; align-items: center; gap: var(--spacing-s3);
-    min-height: 44px; font-weight: 400; font-size: var(--text-base);
-    white-space: nowrap;
+    min-height: 44px; font-weight: 400; font-size: var(--text-base); white-space: nowrap;
   }
-  .field--radio input { width: 24px; height: 24px; accent-color: var(--color-navy); flex: none; }
-  .form-status:empty { display: none; }
-  .form-status { padding: var(--spacing-s4) var(--spacing-s5); border-left: 2px solid var(--surface-accent); background: var(--color-paper-2); }
-  .form-status[data-state="error"] { border-left-color: var(--color-accent); }
-  .bring { list-style: none; display: grid; gap: var(--spacing-s4); max-width: var(--container-m-read); }
-  .bring > li { display: grid; grid-template-columns: 1.25rem 1fr; gap: var(--spacing-s3); }
-  .bring > li::before { content: "\2014"; color: var(--surface-accent-ink); }
-  .ways { display: grid; gap: var(--spacing-s4); justify-items: start; }
-  .ways-addr { display: grid; gap: var(--spacing-s1); font-style: normal; }
-  .ways-addr a { color: var(--surface-ink); display: inline-flex; align-items: center; min-height: 44px; }
-  .ways-map {
-    display: block; width: 100%; aspect-ratio: 4 / 3; min-height: 240px;
-    margin-top: var(--spacing-s4);
+  .field--radio input { width: 22px; height: 22px; accent-color: var(--color-navy); flex: none; }
+
+  .form-submit { justify-self: start; min-width: 12rem; }
+  .form-submit:disabled { opacity: 0.7; cursor: progress; }
+
+  .form-alert, .form-status {
+    margin: 0; padding: var(--spacing-s4) var(--spacing-s5);
+    border-left: 2px solid var(--color-accent-ink); background: var(--color-paper-2);
+  }
+  .form-status { margin-top: var(--spacing-s5); }
+  .form-status[data-state="ok"] { border-left-color: var(--color-navy); font-size: var(--text-lead); }
+  .form-status:focus { outline: none; }
+  .form-status:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* --- the ways to reach the office ------------------------------------- */
+  .cways { display: grid; gap: var(--spacing-s5); align-content: start; }
+  .cways .eyebrow { margin: 0; }
+  .cways-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
+  .cways-list { display: grid; gap: var(--spacing-s4); margin: 0; }
+  .cways-list > div { display: grid; gap: var(--spacing-s1); padding-top: var(--spacing-s4); border-top: 1px solid var(--surface-line); }
+  .cways-list dd { margin: 0; }
+  .cways-list address { font-style: normal; }
+  .cways-list .apparatus { margin-left: var(--spacing-s2); color: var(--surface-ink-2); }
+  /* A standalone link, so a full 44px target on touch screens. */
+  .cways-mail { display: inline-flex; align-items: center; min-height: 44px; color: var(--surface-ink); text-underline-offset: 0.2em; overflow-wrap: anywhere; }
+  .cways-map {
+    display: block; width: 100%; aspect-ratio: 4 / 3; min-height: 220px;
     border: 1px solid var(--color-line); border-radius: var(--radius-sm);
-    background: var(--color-paper-2);
-    filter: saturate(0.85);
+    background: var(--color-paper-2); filter: saturate(0.85);
   }
+  .cways .link-arrow { justify-self: start; }
 </style>

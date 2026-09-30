@@ -26,7 +26,8 @@ const crumbs = [
   { name: _("nav.services"), url: langPath(lang, "servicios"), live: demoAllows("servicios") },
   { name: service.name[lang], url: path, live: true },
 ];
-const book = demoAllows("consulta") ? langPath(lang, "consulta") : `tel:${ORG.phone.value}`;
+// The consultation form opens with this matter already chosen as the topic.
+const book = demoAllows("consulta") ? `${langPath(lang, "consulta")}?tema=${service.slug}` : `tel:${ORG.phone.value}`;
 const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs), serviceSchema(service.name[lang], path, lang, service.line[lang])]);
 
 // Section headings get ids from their own words, so a section can be linked

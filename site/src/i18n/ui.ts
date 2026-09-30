@@ -41,6 +41,8 @@ export const ui = {
     "form.type": "Tipo de consulta", // camulaw consultationForm.consultationType
     "form.selectType": "Seleccione un tipo de consulta", // camulaw consultationForm.selectConsultation
     "form.notSure": "No estoy seguro / Otro", // camulaw consultationForm.notSure
+    "form.required": "Por favor complete todos los campos.", // camulaw chat.requiredError
+    "form.badPhone": "Por favor ingrese un número de teléfono válido.", // camulaw chat.phoneError
     "contact.title": "Agende Su Consulta Ahora", // camulaw contact.title
     "contact.subtitle": "Estamos aquí para ayudarle", // camulaw contact.subtitle
     "contact.confidential": "Consultas confidenciales", // camulaw contact.subtitleAlt
@@ -100,6 +102,8 @@ export const ui = {
     "form.type": "Type of consultation",
     "form.selectType": "Select a consultation type",
     "form.notSure": "Not sure / Other",
+    "form.required": "Please complete all fields.",
+    "form.badPhone": "Please enter a valid phone number.",
     "contact.title": "Schedule Your Consultation Now",
     "contact.subtitle": "We are here to help you",
     "contact.confidential": "Confidential consultations",

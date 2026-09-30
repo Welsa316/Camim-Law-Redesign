@@ -197,87 +197,129 @@ if (slides.length > 1) {
    way back up. */
 const langWidget = document.querySelector<HTMLElement>("[data-lang-widget]");
 const pageFooter = document.querySelector("footer");
-if (langWidget && pageFooter && "IntersectionObserver" in window) {
-  new IntersectionObserver(
-    ([entry]) => { langWidget.toggleAttribute("data-tucked", entry.isIntersecting); },
-    { threshold: 0 },
-  ).observe(pageFooter);
+if (langWidget && "IntersectionObserver" in window) {
+  // Two reasons to step aside, tracked together: the footer is on screen, or
+  // something marked data-widget-clear (a form, whose every field is a
+  // control) is passing through the bottom band the pill floats in.
+  const over = new Set<Element>();
+  const update = (entries: IntersectionObserverEntry[]) => {
+    for (const e of entries) {
+      if (e.isIntersecting) over.add(e.target);
+      else over.delete(e.target);
+    }
+    langWidget.toggleAttribute("data-tucked", over.size > 0);
+  };
+  if (pageFooter) new IntersectionObserver(update, { threshold: 0 }).observe(pageFooter);
+  const clear = document.querySelectorAll("[data-widget-clear]");
+  if (clear.length) {
+    const band = new IntersectionObserver(update, { threshold: 0, rootMargin: "-82% 0px 0px 0px" });
+    clear.forEach((el) => band.observe(el));
+  }
 }
 
 /* -------------------------------------------------------------------- form */
 const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
 if (form) {
-  const status = form.querySelector<HTMLElement>("[data-form-status]");
+  // The script's messages replace the browser's own. Without the script the
+  // browser's validation still runs, because noValidate is only set here.
+  form.noValidate = true;
+  const status = document.querySelector<HTMLElement>("[data-form-status]");
+  const alertBox = form.querySelector<HTMLElement>("[data-form-alert]");
   const submit = form.querySelector<HTMLButtonElement>("button[type=submit]");
   const busyLabel = form.dataset.sendingLabel ?? "…";
   const idleLabel = submit?.textContent ?? "";
+  type Field = HTMLInputElement | HTMLSelectElement;
 
-  const showError = (field: HTMLInputElement | HTMLSelectElement, message: string) => {
-    const holder = field.closest(".field")?.querySelector<HTMLElement>("[data-field-error]");
-    if (!holder) return;
-    holder.textContent = message;
-    field.setAttribute("aria-invalid", "true");
-  };
+  // A practice page's "book" button carries its topic, so the reader does
+  // not have to find their matter again in the list.
+  const tema = new URLSearchParams(location.search).get("tema");
+  const topic = form.querySelector<HTMLSelectElement>("select[name=topic]");
+  if (tema && topic && Array.from(topic.options).some((o) => o.value === tema)) topic.value = tema;
 
-  const clearError = (field: HTMLInputElement | HTMLSelectElement) => {
-    const holder = field.closest(".field")?.querySelector<HTMLElement>("[data-field-error]");
+  const phoneBad = (f: Field) => f.type === "tel" && !!f.value.trim() && f.value.replace(/\D/g, "").length < 7;
+  const errorHolder = (f: Field) => f.closest(".field")?.querySelector<HTMLElement>("[data-field-error]");
+
+  // A field stops being marked the moment it is corrected, not on the next send.
+  form.addEventListener("input", (e) => {
+    const f = e.target as Field;
+    if (f.getAttribute("aria-invalid") !== "true") return;
+    if ((f.required && !f.value.trim()) || phoneBad(f)) return;
+    f.removeAttribute("aria-invalid");
+    const holder = errorHolder(f);
     if (holder) holder.textContent = "";
-    field.removeAttribute("aria-invalid");
+    if (!form.querySelector('[aria-invalid="true"]') && alertBox) alertBox.hidden = true;
+  });
+
+  const busy = (on: boolean) => {
+    if (!submit) return;
+    submit.disabled = on;
+    submit.textContent = on ? busyLabel : idleLabel;
   };
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    let firstInvalid: HTMLElement | null = null;
+    let first: Field | null = null;
+    let missing = false;
 
-    const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-validate]");
-    fields.forEach((field) => {
-      clearError(field);
-      const required = field.hasAttribute("required") && !field.value.trim();
-      const badEmail =
-        field.type === "email" && field.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(field.value);
-      const badPhone =
-        field.type === "tel" && field.value.trim() && field.value.replace(/\D/g, "").length < 7;
-
-      if (required) showError(field, field.dataset.errRequired ?? "");
-      else if (badEmail) showError(field, field.dataset.errEmail ?? "");
-      else if (badPhone) showError(field, field.dataset.errPhone ?? "");
-      else return;
-
-      firstInvalid ??= field;
+    form.querySelectorAll<Field>("input, select").forEach((f) => {
+      const empty = f.required && !f.value.trim();
+      const bad = phoneBad(f);
+      const holder = errorHolder(f);
+      if (holder) holder.textContent = bad ? (form.dataset.phoneMessage ?? "") : "";
+      if (empty || bad) {
+        f.setAttribute("aria-invalid", "true");
+        first ??= f;
+        missing ||= empty;
+      } else {
+        f.removeAttribute("aria-invalid");
+      }
     });
 
-    if (firstInvalid) {
-      (firstInvalid as HTMLElement).focus();
+    if (alertBox) {
+      alertBox.textContent = missing ? (form.dataset.requiredMessage ?? "") : "";
+      alertBox.hidden = !missing;
+    }
+    if (first) {
+      (first as Field).focus();
       return;
     }
 
-    if (submit) {
-      submit.disabled = true;
-      submit.textContent = busyLabel;
-    }
-
+    if (status) status.hidden = true;
+    busy(true);
     try {
       const res = await fetch(form.action, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(Object.fromEntries(new FormData(form) as unknown as Iterable<[string, string]>)),
       });
+      if (res.status === 429) {
+        if (status) {
+          status.textContent = form.dataset.ratelimitMessage ?? "";
+          status.dataset.state = "error";
+          status.hidden = false;
+        }
+        busy(false);
+        return;
+      }
       if (!res.ok) throw new Error(String(res.status));
       form.hidden = true;
       if (status) {
         status.textContent = form.dataset.successMessage ?? "";
         status.dataset.state = "ok";
+        status.hidden = false;
         status.focus();
       }
     } catch {
       if (status) {
-        status.innerHTML = `${form.dataset.failureMessage ?? ""} <a href="tel:${form.dataset.phone}">${form.dataset.phoneDisplay}</a>`;
+        status.textContent = `${form.dataset.failureMessage ?? ""} `;
+        const call = document.createElement("a");
+        call.href = `tel:${form.dataset.phone}`;
+        call.textContent = form.dataset.phoneDisplay ?? "";
+        status.append(call);
         status.dataset.state = "error";
+        status.hidden = false;
       }
-      if (submit) {
-        submit.disabled = false;
-        submit.textContent = idleLabel;
-      }
+      busy(false);
     }
   });
 }

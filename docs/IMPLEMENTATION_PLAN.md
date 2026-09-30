@@ -131,3 +131,22 @@ for a decision or a later pass, each for the reason given.
 - **The breadcrumb nav has no accessible name**; one would need a new word.
 - **The services index's meta description is just "Services"**; part of the
   search item in phase two.
+
+From the first pass at the consultation and payment pages (2026-09-29):
+
+- **Lead delivery.** The form's endpoint accepts and logs requests but sends
+  nothing until `LEAD_INBOX`, `LEAD_FROM` and `RESEND_API_KEY` are set; the
+  client has to name the inbox.
+- **The form without JavaScript** posts form-encoded data to an endpoint that
+  reads only JSON, so it fails. The endpoint should accept a plain post and
+  answer with a page.
+- **The preview cannot take the form.** The preview is served as static
+  files, so `/api/contact` does not exist there; the consultation page can
+  join the preview only once the preview has a server or the form is shown
+  there as call-only.
+- **The language question's label** is "Español / English", two sourced
+  words side by side; neither site has a sourced "preferred language".
+- **English payment wording.** The sister site's English payment title is a
+  question ("Want to make a payment?"); the button falls back to "Payment",
+  under a "Payment" label. A plain "Make a payment" would need the client's
+  English.

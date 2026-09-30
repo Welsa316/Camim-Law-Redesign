@@ -1,9 +1,9 @@
 {
-  "updated": "2026-09-28",
+  "updated": "2026-09-29",
   "now": {
     "phase": 2,
-    "item": "intake",
-    "note": "The consultation page and form need the email address where you would like consultation requests to arrive."
+    "item": "payments-page",
+    "note": "The payments page is being laid out around your existing LawPay link, with the office as the other way to pay."
   },
   "payments": [
     {
@@ -120,13 +120,13 @@
           "name": "Consultation page and intake form",
           "desc": "Name, phone, preferred language and topic, delivered to whichever inbox you name.",
           "status": "waiting",
-          "note": "This needs the email address where you would like consultation requests to arrive."
+          "note": "The page and form are laid out; sending requests needs the email address where you would like them to arrive."
         },
         {
           "id": "payments-page",
           "name": "Payments page",
           "desc": "The existing LawPay link, presented as a page rather than a loose link.",
-          "status": "next"
+          "status": "in_progress"
         },
         {
           "id": "bar-statements",

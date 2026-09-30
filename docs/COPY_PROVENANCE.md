@@ -4,10 +4,10 @@ Every visible string on the built site, checked by `verify/copy-provenance.py` a
 
 | Category | Strings | Words |
 |---|---:|---:|
-| verbatim | 160 | 918 |
-| verbatim-fragment | 49 | 631 |
-| verbatim-parts | 43 | 274 |
-| verbatim-part-of-element | 15 | 24 |
+| verbatim | 162 | 925 |
+| verbatim-fragment | 53 | 640 |
+| verbatim-parts | 41 | 264 |
+| verbatim-part-of-element | 17 | 28 |
 | record | 21 | 66 |
 | paraphrase | 362 | 9695 |
 | unsourced | 0 | 0 |

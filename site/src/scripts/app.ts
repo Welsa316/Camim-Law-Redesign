@@ -191,30 +191,24 @@ if (slides.length > 1) {
 /* ------------------------------------------------------ language switch */
 /* A fixed pill sits on top of whatever scrolls under it. Over body copy that
    is what a floating control does; over the footer's own brand link and its
-   navigation it is a control covering a control, which verify/widget-overlap.py
-   now catches at every scroll position. The switch therefore retracts once the
-   footer arrives — the page has ended, and the header's own pill is still the
-   way back up. */
+   navigation it would be a control covering a control. It used to retract
+   while the footer was on screen, which on a short page meant it was never
+   seen at all. Now it stays, and rides the footer's top edge instead: as the
+   footer comes up under it, it is lifted by exactly as much, so it is on
+   every page and never on the footer. */
 const langWidget = document.querySelector<HTMLElement>("[data-lang-widget]");
 const pageFooter = document.querySelector("footer");
-if (langWidget && "IntersectionObserver" in window) {
-  // Two reasons to step aside, tracked together: the footer is on screen, or
-  // something marked data-widget-clear (a form, whose every field is a
-  // control) is passing through the bottom band the pill floats in.
-  const over = new Set<Element>();
-  const update = (entries: IntersectionObserverEntry[]) => {
-    for (const e of entries) {
-      if (e.isIntersecting) over.add(e.target);
-      else over.delete(e.target);
-    }
-    langWidget.toggleAttribute("data-tucked", over.size > 0);
+if (langWidget && pageFooter) {
+  let queued = false;
+  const dock = () => {
+    queued = false;
+    const lift = Math.max(0, innerHeight - pageFooter.getBoundingClientRect().top);
+    langWidget.style.setProperty("--lw-lift", `${Math.round(lift)}px`);
   };
-  if (pageFooter) new IntersectionObserver(update, { threshold: 0 }).observe(pageFooter);
-  const clear = document.querySelectorAll("[data-widget-clear]");
-  if (clear.length) {
-    const band = new IntersectionObserver(update, { threshold: 0, rootMargin: "-82% 0px 0px 0px" });
-    clear.forEach((el) => band.observe(el));
-  }
+  addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(dock); } }, { passive: true });
+  addEventListener("resize", dock);
+  addEventListener("load", dock);
+  dock();
 }
 
 /* -------------------------------------------------------------------- form */

@@ -40,8 +40,11 @@ const flag = other === "en" ? "/img/flags/us.svg" : "/img/flags/mx.svg";
     border: 1px solid var(--color-line-strong);
     box-shadow: 0 6px 24px rgb(11 31 51 / 0.18);
     text-decoration: none;
-    transition: transform var(--d-state) var(--ease-state), box-shadow var(--d-state) var(--ease-state),
-                opacity var(--d-state) var(--ease-state), visibility var(--d-state);
+    /* Rides the top edge of the footer once the footer comes up under it, so
+       it is on every page without ever sitting on the footer's own links.
+       Set by the script as the page scrolls; no transition, so it tracks. */
+    transform: translateY(calc(-1 * var(--lw-lift, 0px)));
+    transition: box-shadow var(--d-state) var(--ease-state);
   }
   /* Hover deepens the shadow; the pill does not lift. */
   @media (any-hover: hover) { .lw:hover { box-shadow: 0 10px 28px rgb(11 31 51 / 0.24); } }
@@ -57,9 +60,6 @@ const flag = other === "en" ? "/img/flags/us.svg" : "/img/flags/mx.svg";
   /* Below 1024 the switch lives inside the phone bar instead, where nothing
      can be underneath it; at tablet width a floating pill sat on body text on
      every service page. */
-  /* Retracted while the footer is on screen. `visibility` rather than opacity
-     alone, so it leaves the tab order with it. */
-  .lw[data-tucked] { opacity: 0; visibility: hidden; transform: translateY(10px); pointer-events: none; }
   @media (max-width: 1023px) { .lw { display: none; } }
   @media (prefers-reduced-motion: reduce) { .lw { transition: none; } }
 </style>

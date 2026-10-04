@@ -218,23 +218,104 @@ if (langWidget && "IntersectionObserver" in window) {
 }
 
 /* -------------------------------------------------------------------- form */
-const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
-if (form) {
+/* The consultation card: step 1 is the matter, chosen from a list that stays
+   tucked away until opened; step 2 is the person's details; step 3 is the
+   thanks. Panels slide inside a frame whose height follows the current one. */
+const card = document.querySelector<HTMLElement>("[data-stepper]");
+const form = card?.querySelector<HTMLFormElement>("[data-contact-form]");
+if (card && form) {
   // The script's messages replace the browser's own. Without the script the
   // browser's validation still runs, because noValidate is only set here.
   form.noValidate = true;
-  const status = document.querySelector<HTMLElement>("[data-form-status]");
+  type Field = HTMLInputElement;
+  const vp = card.querySelector<HTMLElement>("[data-viewport]")!;
+  const panels = Array.from(card.querySelectorAll<HTMLElement>("[data-panel]"));
+  const dots = Array.from(card.querySelectorAll<HTMLElement>("[data-dot]"));
+  const chosen = card.querySelector<HTMLElement>("[data-chosen]")!;
+  const btn = card.querySelector<HTMLButtonElement>("[data-picker-btn]")!;
+  const list = card.querySelector<HTMLElement>("[data-picker-list]")!;
+  const value = card.querySelector<HTMLElement>("[data-picker-value]")!;
   const alertBox = form.querySelector<HTMLElement>("[data-form-alert]");
-  const submit = form.querySelector<HTMLButtonElement>("button[type=submit]");
-  const busyLabel = form.dataset.sendingLabel ?? "…";
-  const idleLabel = submit?.textContent ?? "";
-  type Field = HTMLInputElement | HTMLSelectElement;
+  const errorBox = form.querySelector<HTMLElement>("[data-form-error]");
+  const done = card.querySelector<HTMLElement>("[data-form-status]");
+  const send = form.querySelector<HTMLButtonElement>("[data-send]");
+  const sendLabel = form.querySelector<HTMLElement>("[data-send-label]");
+  const idleLabel = sendLabel?.textContent ?? "";
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // A practice page's "book" button carries its topic, so the reader does
-  // not have to find their matter again in the list.
+  const go = (n: number) => {
+    card.dataset.step = String(n);
+    panels.forEach((p) => {
+      const k = Number(p.dataset.panel);
+      p.dataset.pos = k === n ? "here" : k < n ? "left" : "right";
+    });
+    dots.forEach((d) => {
+      if (Number(d.dataset.dot) <= n) d.dataset.state = "";
+      else delete d.dataset.state;
+    });
+    const here = panels.find((p) => Number(p.dataset.panel) === n);
+    if (here) vp.style.height = `${here.offsetHeight}px`;
+  };
+  // The frame follows whatever the current panel needs: opening the list,
+  // or a message appearing, grows the card rather than clipping it.
+  const resize = () => go(Number(card.dataset.step));
+  addEventListener("resize", resize);
+  if ("ResizeObserver" in window) {
+    const ro = new ResizeObserver(resize);
+    panels.forEach((p) => ro.observe(p));
+  }
+  // Focus moving inside the clipped frame must not scroll it.
+  vp.addEventListener("scroll", () => { if (vp.scrollTop) vp.scrollTop = 0; });
+
+  const setOpen = (open: boolean, focusList = false) => {
+    list.hidden = !open;
+    btn.setAttribute("aria-expanded", String(open));
+    if (open && focusList) {
+      const target = list.querySelector<HTMLInputElement>("input:checked") ?? list.querySelector<HTMLInputElement>("input");
+      target?.focus({ preventScroll: true });
+      const row = target?.closest("label");
+      if (row) list.scrollTop = Math.max(0, row.offsetTop - list.clientHeight / 2 + row.offsetHeight / 2);
+    }
+    vp.scrollTop = 0;
+  };
+  btn.addEventListener("click", () => setOpen(list.hidden, true));
+  list.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { setOpen(false); btn.focus(); }
+  });
+  document.addEventListener("click", (e) => {
+    if (!list.hidden && !btn.parentElement!.contains(e.target as Node)) setOpen(false);
+  });
+
+  const choose = (input: HTMLInputElement, advance: boolean) => {
+    input.checked = true;
+    const name = input.closest("label")?.querySelector(".topic-name")?.textContent ?? "";
+    chosen.textContent = name;
+    value.textContent = name;
+    btn.dataset.chosen = "";
+    setOpen(false);
+    if (advance) {
+      go(2);
+      setTimeout(() => form.querySelector<HTMLInputElement>("#firstName")?.focus({ preventScroll: true }), reduced ? 0 : 460);
+    }
+  };
+  list.querySelectorAll<HTMLInputElement>("input[name=topic]").forEach((r) => {
+    // A pointer picks. The click a row forwards to its radio, like an arrow
+    // key's, carries no click count and only moves the selection; Enter picks.
+    r.closest("label")?.addEventListener("click", (e) => { if (e.detail > 0) choose(r, true); });
+    r.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); choose(r, true); }
+    });
+  });
+  card.querySelector("[data-back]")?.addEventListener("click", () => {
+    go(1);
+    setTimeout(() => btn.focus({ preventScroll: true }), reduced ? 0 : 460);
+  });
+
+  // A practice page's "book" button carries its matter: start at step 2.
   const tema = new URLSearchParams(location.search).get("tema");
-  const topic = form.querySelector<HTMLSelectElement>("select[name=topic]");
-  if (tema && topic && Array.from(topic.options).some((o) => o.value === tema)) topic.value = tema;
+  const preset = tema ? list.querySelector<HTMLInputElement>(`input[name=topic][value="${CSS.escape(tema)}"]`) : null;
+  if (preset) choose(preset, false);
+  go(preset ? 2 : 1);
 
   const phoneBad = (f: Field) => f.type === "tel" && !!f.value.trim() && f.value.replace(/\D/g, "").length < 7;
   const errorHolder = (f: Field) => f.closest(".field")?.querySelector<HTMLElement>("[data-field-error]");
@@ -250,18 +331,32 @@ if (form) {
     if (!form.querySelector('[aria-invalid="true"]') && alertBox) alertBox.hidden = true;
   });
 
-  const busy = (on: boolean) => {
-    if (!submit) return;
-    submit.disabled = on;
-    submit.textContent = on ? busyLabel : idleLabel;
+  const busy = (state: "busy" | "ok" | null) => {
+    if (!send) return;
+    if (state) send.dataset.state = state;
+    else delete send.dataset.state;
+    send.disabled = state !== null;
+    // The visible label fades for the ring; a screen reader hears this.
+    if (sendLabel) sendLabel.textContent = state === "busy" ? (form.dataset.sendingLabel ?? "") : idleLabel;
+  };
+  const showError = (text: string, withCall: boolean) => {
+    if (!errorBox) return;
+    errorBox.textContent = `${text} `;
+    if (withCall) {
+      const call = document.createElement("a");
+      call.href = `tel:${form.dataset.phone}`;
+      call.textContent = form.dataset.phoneDisplay ?? "";
+      errorBox.append(call);
+    }
+    errorBox.hidden = false;
   };
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (!form.querySelector("input[name=topic]:checked")) { go(1); btn.focus(); return; }
     let first: Field | null = null;
     let missing = false;
-
-    form.querySelectorAll<Field>("input, select").forEach((f) => {
+    panels[1].querySelectorAll<Field>("input[type=text], input[type=tel]").forEach((f) => {
       const empty = f.required && !f.value.trim();
       const bad = phoneBad(f);
       const holder = errorHolder(f);
@@ -274,18 +369,14 @@ if (form) {
         f.removeAttribute("aria-invalid");
       }
     });
-
     if (alertBox) {
       alertBox.textContent = missing ? (form.dataset.requiredMessage ?? "") : "";
       alertBox.hidden = !missing;
     }
-    if (first) {
-      (first as Field).focus();
-      return;
-    }
+    if (first) { (first as Field).focus(); return; }
 
-    if (status) status.hidden = true;
-    busy(true);
+    if (errorBox) errorBox.hidden = true;
+    busy("busy");
     try {
       const res = await fetch(form.action, {
         method: "POST",
@@ -293,33 +384,19 @@ if (form) {
         body: JSON.stringify(Object.fromEntries(new FormData(form) as unknown as Iterable<[string, string]>)),
       });
       if (res.status === 429) {
-        if (status) {
-          status.textContent = form.dataset.ratelimitMessage ?? "";
-          status.dataset.state = "error";
-          status.hidden = false;
-        }
-        busy(false);
+        busy(null);
+        showError(form.dataset.ratelimitMessage ?? "", false);
         return;
       }
       if (!res.ok) throw new Error(String(res.status));
-      form.hidden = true;
-      if (status) {
-        status.textContent = form.dataset.successMessage ?? "";
-        status.dataset.state = "ok";
-        status.hidden = false;
-        status.focus();
-      }
+      busy("ok");
+      setTimeout(() => {
+        go(3);
+        done?.focus({ preventScroll: true });
+      }, reduced ? 0 : 700);
     } catch {
-      if (status) {
-        status.textContent = `${form.dataset.failureMessage ?? ""} `;
-        const call = document.createElement("a");
-        call.href = `tel:${form.dataset.phone}`;
-        call.textContent = form.dataset.phoneDisplay ?? "";
-        status.append(call);
-        status.dataset.state = "error";
-        status.hidden = false;
-      }
-      busy(false);
+      busy(null);
+      showError(form.dataset.failureMessage ?? "", true);
     }
   });
 }

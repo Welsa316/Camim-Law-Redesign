@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-03",
+  "updated": "2026-10-04",
   "now": {
     "phase": 2,
     "item": "payments-page",
-    "note": "The consultation page is now in your preview, and the payments page is being finished in the same style around your existing LawPay link."
+    "note": "The payments page is being built in the same style as the consultation page, with your LawPay link as the main way to pay."
   },
   "payments": [
     {

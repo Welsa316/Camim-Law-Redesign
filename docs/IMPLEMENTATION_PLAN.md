@@ -140,10 +140,12 @@ From the first pass at the consultation and payment pages (2026-09-29):
 - **The form without JavaScript** posts form-encoded data to an endpoint that
   reads only JSON, so it fails. The endpoint should accept a plain post and
   answer with a page.
-- **The preview cannot take the form.** The preview is served as static
-  files, so `/api/contact` does not exist there; the consultation page can
-  join the preview only once the preview has a server or the form is shown
-  there as call-only.
+- **The preview's form endpoint is a stand-in.** The preview is served as
+  static files, so `site/scripts/serve-preview.mjs` answers `/api/contact`
+  itself, the way the real endpoint does with no inbox: it checks the same
+  fields, keeps the same rate limit, logs the request and delivers nothing.
+  When the inbox exists, either the preview gets the real server route or
+  the stand-in forwards to it.
 - **The language question's label** is "Español / English", two sourced
   words side by side; neither site has a sourced "preferred language".
 - **English payment wording.** The sister site's English payment title is a

@@ -1,13 +1,16 @@
 ---
 import Base from "../layouts/Base.astro";
+import TileIcon from "./TileIcon.astro";
 import { t, langPath, type Lang } from "../i18n/ui";
 import { ORG, show } from "../lib/org";
 import { graph, orgSchema, breadcrumbSchema } from "../lib/seo";
 import { demoAllows } from "../lib/site.js";
 
 /* camimlaw.com "Hacer un pago"; camulaw.com payment.subtitle / contactMessage;
-   the LawPay link is a record. Two ways to pay, side by side on a desktop:
-   the firm's existing LawPay page, and the office. */
+   the LawPay link is a record. The same three-tile composition as the
+   consultation page: the firm's existing LawPay page first, as the primary
+   tile, then the office by phone or WhatsApp, with the sister site's own line
+   about arranging payment with the office under them. */
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
@@ -16,8 +19,9 @@ const path = langPath(lang, "pagos");
 const alternates = { es: "/pagos/", en: "/en/pagos/" };
 const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.payment"), url: path }];
 const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
+const addr = ORG.address.value;
 // The English title is the sister site's question ("Want to make a payment?"),
-// which reads badly on a button; the navigation's "Payment" is used there.
+// which reads badly on a tile; the navigation's "Payment" is used there.
 const payLabel = lang === "es" ? _("payment.title") : _("nav.payment");
 ---
 <Base lang={lang} title={`${_("payment.title")} — ${ORG.name.value}`} description={_("payment.subtitle")} path={path} alternates={alternates} schema={schema}>
@@ -31,48 +35,43 @@ const payLabel = lang === "es" ? _("payment.title") : _("nav.payment");
 
   <section class="phead wrap-wide" data-surface="paper">
     <h1 class="h1 phead-title" data-split-lines="hero">{_("payment.title")}</h1>
-    <p class="lead phead-lead">{_("payment.subtitle")}</p>
+    <p class="lead">{_("payment.subtitle")}</p>
   </section>
 
-  <section class="section pbody" data-surface="paper">
-    <div class="wrap-wide pbody-inner">
-      <div class="pway pway--online">
-        <h2 class="eyebrow">{_("nav.payment")}</h2>
-        <a class="btn btn-primary pway-pay" href={ORG.paymentUrl.value} rel="noopener">
-          {payLabel} <span aria-hidden="true">&#8599;</span>
-        </a>
-      </div>
-      <div class="pway pway--office">
-        <h2 class="eyebrow">{_("contact.contact")}</h2>
-        <p class="pway-body">{_("payment.body")}</p>
-        <div class="pway-actions">
-          <a class="btn btn-secondary" href={`tel:${ORG.phone.value}`}>{_("cta.call")} {ORG.phoneDisplay.value}</a>
-          {whatsapp && <a class="btn btn-secondary" href={whatsapp} rel="noopener">{_("cta.whatsapp")}</a>}
-        </div>
-        <p class="pway-hours">{_("contact.monFri")} <span class="apparatus">{ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</span></p>
-      </div>
-    </div>
+  <section class="wrap-wide tiles" aria-label={_("payment.subtitle")}>
+    <a class="tile tile--primary" href={ORG.paymentUrl.value} rel="noopener">
+      <TileIcon name="card" />
+      <span class="tile-label">{payLabel} <span aria-hidden="true">&#8599;</span></span>
+      <span class="tile-meta apparatus">{ORG.paymentProvider.value}</span>
+    </a>
+    <a class="tile" href={`tel:${ORG.phone.value}`}>
+      <TileIcon name="phone" />
+      <span class="tile-label">{_("cta.call")}</span>
+      <span class="tile-meta apparatus">{ORG.phoneDisplay.value}</span>
+    </a>
+    {whatsapp && (
+      <a class="tile" href={whatsapp} rel="noopener">
+        <TileIcon name="whatsapp" />
+        <span class="tile-label">{_("cta.whatsapp")}</span>
+        <span class="tile-meta apparatus">WhatsApp</span>
+      </a>
+    )}
+  </section>
+
+  <section class="wrap-wide pnote">
+    <p class="pnote-body">{_("payment.body")}</p>
+    <p class="office apparatus">{addr.street} <span aria-hidden="true">&middot;</span> {addr.locality}, {addr.region} <span aria-hidden="true">&middot;</span> {_("contact.monFri")} {ORG.hours.value.opens}&ndash;{ORG.hours.value.closes}</p>
   </section>
 </Base>
 
 <style>
   /* One left edge with the logo, as on every other inner page. */
   .phead { padding-block: var(--spacing-s6) 0; display: grid; gap: var(--spacing-s4); justify-items: start; }
+  .phead p { margin: 0; }
   .phead-title { margin: 0; max-width: 16ch; }
-  .phead-lead { margin: 0; }
 
-  .pbody { padding-block: clamp(44px, 4.4vw, 72px) clamp(72px, 7vw, 128px); }
-  .pbody-inner { display: grid; gap: var(--spacing-s7); }
-  .pway { display: grid; gap: var(--spacing-s4); justify-items: start; align-content: start;
-          padding-top: var(--spacing-s5); border-top: 1px solid var(--surface-line); }
-  .pway .eyebrow { margin: 0; }
-  .pway-pay { min-width: 14rem; gap: var(--spacing-s3); }
-  .pway-body { margin: 0; max-width: 34em; }
-  .pway-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-s3); }
-  .pway-hours { margin: 0; color: var(--surface-ink-2); }
-  .pway-hours .apparatus { margin-left: var(--spacing-s2); }
-  /* On a desktop the two ways sit side by side under one rule each. */
-  @media (min-width: 1024px) {
-    .pbody-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacing-s8); }
-  }
+  .pnote { display: grid; gap: var(--spacing-s4); padding-block: var(--spacing-s2) clamp(72px, 7vw, 128px); }
+  .pnote-body { margin: 0; max-width: 34em; padding-left: var(--spacing-s4); border-left: 2px solid var(--surface-line-strong); }
+  .office { margin: 0; color: var(--color-ink-2); }
+  .office span { margin-inline: var(--spacing-s1); }
 </style>

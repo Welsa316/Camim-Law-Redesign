@@ -547,6 +547,35 @@ a { color: inherit; }
 }
 .opener-pill:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 3px; }
 
+/* --- contact tiles: the ways in, on the consultation and payment pages ---- */
+.tiles { display: grid; gap: var(--spacing-s3); padding-block: var(--spacing-s7) var(--spacing-s6); }
+@media (min-width: 768px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-s4); } }
+.tile {
+  display: grid; gap: var(--spacing-s2); align-content: start;
+  min-height: 168px; padding: var(--spacing-s5);
+  border: 1px solid var(--color-line); border-radius: 18px; background: var(--color-paper);
+  color: var(--color-ink); text-decoration: none;
+  transition: border-color var(--d-quick) var(--ease-state), background-color var(--d-quick) var(--ease-state);
+}
+/* Hover changes the border in place; nothing lifts. */
+@media (any-hover: hover) { .tile:hover { border-color: var(--color-ink); } }
+.tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.tile-ico { width: 44px; height: 44px; padding: 10px; border-radius: 12px; background: var(--color-paper-2); color: var(--color-navy); }
+.tile-label { font-size: var(--text-h4); font-weight: var(--font-weight-semibold); line-height: 1.25; margin-top: var(--spacing-s6); }
+.tile-meta { color: var(--color-ink-2); font-size: var(--text-sm); }
+.tile--primary { background: var(--color-navy); border-color: var(--color-navy); color: var(--color-paper); }
+.tile--primary .tile-ico { background: rgb(255 255 255 / 0.12); color: var(--color-paper); }
+.tile--primary .tile-meta { color: #c9d3de; }
+@media (any-hover: hover) { .tile--primary:hover { border-color: var(--color-navy-deep); background: var(--color-navy-deep); } }
+/* On a phone the bar at the bottom already calls and opens WhatsApp, so the
+   tiles shrink to one compact row each rather than three tall cards. */
+@media (max-width: 767px) {
+  .tile { min-height: 0; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: var(--spacing-s4); row-gap: 2px; align-items: center; padding: var(--spacing-s4); }
+  .tile-ico { grid-row: 1 / span 2; }
+  .tile-label { margin-top: 0; }
+}
+
+
 /* --- link with arrow ----------------------------------------------------- */
 .link-arrow {
   display: inline-flex; align-items: baseline; gap: var(--spacing-s2);

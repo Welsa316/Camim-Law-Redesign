@@ -49,6 +49,7 @@ export const ORG = {
     "https://secure.lawpay.com/pages/camposimmigrationlawfirmllc/operating",
     "camimlaw.com header link, every page",
   ),
+  paymentProvider: v("LawPay", "the host of paymentUrl, secure.lawpay.com"),
   googleRating: v(
     { value: 5.0, count: 59, category: "Immigration attorney" },
     "Google Business Profile, read 2026-09-09. Displayed as plain HTML linking to Google; never as AggregateRating schema on our own domain.",

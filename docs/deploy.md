@@ -53,8 +53,10 @@ the folder.
 - Build command: `cd site && npm ci && npm run build`
 - Start command: `node site/dist/server/entry.mjs`
 - Do **not** set `PUBLIC_DEMO`. Confirm `/progress` returns 404 there.
-- The contact endpoint needs `LEAD_INBOX`, `LEAD_FROM` and `RESEND_API_KEY`;
-  without them the form accepts the lead and logs it instead of sending.
+- The contact endpoint sends to juan@camimlaw.com (`ORG.email`; set
+  `LEAD_INBOX` only to override it). It needs `RESEND_API_KEY` and a
+  `LEAD_FROM` on a domain verified in Resend; without them the form accepts
+  the lead and logs it instead of sending.
 
 ## Before any deploy
 

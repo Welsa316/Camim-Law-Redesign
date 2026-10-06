@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { ORG } from "../../lib/org";
 
 export const prerender = false;
 
@@ -80,13 +81,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({ ok: false, error: "bad_email" }, 422);
   }
 
-  const to = import.meta.env.LEAD_INBOX;
+  // The client named the office address on 2026-10-05; LEAD_INBOX overrides it.
+  const to = import.meta.env.LEAD_INBOX || ORG.email.value;
   const key = import.meta.env.RESEND_API_KEY;
   const from = import.meta.env.LEAD_FROM;
 
-  // Not configured yet. Accept the lead and record it in the server log rather
-  // than failing in front of the visitor; the client still has to supply an
-  // inbox before launch (docs/CONTENT_REVIEW.md).
+  // The sending service is not set up yet (a Resend key, and a verified
+  // camimlaw.com sender for LEAD_FROM). Accept the lead and record it in the
+  // server log rather than failing in front of the visitor
+  // (docs/CONTENT_REVIEW.md 1.7).
   if (!to || !key || !from) {
     console.warn("[contact] no inbox configured; lead not delivered:", {
       ...lead,

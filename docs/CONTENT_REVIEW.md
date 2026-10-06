@@ -526,9 +526,11 @@ The current site says "abogados" and "nuestros abogados" in the plural. Sunbiz l
 
 ### 1.7 Where leads go
 
-The contact endpoint accepts submissions and logs them, but delivers nothing until an inbox is configured. **Confirm the address**, and whether WhatsApp or SMS should be offered.
+**Confirmed 2026-10-05:** consultation requests go to **juan@camimlaw.com**, the office address already published on the site (`ORG.email`); `LEAD_INBOX` overrides it if it is ever set. WhatsApp is offered on the consultation page and the phone bar.
 
-**Where:** `LEAD_INBOX`, `LEAD_FROM`, `RESEND_API_KEY` in the environment; `ORG.whatsapp` for the channel.
+**Still needed before requests are delivered:** a Resend account with camimlaw.com verified as a sending domain (DNS records on the domain), its API key as `RESEND_API_KEY`, and a sender on that domain as `LEAD_FROM`. Until then the endpoint, and the preview's stand-in for it, accept each request and write it to the server log, and send nothing.
+
+**Where:** `site/src/pages/api/contact.ts`; `LEAD_FROM` and `RESEND_API_KEY` in the environment.
 
 ### 1.8 Reviews
 

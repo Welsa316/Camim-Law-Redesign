@@ -37,7 +37,7 @@ function contact(req, res) {
       topic: clean(body.topic, 60), preferredLanguage: clean(body.preferredLanguage, 8),
     };
     if (!lead.firstName || !lead.phone || !lead.topic) return json(422, { ok: false, error: "missing_fields" });
-    console.warn("[contact] preview; no inbox configured; lead not delivered:", { ...lead, at: new Date().toISOString() });
+    console.warn("[contact] preview; sending service not set up; lead not delivered:", { ...lead, at: new Date().toISOString() });
     json(200, { ok: true, delivered: false });
   });
 }

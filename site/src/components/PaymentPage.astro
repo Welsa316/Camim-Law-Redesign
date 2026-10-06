@@ -24,7 +24,7 @@ const addr = ORG.address.value;
 // which reads badly on a tile; the navigation's "Payment" is used there.
 const payLabel = lang === "es" ? _("payment.title") : _("nav.payment");
 ---
-<Base lang={lang} title={`${_("payment.title")} — ${ORG.name.value}`} description={_("payment.subtitle")} path={path} alternates={alternates} schema={schema}>
+<Base lang={lang} title={`${_("payment.title")} — ${ORG.name.value}`} description={_("payment.body")} path={path} alternates={alternates} schema={schema}>
 
   <nav class="crumbs wrap-wide">
     <ol>

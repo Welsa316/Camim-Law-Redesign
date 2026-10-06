@@ -24,23 +24,8 @@ export default defineConfig({
     sitemap({
       // The sitemap must match the route table, not intent. Anything that is
       // noindex or a utility route is excluded here rather than being an
-      // advertised soft-404.
-      // A review build renders unconfirmed matter pages so the client can judge
-      // page rhythm. Those must never reach the sitemap or the index.
-      filter: (page) => {
-        if (page.includes("/404")) return false;
-        if (process.env.PUBLIC_REVIEW_BUILD === "1") {
-          const draftSlugs = [
-            "abogado-vawa-orlando", "vawa-lawyer-orlando",
-            "abogado-visa-u-orlando", "u-visa-lawyer-orlando",
-            "abogado-de-deportacion-orlando", "deportation-defense-orlando",
-            "abogado-de-ciudadania-orlando", "citizenship-lawyer-orlando",
-            "abogado-peticiones-familiares-orlando", "family-petitions-orlando",
-          ];
-          if (draftSlugs.some((d) => page.includes(d))) return false;
-        }
-        return true;
-      },
+      // advertised soft-404; verify/search.py holds it to the route table.
+      filter: (page) => !page.includes("/404"),
       i18n: {
         defaultLocale: "es",
         locales: { es: "es-US", en: "en-US" },

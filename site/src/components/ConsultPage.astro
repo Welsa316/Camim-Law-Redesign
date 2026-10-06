@@ -28,7 +28,7 @@ const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 const addr = ORG.address.value;
 const topics = [...SERVICES.map((s) => ({ v: s.slug, n: s.name[lang] })), { v: "otro", n: _("form.notSure") }];
 ---
-<Base lang={lang} title={`${_("contact.title")} — ${ORG.name.value}`} description={_("contact.subtitle")} path={path} alternates={alternates} schema={schema}>
+<Base lang={lang} title={`${_("contact.title")} — ${ORG.name.value}`} description={`${_("contact.subtitle")} · ${_("contact.confidential")} · ${_("contact.virtual")}`} path={path} alternates={alternates} schema={schema}>
 
   <nav class="crumbs wrap-wide">
     <ol>

@@ -57,7 +57,7 @@ const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.att
 const schema = graph([orgSchema(), attorneySchema(lang), breadcrumbSchema(crumbs)]);
 const title = `${ATTORNEY.displayName.value}, ${ATTORNEY.credentialSuffix.value} — ${ORG.name.value}`;
 ---
-<Base lang={lang} title={title} description={es ? camim!.h : bio[0]} path={path} alternates={alternates} schema={schema}>
+<Base lang={lang} title={title} description={es ? "Juan está admitido para ejercer la abogacía ante la Corte Suprema del Estado de Luisiana y es miembro de la American Immigration Lawyers Association (AILA)." : bio[0]} path={path} alternates={alternates} schema={schema}>
   <nav class="crumbs wrap-wide">
     <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
   </nav>

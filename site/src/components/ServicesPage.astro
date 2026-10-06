@@ -20,7 +20,7 @@ const alternates = { es: "/servicios/", en: "/en/servicios/" };
 const crumbs = [{ name: _("nav.home"), url: langPath(lang) }, { name: _("nav.services"), url: path }];
 const schema = graph([orgSchema(), breadcrumbSchema(crumbs)]);
 ---
-<Base lang={lang} title={`${_("nav.services")} — ${ORG.name.value}`} description={_("nav.services")} path={path} alternates={alternates} schema={schema} landing>
+<Base lang={lang} title={`${_("nav.services")} — ${ORG.name.value}`} description={SERVICES.map((s) => s.name[lang]).join(" · ")} path={path} alternates={alternates} schema={schema} landing>
 
   <nav class="crumbs wrap-wide">
     <ol>

@@ -54,8 +54,11 @@ const src = es
       book: "Agende su consulta",
       // camimlaw.com home, "Áreas en las que prestamos servicios"
       where: "Nuestras oficinas están ubicadas en Orlando, sin embargo, atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero.",
-      title: "Campos Immigration Law",                        // camimlaw.com <title>
-      description: "Campos Immigration Law está compuesto por abogados atentos y dedicados que practican exclusivamente la ley de inmigración en los Estados Unidos.",
+      // The title carries the category noun: camimlaw.com about page, fragment.
+      title: "Abogado de inmigración con sede en Orlando — Campos Immigration Law",
+      // camimlaw.com home. Not its "compuesto por abogados" line: this is a
+      // one-attorney firm, and a plural claim about its lawyers misleads.
+      description: "Nuestras oficinas están ubicadas en Orlando, sin embargo, atendemos a clientes en los 50 estados de Estados Unidos y en el extranjero.",
     }
   : {
       display: "Hire an Experienced Immigration Lawyer",     // camimlaw.com services page
@@ -70,7 +73,7 @@ const src = es
       introNote: "We will make sure you understand what is happening with your case", // camulaw home.porQueNosotrosText, fragment
       book: "Schedule your consultation", // camulaw contact.title, fragment
       where: "We serve clients in all 50 states and abroad.", // camulaw home.dondeEstamosText, fragment (without the other firm's location)
-      title: "Campos Immigration Law",
+      title: "Immigration lawyer based in Orlando — Campos Immigration Law", // camimlaw.com services page, fragment
       description: "We are here to help you. Virtual consultation available.",
     };
 

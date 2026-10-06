@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the preview into ../demo/: the landing page, the attorney page and the
-# fourteen practice-area pages, the services index and the consultation page,
-# in both languages, and nothing else. The routes are listed once, in
+# fourteen practice-area pages, the services index, the consultation page and
+# the payments page, in both languages, and nothing else. The routes are listed once, in
 # DEMO_ROUTES in src/lib/site.js, which is what makes every link to anything
 # else render as inert text; this script copies the matching files, so no other
 # route exists at the preview URL even if someone types it.
@@ -9,7 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Kept in step with DEMO_ROUTES by the check below, not by memory.
-ROUTES=("" "juan-campos" "servicios" "consulta" "green-card" "peticiones-familiares" "ciudadania" "defensa-contra-la-deportacion" "visas-especial-para-jovenes" "visas-de-prometido" "asilo" "vawa" "daca" "tramite-consular" "ead" "estatus-de-proteccion-temporal" "visa-u" "visa-t")
+ROUTES=("" "juan-campos" "servicios" "consulta" "pagos" "green-card" "peticiones-familiares" "ciudadania" "defensa-contra-la-deportacion" "visas-especial-para-jovenes" "visas-de-prometido" "asilo" "vawa" "daca" "tramite-consular" "ead" "estatus-de-proteccion-temporal" "visa-u" "visa-t")
 # English-only pages, outside the bilingual pairs above.
 SINGLE=("progress")
 

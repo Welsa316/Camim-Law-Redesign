@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-04",
+  "updated": "2026-10-05",
   "now": {
     "phase": 2,
-    "item": "payments-page",
-    "note": "The payments page is being built in the same style as the consultation page, with your LawPay link as the main way to pay."
+    "item": "seo-redirects",
+    "note": "Every old camimlaw.com address now leads to its new page, and the titles and descriptions search engines show are being finished."
   },
   "payments": [
     {
@@ -120,25 +120,27 @@
           "name": "Consultation page and intake form",
           "desc": "Name, phone, preferred language and topic, delivered to whichever inbox you name.",
           "status": "waiting",
-          "note": "The page and form are built and in your preview; sending requests needs the email address where you would like them to arrive."
+          "note": "Requests will go to juan@camimlaw.com once a few settings are added to the camimlaw.com domain, which we will arrange with you."
         },
         {
           "id": "payments-page",
           "name": "Payments page",
           "desc": "The existing LawPay link, presented as a page rather than a loose link.",
-          "status": "in_progress"
+          "status": "done",
+          "doneOn": "2026-10-05"
         },
         {
           "id": "bar-statements",
           "name": "The statements the Bar rules expect",
           "desc": "The admission limitation and the accompanying notices, in wording you or your counsel supply.",
-          "status": "planned"
+          "status": "waiting",
+          "note": "This needs the sentence, from you or your counsel, saying where you are admitted and that immigration is a federal practice."
         },
         {
           "id": "seo-redirects",
           "name": "Search and existing links",
           "desc": "Sitemap, structured data, titles and descriptions, and a redirect from every old Squarespace address so links already out in the world keep working.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "launch",

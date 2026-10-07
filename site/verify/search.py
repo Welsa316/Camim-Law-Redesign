@@ -10,8 +10,9 @@ Search and existing links, held to the facts rather than to intent.
     answers 404, not a soft 200.
   - The sitemap lists exactly the route table, robots.txt points at it, and
     the sitemap index points at the sitemap.
-  - Each page declares its own canonical, links both languages, has a share
-    image that is served as an image, carries structured data that parses,
+  - Each page declares its own canonical, links both languages, shares its
+    own card (a 1200x630 JPEG no other page uses, with alt text, served as
+    an image; src/lib/og.ts), carries structured data that parses,
     has a title no other page in its language shares, and a description of
     at least 50 characters.
 
@@ -76,6 +77,7 @@ def main() -> int:
 
     titles: dict[tuple[str, str], str] = {}
     og_checked = set()
+    og_owner: dict[str, str] = {}
     for r in routes:
         t = (ROOT / r.lstrip("/") / "index.html").read_text()
         lang = "en" if r.startswith("/en/") else "es"
@@ -85,6 +87,7 @@ def main() -> int:
         canon = g(r'<link rel="canonical" href="([^"]*)"')
         alts = set(re.findall(r'<link rel="alternate" hreflang="([^"]+)"', t))
         og = g(r'<meta property="og:image" content="([^"]*)"')
+        og_alt = g(r'<meta property="og:image:alt" content="([^"]*)"')
         if not title: bad.append(f"{r}: no title")
         elif (lang, title) in titles: bad.append(f"{r}: title '{title}' also used by {titles[(lang, title)]}")
         else: titles[(lang, title)] = r
@@ -92,10 +95,22 @@ def main() -> int:
         if canon != SITE + r: bad.append(f"{r}: canonical is {canon}")
         if not {"es", "en"} <= {a.split("-")[0] for a in alts}: bad.append(f"{r}: hreflang links {sorted(alts)}")
         if not og: bad.append(f"{r}: no og:image")
-        elif og not in og_checked:
-            og_checked.add(og)
-            s, h, _ = get(og.replace(SITE, ""))
-            if s != 200 or not (h.get("Content-Type") or "").startswith("image/"): bad.append(f"{og}: {s} {h.get('Content-Type')}")
+        else:
+            if og in og_owner: bad.append(f"{r}: shares {og} with {og_owner[og]}; each page has its own card")
+            og_owner.setdefault(og, r)
+            if not og_alt: bad.append(f"{r}: share image has no alt text")
+            if og not in og_checked:
+                og_checked.add(og)
+                s, h, body = get(og.replace(SITE, ""))
+                if s != 200 or (h.get("Content-Type") or "") != "image/jpeg": bad.append(f"{og}: {s} {h.get('Content-Type')}")
+                else:
+                    # JPEG frame size from the SOF marker, without an imaging library
+                    i, size = 2, None
+                    while i < len(body) - 9:
+                        if body[i] == 0xFF and body[i + 1] in (0xC0, 0xC1, 0xC2):
+                            size = (int.from_bytes(body[i + 7:i + 9], "big"), int.from_bytes(body[i + 5:i + 7], "big")); break
+                        i += 2 + int.from_bytes(body[i + 2:i + 4], "big") if body[i] == 0xFF else 1
+                    if size != (1200, 630): bad.append(f"{og}: {size}, want 1200x630")
         for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', t, re.S):
             try: json.loads(block)
             except Exception as e: bad.append(f"{r}: structured data does not parse ({e})")

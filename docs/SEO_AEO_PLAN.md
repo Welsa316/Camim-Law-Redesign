@@ -66,6 +66,8 @@ Subdirectory rather than subdomain or ccTLD: this is a language split, not a cou
 
 Spanish at the root is the contested call. In favour: the site already publishes Spanish at the root, the attorney's entire public output is Spanish, the Spanish directory layer is two sites deep against nine, and the Spanish result sets show category mismatches that only occur where supply is short. Against: root-English is the convention and English head terms carry more absolute demand. The architecture is symmetric, so flipping it is a config change plus a redirect map, but flipping it after launch costs a second migration. **This is an explicit client decision, not a default.**
 
+**Decided 2026-10-07: Spanish stays at the root** (`/` in Spanish, `/en/` in English), with `x-default` pointing at the Spanish root. Search Console is set aside for now.
+
 **Flat, descriptive slugs, revised from the first draft of the information architecture.** The first draft nested matters under `/servicios/`. The observed evidence changed that: the pages that rank for these queries are city-scoped service pages, and the benchmark's Spanish inventory is flat and city-scoped. Hierarchy is still expressed, through `BreadcrumbList` structured data and visible breadcrumbs, which do not require nested paths.
 
 **Never `/sp/`.** Three local firms use it. It is not an ISO 639-1 code, and all three also ship zero hreflang tags, which is the real problem the wrong path advertises.

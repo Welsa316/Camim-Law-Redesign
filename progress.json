@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-05",
+  "updated": "2026-10-07",
   "now": {
     "phase": 2,
-    "item": "seo-redirects",
-    "note": "Every old camimlaw.com address now leads to its new page, and the titles and descriptions search engines show are being finished."
+    "item": "intake",
+    "note": "Requests will go to juan@camimlaw.com once a few settings are added to the camimlaw.com domain, which we will arrange with you."
   },
   "payments": [
     {
@@ -140,13 +140,14 @@
           "id": "seo-redirects",
           "name": "Search and existing links",
           "desc": "Sitemap, structured data, titles and descriptions, and a redirect from every old Squarespace address so links already out in the world keep working.",
-          "status": "in_progress"
+          "status": "done",
+          "doneOn": "2026-10-07"
         },
         {
           "id": "launch",
           "name": "Launch on camimlaw.com",
           "desc": "Domain, hosting, certificates, and the switch itself.",
-          "status": "planned"
+          "status": "next"
         }
       ]
     },

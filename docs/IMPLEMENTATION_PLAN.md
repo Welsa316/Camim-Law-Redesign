@@ -152,3 +152,12 @@ From the first pass at the consultation and payment pages (2026-09-29):
   question ("Want to make a payment?"); the button falls back to "Payment",
   under a "Payment" label. A plain "Make a payment" would need the client's
   English.
+
+From the search pass (2026-10-07):
+
+- **Search Console** is set aside on the client's word; it belongs to the
+  phase four "Search, after launch" item.
+- **Two audit warnings.** `npm audit` reports `devalue` (an Astro dependency,
+  already present) and `fflate` (pulled in by `satori`, which only runs at
+  build time on the site's own fonts). Neither is reachable from a visitor's
+  request; take the fixes with the next Astro update rather than forcing them.

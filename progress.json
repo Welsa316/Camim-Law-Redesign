@@ -2,8 +2,8 @@
   "updated": "2026-10-07",
   "now": {
     "phase": 2,
-    "item": "intake",
-    "note": "Requests will go to juan@camimlaw.com once a few settings are added to the camimlaw.com domain, which we will arrange with you."
+    "item": "launch",
+    "note": "The site is ready to go live on camimlaw.com, and the switch waits on the admission sentence, your confirmed office hours, and the settings that let the form reach your inbox."
   },
   "payments": [
     {
@@ -147,7 +147,8 @@
           "id": "launch",
           "name": "Launch on camimlaw.com",
           "desc": "Domain, hosting, certificates, and the switch itself.",
-          "status": "next"
+          "status": "waiting",
+          "note": "The site is ready to go live on camimlaw.com, and the switch waits on the admission sentence, your confirmed office hours, and the settings that let the form reach your inbox."
         }
       ]
     },
@@ -161,7 +162,7 @@
           "id": "videos",
           "name": "The eleven Spanish videos",
           "desc": "Hosting decided, poster frames, captions, and each video placed on the practice-area page it explains.",
-          "status": "planned"
+          "status": "next"
         },
         {
           "id": "broadcast",

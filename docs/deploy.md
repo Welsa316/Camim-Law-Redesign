@@ -49,9 +49,11 @@ Both services come from this repository.
 serves, on top of the `noindex` in each page's head and the `robots.txt` in
 the folder.
 
-**Production service** — not live yet. When it is:
+**Production service** — not live yet. The full procedure, with the DNS that
+must not change and the way back, is `docs/LAUNCH.md`. In short:
 - Build command: `cd site && npm ci && npm run build`
 - Start command: `node site/dist/server/entry.mjs`
+- `HOST=0.0.0.0` is required: without it the server listens on localhost only.
 - Do **not** set `PUBLIC_DEMO`. Confirm `/progress` returns 404 there.
 - The contact endpoint sends to juan@camimlaw.com (`ORG.email`; set
   `LEAD_INBOX` only to override it). It needs `RESEND_API_KEY` and a
